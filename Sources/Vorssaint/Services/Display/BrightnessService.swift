@@ -2237,7 +2237,10 @@ final class BrightnessService: ObservableObject {
 /// through dlopen/dlsym and the feature degrades gracefully wherever one is
 /// missing: no system brightness symbol means no built-in slider, no I2C
 /// symbols mean no external sliders, never a crash.
-private enum BrightnessBridge {
+/// Also used by `LidDisplayDimmer` to write the built-in panel directly by
+/// ID while the lid is closed, when it is off `CGGetOnlineDisplayList`'s
+/// active subset and this class's own display rows do not cover it.
+enum BrightnessBridge {
     typealias GetBrightnessFn = @convention(c) (UInt32, UnsafeMutablePointer<Float>) -> Int32
     typealias SetBrightnessFn = @convention(c) (UInt32, Float) -> Int32
     typealias CreateInfoDictionaryFn = @convention(c) (UInt32) -> Unmanaged<CFDictionary>?
