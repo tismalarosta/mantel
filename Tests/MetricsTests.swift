@@ -41,6 +41,7 @@ struct MetricsTests {
             }),
             ("audio-priority", { AudioPriorityTests.run(suite) }),
             ("shelf", { ShelfFeatureTests.run(suite) }),
+            ("overlays", { OverlayPanelTests.run(suite) }),
             ("updates", {
                 UpdateFeatureTests.run(suite)
                 PostUpdateStatusItemRecoveryTests.run(suite)
