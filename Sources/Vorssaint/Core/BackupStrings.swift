@@ -27,6 +27,7 @@ extension FeatureStrings {
         case .tr: return .tr
         case .ru: return .ru
         case .es: return .es
+        case .sk: return .sk
         case .de: return .de
         case .fr: return .fr
         case .it: return .it
@@ -118,6 +119,19 @@ extension BackupFeatureStrings {
         importConfirmBody: "Los ajustes actuales se sustituyen por los del archivo y la app se reinicia. Nada más cambia en este Mac.",
         importAction: "Importar y reiniciar",
         invalidFile: "Este archivo no es una copia de seguridad válida de Vorssaint."
+    )
+
+    static let sk = BackupFeatureStrings(
+        title: "Záloha",
+        description: "Preneste svoje nastavenia na iný Mac: exportujte všetky predvoľby do súboru a tam ich importujte. Poznámkový blok, história schránky, položky police a systémové povolenia nikdy neopustia tento Mac.",
+        exportButton: "Exportovať nastavenia…",
+        importButton: "Importovať nastavenia…",
+        exported: "Záloha uložená",
+        exportFailed: "Zálohu sa nepodarilo uložiť.",
+        importConfirmTitle: "Importovať tieto nastavenia?",
+        importConfirmBody: "Vaše aktuálne nastavenia sa nahradia nastaveniami zo súboru a aplikácia sa reštartuje. Nič iné na tomto Macu sa nezmení.",
+        importAction: "Importovať a reštartovať",
+        invalidFile: "Tento súbor nie je platná záloha Vorssaint."
     )
 
     static let de = BackupFeatureStrings(

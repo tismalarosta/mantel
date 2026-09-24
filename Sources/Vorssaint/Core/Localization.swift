@@ -4,6 +4,19 @@
 import Combine
 import Foundation
 
+/// The way a language agrees a noun with the number in front of it.
+enum CountAgreement {
+    /// One form for exactly one, another for every other count.
+    case oneAndMany
+    /// Russian: the number's last digits decide. 21 takes the first form and
+    /// 22 the middle one, while 11 through 14 fall back to the last.
+    case byLastDigits
+    /// Slovak: the whole number decides. Only one itself takes the first form
+    /// and only two through four the middle one, so 21 and 22 read
+    /// "21 súborov" and "22 súborov" the same way 25 does.
+    case byWholeNumber
+}
+
 /// Languages the interface can use. The first launch defaults to the system
 /// language; the onboarding and Settings let the user override it at any time.
 enum AppLanguage: String, CaseIterable, Identifiable {
@@ -12,6 +25,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case tr = "tr"
     case ru = "ru"
     case es = "es"
+    case sk = "sk"
     case de = "de"
     case fr = "fr"
     case it = "it"
@@ -23,10 +37,17 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Whether this language puts a distinct form between one and many. Only
-    /// Russian, of the thirteen: two through four take a form of their own,
-    /// so "2 файла" and not "2 файлов".
-    var usesFewCountForm: Bool { self == .ru }
+    /// How this language agrees a counted noun with the number in front of
+    /// it. Two of the fourteen put a distinct form between one and many, and
+    /// they disagree on which numbers take it, so the count itself is not
+    /// enough to pick a form without knowing the language's rule.
+    var countAgreement: CountAgreement {
+        switch self {
+        case .ru: return .byLastDigits
+        case .sk: return .byWholeNumber
+        default: return .oneAndMany
+        }
+    }
 
     /// The language's own name, shown in its own script, the way macOS lists them.
     var displayName: String {
@@ -36,6 +57,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         case .tr: return "Türkçe"
         case .ru: return "Русский"
         case .es: return "Español"
+        case .sk: return "Slovenčina"
         case .de: return "Deutsch"
         case .fr: return "Français"
         case .it: return "Italiano"
@@ -71,8 +93,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         }
 
         let matches: [(String, AppLanguage)] = [
-            ("pt", .ptBR), ("tr", .tr), ("ru", .ru), ("es", .es), ("de", .de), ("fr", .fr),
-            ("it", .it), ("ja", .ja), ("ko", .ko), ("zh", .zhHans),
+            ("pt", .ptBR), ("tr", .tr), ("ru", .ru), ("es", .es), ("sk", .sk), ("de", .de),
+            ("fr", .fr), ("it", .it), ("ja", .ja), ("ko", .ko), ("zh", .zhHans),
         ]
         for (prefix, language) in matches where preferred.hasPrefix(prefix) { return language }
         return .enUS
@@ -95,6 +117,7 @@ final class L10n: ObservableObject {
         case .tr: return .tr
         case .ru: return .ru
         case .es: return .es
+        case .sk: return .sk
         case .de: return .de
         case .fr: return .fr
         case .it: return .it

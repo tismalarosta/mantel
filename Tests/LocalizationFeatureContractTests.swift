@@ -63,8 +63,8 @@ enum LocalizationFeatureContractTests {
             suite.expect(anglesUsed == (language == .fr || language == .ru),
                    "only French and Russian quote with angled marks (\(language.rawValue))")
             let lowOpenUsed = values.contains { $0.contains("„") }
-            suite.expect(lowOpenUsed == (language == .de),
-                   "only German opens a quote with the low mark (\(language.rawValue))")
+            suite.expect(lowOpenUsed == (language == .de || language == .sk),
+                   "only German and Slovak open a quote with the low mark (\(language.rawValue))")
         }
         for (language, strings) in localizedStrings {
             let prefix = "localization \(language.rawValue)"
