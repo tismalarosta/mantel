@@ -51,6 +51,7 @@ struct MetricsTests {
                 ScreenshotPreviewHoverTests.run(suite)
                 ScreenshotWatermarkTests.run(suite)
                 ScreenshotFeatureTests.run(suite)
+                ScreenCaptureToolPickerTests.run(suite)
             }),
             ("recorder", {
                 RecorderFeatureTests.run(suite)
