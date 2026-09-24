@@ -2475,6 +2475,16 @@ enum SwitcherModelFeatureTests {
                "window gestures start with the deliberate control-command chord")
         suite.expect(registeredDefaults[DefaultsKey.windowGestureRaiseWindow] as? Bool == false,
                "window gestures do not change app focus unless requested")
+        suite.expect(registeredDefaults[DefaultsKey.windowLayoutIgnoredApps] as? [String] == [],
+               "window layout ignores no apps by default")
+        suite.expect(WindowLayoutIgnoredApps.contains("com.example.game", in: ["com.example.game"])
+                && !WindowLayoutIgnoredApps.contains("com.example.editor", in: ["com.example.game"])
+                && !WindowLayoutIgnoredApps.contains(nil, in: ["com.example.game"]),
+               "window layout only pauses for the focused app on its list")
+        suite.expect(WindowLayoutIgnoredApps.matches(bundleID: nil,
+                                               executablePath: "/Applications/Game",
+                                               apps: ["/Applications/Game"]),
+               "window layout pauses for a focused executable without a bundle identifier")
         let assignedLayoutShortcutKeys = [
             DefaultsKey.windowLayoutShortcutLeft,
             DefaultsKey.windowLayoutShortcutRight,

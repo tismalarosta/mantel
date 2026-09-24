@@ -115,6 +115,10 @@ struct WindowLayoutSettings: View {
                     }
                 }
 
+                Section(FeatureStrings.windowLayoutIgnoredApps(l10n.language).sectionTitle) {
+                    WindowLayoutIgnoredAppsList()
+                }
+
                 Section(text.gapsSection) {
                     gapPicker(text.windowGap, selection: $windowGap)
                     gapPicker(text.screenGap, selection: $screenGap)
@@ -163,7 +167,9 @@ struct WindowLayoutSettings: View {
                     Toggle(PointerDisplayStrings.localized(l10n.language).title,
                            isOn: $pointerDisplayEnabled)
                         .onChange(of: pointerDisplayEnabled) { _, _ in
-                            pointerDisplay.syncWithPreferences()
+                            // Also syncs the pointer key, and starts or stops
+                            // watching app switches for Ignore apps.
+                            service.syncWithPreferences()
                         }
                     Text(PointerDisplayStrings.localized(l10n.language).caption)
                         .font(.caption)
