@@ -34,7 +34,7 @@ enum AppFeature: String, CaseIterable {
          notchQueue, notchLiveEqualizer, notchDownloads, notchAgents
     // System monitor, one entry per metric family (temperatures live with
     // their parent metric: CPU temp with CPU, battery temp with power).
-    case monitorCPU, monitorGPU, monitorMemory, monitorNetwork, monitorDisk, monitorPower, fanControl
+    case monitorCPU, monitorGPU, monitorMemory, monitorNetwork, monitorDisk, monitorPower, connectedDevices, fanControl
 }
 
 /// Hub sections, in display order.
@@ -118,7 +118,7 @@ extension AppFeature {
              .notchLyrics, .notchQueue, .notchLiveEqualizer, .notchDownloads, .notchAgents:
             return .dynamicIsland
         case .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
-             .fanControl:
+             .connectedDevices, .fanControl:
             return .monitor
         }
     }
@@ -198,6 +198,7 @@ extension AppFeature {
         case .monitorNetwork: return "network"
         case .monitorDisk: return "internaldrive"
         case .monitorPower: return "bolt.fill"
+        case .connectedDevices: return "cable.connector"
         case .fanControl: return "fanblades.fill"
         }
     }
@@ -274,7 +275,7 @@ extension AppFeature {
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .scratchpad,
              .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
              .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
-             .fanControl:
+             .connectedDevices, .fanControl:
             return []
         }
     }
@@ -335,7 +336,8 @@ extension AppFeature {
         case .clipboardHistory, .shelf, .urlCleaner,
              .soundOutputSwitcher,
              .extraBrightness, .bluetoothSleep, .quickLauncher, .colorPicker, .micMute, .mediaTools,
-             .scratchpad, .wallpaper, .monitorGPU, .monitorNetwork, .fanControl, .killProcess, .portManager:
+             .scratchpad, .wallpaper, .monitorGPU, .monitorNetwork, .connectedDevices, .fanControl, .killProcess,
+             .portManager:
             return []
         }
     }

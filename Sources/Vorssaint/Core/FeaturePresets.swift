@@ -119,7 +119,7 @@ extension AppFeature {
         case .notch, .notchCalendar, .notchLyrics, .notchLiveEqualizer, .notchAgents: return .periodic
         case .clipboardHistory, .urlCleaner, .extraBrightness,
              .monitorCPU, .monitorGPU, .monitorMemory,
-             .monitorNetwork, .monitorDisk, .monitorPower:
+             .monitorNetwork, .monitorDisk, .monitorPower, .connectedDevices:
             return .periodic
         case .mixer:
             return UserDefaults.standard.bool(forKey: DefaultsKey.preciseVolumeRollerEnabled)
