@@ -61,6 +61,7 @@ struct WhatsAppDownloadStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -494,6 +495,13 @@ extension WhatsAppDownloadStrings {
                 localNote: "只檢查本機中繼資料。Vorssaint 絕不讀取對話或檔案內容。",
                 notificationFormat: "%1$d 個檔案（%2$@）已移至垃圾桶。%3$d 個失敗。",
                 scanFailed: "無法掃描下載項目。請檢查系統設定中的「檔案與資料夾」。", manageButton: "管理…")
+        case .uk: return OperationalStrings(
+            automaticCaption: uk.automaticCaption, retentionCaption: uk.retentionCaption,
+            manualIntro: uk.manualIntro, resultsFormat: uk.resultsFormat,
+            selectRules: uk.selectRules, cleanSelectedFormat: uk.cleanSelectedFormat,
+            lastRunFormat: uk.lastRunFormat, nextRunFormat: uk.nextRunFormat,
+            firstMessageFormat: uk.firstMessageFormat, localNote: uk.localNote,
+            notificationFormat: uk.notificationFormat, scanFailed: uk.scanFailed, manageButton: uk.manageButton)
         case .enUS: return OperationalStrings(
             automaticCaption: enUS.automaticCaption, retentionCaption: enUS.retentionCaption,
             manualIntro: enUS.manualIntro, resultsFormat: enUS.resultsFormat,
@@ -553,4 +561,46 @@ extension WhatsAppDownloadStrings {
             localNote: value.localNote, notificationTitle: notificationTitle,
             notificationFormat: value.notificationFormat, scanFailed: value.scanFailed, manageButton: value.manageButton)
     }
+    static let uk = WhatsAppDownloadStrings(
+        title: "Завантаження WhatsApp",
+        hubDescription: "Тримає під контролем файли WhatsApp у папці «Викачане»",
+        intro: "Знаходить файли, які macOS підтверджує як такі, що прийшли з WhatsApp. Вміст файлів та чати ніколи не читаються.",
+        automatic: "Очищати автоматично",
+        automaticCaption: "Перевіряє раз на день та відправляє відповідні файли старші за ваш ліміт у Смітник.",
+        folder: "Папка спостереження",
+        accessReady: "Папка «Викачане» доступна",
+        accessDenied: "Vorssaint не має доступу до папки «Викачане». Дозвольте його в розділі «Файли та папки».",
+        fileTypes: "Типи файлів",
+        allTypes: "Усі",
+        image: "Зображення",
+        video: "Відео",
+        audio: "Аудіо та голосові нотатки",
+        document: "Документи",
+        archive: "Архіви",
+        other: "Інше",
+        retention: "Зберегти на",
+        retentionCaption: "Нещодавно змінені файли знову чекають повний період.",
+        daysFormat: "%d дн.",
+        manualIntro: "Скануйте будь-коли. Початковий вибір слідує вашим типам та віковому ліміту; ви можете переглянути кожен підтверджений файл.",
+        noFiles: "У папці «Викачане» не знайдено підтверджених файлів WhatsApp.",
+        resultsFormat: "Підтверджених файлів: %1$d · %2$@",
+        selectRules: "Вибрати за моїми правилами",
+        cleanSelectedFormat: "Перемістити в Смітник: %1$d · %2$@",
+        keep: "Зберегти",
+        manageAgain: "Керувати знову",
+        activity: "Активність",
+        neverRun: "Очищення ще не запускалося.",
+        lastRunFormat: "Останнє очищення %@: файлів: %d · %@ · не вдалося: %d",
+        nextRunFormat: "Наступна автоматична перевірка %@.",
+        firstTitle: "Що з наявними файлами?",
+        firstMessageFormat: "Наявних файлів за вашими правилами: %d. Виберіть, чи автоматизація може керувати ними, чи лише майбутніми завантаженнями.",
+        futureOnly: "Лише майбутні завантаження",
+        includeExisting: "Включити наявні файли",
+        trashNote: "Файли переміщуються в Смітник і залишаються відновлюваними, поки ви не очистите його.",
+        localNote: "Перевіряються лише локальні метадані файлів. Vorssaint ніколи не читає чати або вміст файлів.",
+        notificationTitle: "Очищення WhatsApp",
+        notificationFormat: "Переміщено в Смітник: %1$d (%2$@). Не вдалося: %3$d.",
+        scanFailed: "Не вдалося перевірити папку «Викачане». Перевірте «Файли та папки» в Системних параметрах.",
+        manageButton: "Керувати…"
+    )
 }

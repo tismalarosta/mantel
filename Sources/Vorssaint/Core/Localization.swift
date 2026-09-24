@@ -8,8 +8,8 @@ import Foundation
 enum CountAgreement {
     /// One form for exactly one, another for every other count.
     case oneAndMany
-    /// Russian: the number's last digits decide. 21 takes the first form and
-    /// 22 the middle one, while 11 through 14 fall back to the last.
+    /// Russian and Ukrainian: the number's last digits decide. 21 takes the
+    /// first form and 22 the middle one, while 11 through 14 fall back to the last.
     case byLastDigits
     /// Slovak: the whole number decides. Only one itself takes the first form
     /// and only two through four the middle one, so 21 and 22 read
@@ -31,6 +31,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case it = "it"
     case ja = "ja"
     case ko = "ko"
+    case uk = "uk"
     case zhHans = "zh-Hans"
     case zhTW = "zh-TW"
     case zhHK = "zh-HK"
@@ -38,12 +39,12 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     /// How this language agrees a counted noun with the number in front of
-    /// it. Two of the fourteen put a distinct form between one and many, and
+    /// it. Three of the fifteen put a distinct form between one and many, and
     /// they disagree on which numbers take it, so the count itself is not
     /// enough to pick a form without knowing the language's rule.
     var countAgreement: CountAgreement {
         switch self {
-        case .ru: return .byLastDigits
+        case .ru, .uk: return .byLastDigits
         case .sk: return .byWholeNumber
         default: return .oneAndMany
         }
@@ -66,6 +67,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         case .zhHans: return "简体中文"
         case .zhHK: return "繁體中文（香港）"
         case .zhTW: return "繁體中文（台灣）"
+        case .uk: return "Українська"
         }
     }
 
@@ -94,7 +96,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
         let matches: [(String, AppLanguage)] = [
             ("pt", .ptBR), ("tr", .tr), ("ru", .ru), ("es", .es), ("sk", .sk), ("de", .de),
-            ("fr", .fr), ("it", .it), ("ja", .ja), ("ko", .ko), ("zh", .zhHans),
+            ("fr", .fr), ("it", .it), ("ja", .ja), ("ko", .ko), ("uk", .uk), ("zh", .zhHans),
         ]
         for (prefix, language) in matches where preferred.hasPrefix(prefix) { return language }
         return .enUS
@@ -126,6 +128,7 @@ final class L10n: ObservableObject {
         case .zhHans: return .zhHans
         case .zhHK: return .zhHK
         case .zhTW: return .zhTW
+        case .uk: return .uk
         }
     }
 
@@ -720,8 +723,8 @@ struct Strings {
     let shelfSelectedFormat: String      // + count
     let shelfHint: String
     let shelfItemImage: String
-    // Three forms, not two: Russian agrees a noun with the number in front of
-    // it as one, as two through four, and as five or more. Every other
+    // Three forms, not two: Russian and Ukrainian agree a noun with the number
+    // in front of it as one, as two through four, and as five or more. Every other
     // language here needs only the first and the last, and repeats the last
     // in the middle slot. A pile always holds two or more, so the items count
     // has no singular of its own.

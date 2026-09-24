@@ -26,6 +26,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -113,5 +114,10 @@ extension ShortcutSettingsStrings {
         active: "已啟用",
         inactive: "未啟用",
         superKeyAlternativeFormat: "或 %@"
+    )
+    static let uk = ShortcutSettingsStrings(
+        active: "Активно",
+        inactive: "Неактивно",
+        superKeyAlternativeFormat: "або %@"
     )
 }

@@ -35,6 +35,7 @@ extension FeatureStrings {
         case .it: return .it
         case .ja: return .ja
         case .ko: return .ko
+        case .uk: return .uk
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
@@ -43,6 +44,20 @@ extension FeatureStrings {
 }
 
 extension PortManagerFeatureStrings {
+    static let uk = PortManagerFeatureStrings(
+        title: "Менеджер портів", filter: "Фільтрувати за портом, процесом або PID",
+        openFormat: "Відкрито: %d", empty: "Не знайдено портів, що очікують з’єднання",
+        emptyHint: "Спробуйте оновити список або змінити пошук.",
+        listeningCaption: "Порти, що очікують з’єднання", kill: "Завершити",
+        forceKill: "Примусово завершити",
+        loadFailed: "Не вдалося прочитати список портів. Спробуйте оновити.",
+        refresh: "Оновити", terminateFormat: "Завершити %@?",
+        terminateMessageFormat: "Це закриє порт %d, завершивши процес із PID %d.",
+        hubDescription: "Переглядайте відкриті порти й, якщо встановлено функцію завершення процесів, завершуйте процеси, що їх використовують",
+        allInterfaces: "Усі інтерфейси",
+        allInterfacesHelp: "Очікує з’єднань на всіх мережевих інтерфейсах, тож інші пристрої в мережі, можливо, зможуть підключитися."
+    )
+
     static let enUS = PortManagerFeatureStrings(title: "Port Manager", filter: "Filter by port, process, or PID", openFormat: "%d open", empty: "No listening ports found", emptyHint: "Try refreshing or changing your search.", listeningCaption: "Your listening ports", kill: "Kill", forceKill: "Force Kill", loadFailed: "Could not read listening ports. Try refreshing.", refresh: "Refresh", terminateFormat: "Terminate %@?", terminateMessageFormat: "This closes port %d by terminating PID %d.", hubDescription: "View active listening ports and, with Kill Process installed, terminate the processes using them", allInterfaces: "All interfaces", allInterfacesHelp: "Listening on every network interface, so other devices on the network may be able to connect.")
     static let ptBR = PortManagerFeatureStrings(title: "Gerenciador de portas", filter: "Filtrar por porta, processo ou PID", openFormat: "%d abertas", empty: "Nenhuma porta de escuta encontrada", emptyHint: "Atualize ou altere a busca.", listeningCaption: "Suas portas de escuta", kill: "Encerrar", forceKill: "Forçar encerramento", loadFailed: "Não foi possível consultar as portas. Tente atualizar.", refresh: "Atualizar", terminateFormat: "Encerrar %@?", terminateMessageFormat: "Isso fecha a porta %d encerrando o PID %d.", hubDescription: "Visualize portas de escuta ativas e, com Encerrar Processo instalado, encerre os processos que as utilizam", allInterfaces: "Todas as interfaces", allInterfacesHelp: "Escutando em todas as interfaces de rede, então outros dispositivos na rede podem conseguir se conectar.")
     static let tr = PortManagerFeatureStrings(title: "Port Yöneticisi", filter: "Port, işlem veya PID ile filtrele", openFormat: "%d açık", empty: "Dinleyen port bulunamadı", emptyHint: "Yenilemeyi veya aramanızı değiştirmeyi deneyin.", listeningCaption: "Kullanıcınızın dinleyen portları", kill: "Sonlandır", forceKill: "Zorla sonlandır", loadFailed: "Dinleyen portlar okunamadı. Yenilemeyi deneyin.", refresh: "Yenile", terminateFormat: "%@ sonlandırılsın mı?", terminateMessageFormat: "Bu işlem PID %2$d sonlandırılarak %1$d portunu kapatır.", hubDescription: "Etkin dinleyen portları görüntüleyin ve İşlemi Sonlandır kuruluysa bunları kullanan işlemleri sonlandırın", allInterfaces: "Tüm arayüzler", allInterfacesHelp: "Tüm ağ arayüzlerinde dinliyor, bu yüzden ağdaki diğer cihazlar bağlanabilir.")

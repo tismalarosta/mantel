@@ -1542,6 +1542,7 @@ enum FeatureCatalogTests {
                 case .it: return .it
                 case .ja: return .ja
                 case .ko: return .ko
+                case .uk: return .uk
                 case .zhHans: return .zhHans
                 case .zhTW: return .zhTW
                 case .zhHK: return .zhHK

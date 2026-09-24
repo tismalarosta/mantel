@@ -51,6 +51,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -446,5 +447,32 @@ extension QuickToggleFeatureStrings {
         screenSaverTitle: "啟動螢幕保護程式",
         screenSaverCaption: "在所有顯示器上立即啟動。",
         actionFailed: "無法完成。"
+    )
+    static let uk = QuickToggleFeatureStrings(
+        pageTitle: "Швидкі перемикачі",
+        hubDescription: "Дії в один клік, як-от темний режим і Смітник",
+        panelCaption: "Системні дії в один клік у панелі на смузі меню та в швидкій панелі.",
+        darkModeToDark: "Перемикнути на темний режим",
+        darkModeToLight: "Перемикнути на світлий режим",
+        darkModeCaption: "Змінює вигляд усієї системи.",
+        emptyTrashTitle: "Очистити Смітник",
+        emptyTrashCaption: "Видаляє все зі Смітника.",
+        emptyTrashConfirmTitle: "Очистити Смітник?",
+        emptyTrashConfirmMessage: "Усі елементи в Смітнику будуть видалені. Це не можна скасувати.",
+        emptyTrashConfirmButton: "Очистити Смітник",
+        ejectTitle: "Вийняти всі диски",
+        ejectCaption: "Безпечно виймає всі зовнішні диски.",
+        hiddenFilesShow: "Показати приховані файли",
+        hiddenFilesHide: "Сховати приховані файли",
+        desktopIconsHide: "Сховати значки робочого стола",
+        desktopIconsShow: "Показати значки робочого стола",
+        finderRestartCaption: "Finder перезапускається для застосування.",
+        lockScreenTitle: "Заблокувати екран",
+        lockScreenCaption: "Просить пароль для повернення.",
+        displayOffTitle: "Вимкнути дисплей",
+        displayOffCaption: "Mac продовжує працювати з вимкненим екраном.",
+        screenSaverTitle: "Запустити зберігач екрана",
+        screenSaverCaption: "Запускається одразу, на кожному дисплеї.",
+        actionFailed: "Не вдалося завершити."
     )
 }

@@ -701,10 +701,11 @@ enum ShelfFeatureTests {
             suite.expect(slovakStrings.form(for: count) == wanted,
                    "a language that reads the whole number asks for the right form at \(count)")
         }
-        suite.expect(AppLanguage.allCases.filter { $0.countAgreement != .oneAndMany } == [.ru, .sk]
+        suite.expect(AppLanguage.allCases.filter { $0.countAgreement != .oneAndMany } == [.ru, .sk, .uk]
                && AppLanguage.ru.countAgreement == .byLastDigits
+               && AppLanguage.uk.countAgreement == .byLastDigits
                && AppLanguage.sk.countAgreement == .byWholeNumber,
-               "Russian and Slovak are the two languages of the fourteen that ask for the middle form, each by its own rule")
+               "Russian, Slovak and Ukrainian are the three languages of the fifteen that ask for the middle form, each by its own rule")
 
         expectEqual(ShelfTooltipSupport.text(forFileNamed: "risaPOGCHAMP.gif", resolvedKind: "GIF Image"),
                     "risaPOGCHAMP.gif\nGIF Image",

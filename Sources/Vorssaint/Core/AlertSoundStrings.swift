@@ -8,7 +8,7 @@ import Foundation
 /// match the file name in /System/Library/Sounds (Tink shows as Boop, Ping
 /// as Sonar, and so on). Sourced from Apple's own AlertSounds.loctable so
 /// the picker reads the same as System Settings instead of drifting from
-/// it, and translated only for the fourteen languages this app supports;
+/// it, and translated only for the fifteen languages this app supports;
 /// a name outside this table (a sound this Mac ships that macOS never
 /// renamed) falls back to the file name unchanged.
 enum AlertSoundStrings {
@@ -42,6 +42,7 @@ enum AlertSoundStrings {
         case .de: return de
         case .fr: return fr
         case .it: return it
+        case .uk: return uk
         // Apple's own loctable keeps the English names for these
         // languages too, rather than translating them.
         case .ja, .ko, .zhHans, .zhTW, .zhHK: return enUS
@@ -199,5 +200,22 @@ enum AlertSoundStrings {
         "Sosumi": "Sonumi",
         "Submarine": "Immersione",
         "Tink": "Boop",
+    ]
+
+    private static let uk: [String: String] = [
+        "Basso": "Мецо",
+        "Blow": "Вітерець",
+        "Bottle": "Галька",
+        "Frog": "Стрибок",
+        "Funk": "Модний",
+        "Glass": "Кришталь",
+        "Hero": "Героїня",
+        "Morse": "Понг",
+        "Ping": "Сонар",
+        "Pop": "Булька",
+        "Purr": "Щипок",
+        "Sosumi": "Повідомлення",
+        "Submarine": "Занурення",
+        "Tink": "Тиць",
     ]
 }

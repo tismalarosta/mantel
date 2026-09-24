@@ -66,6 +66,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -713,5 +714,50 @@ extension FanControlFeatureStrings {
         hottestGPU: "GPU最高溫度",
         helperUnavailable: "受保護的風扇控制器無法使用。請在登入項目允許 Vorssaint，然後再試一次。",
         resumeAfterRestart: "重新啟動或睡眠後恢復"
+    )
+    static let uk = FanControlFeatureStrings(
+        title: "Керування вентиляторами",
+        hubDescription: "Керуйте вентиляторами вручну або за температурними кривими, бачачи поточні та цільові об/хв",
+        showInPanel: "Показувати керування вентиляторами в панелі",
+        settingsCaption: "Додає ручні швидкості вентиляторів та температурні криві до панелі на смузі меню.",
+        fanNameFormat: "Вентилятор %d",
+        rpmFormat: "%d об/хв",
+        allowControl: "Дозволити керування вентиляторами",
+        approvalCaption: "Дозвольте Vorssaint у розділі «Автозапуск», щоб використовувати захищений контролер вентиляторів.",
+        openSettings: "Відкрити Системні параметри",
+        noFans: "На цьому Mac немає вентилятора, яким можна керувати.",
+        unsupported: "Керування вентиляторами недоступне на цьому Mac.",
+        alreadyControlled: "Інший процес керує вентиляторами. Спочатку поверніть його під системне керування.",
+        failed: "Вентилятори повернулися під системне керування, оскільки запитане керування не вдалося перевірити.",
+        safetyCaption: "Керування залишається активним, поки ви не повернетесь до «Система». Воно повертається автоматично, якщо програма відключається, Mac засинає, датчики дають збій або зростає термічний тиск.",
+        safetyStopped: "Повернуто під системне керування, оскільки керування вентиляторами було перервано.",
+        menuBarTitle: "Швидкість вентилятора",
+        systemControl: "Система",
+        manualControl: "Вручну",
+        customCurve: "Крива",
+        mode: "Режим керування",
+        coolingIntensity: "Швидкість вентилятора",
+        currentRPMFormat: "Поточні %d об/хв",
+        targetRPMFormat: "Цільові %d об/хв",
+        applyManual: "Застосувати ручне керування",
+        applyCurve: "Застосувати криву вентилятора",
+        returnToSystem: "Системне керування",
+        temperatureUnavailable: "Обраний датчик температури припинив відповідати. Керування вентиляторами повернуто до «Система».",
+        curveUnavailable: "Обраний датчик температури недоступний на цьому Mac.",
+        sensor: "Датчик температури",
+        temperature: "Температура",
+        fanSpeed: "Швидкість вентилятора",
+        addPoint: "Додати точку",
+        addSensor: "Додати датчик",
+        removePoint: "Видалити точку",
+        removeSensor: "Видалити датчик",
+        curveGraph: "Крива температури та швидкості вентилятора",
+        averageSoC: "Середній SoC",
+        hottestSoC: "Найгарячіший SoC",
+        averageCPU: "Середній CPU",
+        hottestCPU: "Найгарячіший CPU",
+        hottestGPU: "Найгарячіший GPU",
+        helperUnavailable: "Захищений контролер вентиляторів недоступний. Дозвольте Vorssaint у розділі «Автозапуск» і спробуйте знову.",
+        resumeAfterRestart: "Відновлювати після перезавантаження або сну"
     )
 }

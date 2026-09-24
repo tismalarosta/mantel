@@ -54,6 +54,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -398,5 +399,28 @@ extension SuperKeyStrings {
         mappingForeignMapping: "另一個 App 嘅按鍵對應用咗所選按鍵。請喺嗰個 App 度移除對應：淨係結束佢唔夠。",
         mappingSystemRefused: "macOS 拒絕咗按鍵對應。請重新接駁鍵盤或者重新啟動 Mac，然後重新開啟呢個功能。",
         keyboardTapRefused: "macOS 唔俾 Vorssaint 監聽鍵盤。請喺系統設定 › 隱私權與安全性 › 輔助使用入面關閉再開啟 Vorssaint，然後重新開啟呢個功能。"
+    )
+    static let uk = SuperKeyStrings(
+        pageTitle: "Супер-клавіша",
+        hubDescription: "Перетворює одну клавішу на обране вами поєднання модифікаторів.",
+        enableToggle: "Використовувати цю клавішу як супер-клавішу",
+        enableCaption: "Утримуйте її та натисніть будь-яку клавішу. Виберіть один або кілька модифікаторів нижче.",
+        modifierKeysNote: "Залиште для цієї клавіші типову дію в розділі «Системні параметри › Клавіатура › Клавіші-модифікатори».",
+        sourceKey: "Клавіша для утримання",
+        capsLockKey: "Caps Lock",
+        rightKeyFormat: "Правий %@",
+        holdHint: "Утримати",
+        soloSection: "Окреме натискання",
+        soloCaption: "Що робить коротке натискання, коли не натиснуто інших клавіш.",
+        soloNothing: "Нічого",
+        soloCapsLock: "Вмикати й вимикати Caps Lock",
+        soloEscape: "Натискати Escape",
+        activeNow: "Зараз працює",
+        panelCaptionFormat: "%1$@ утримує %2$@.",
+        manageButton: "Налаштувати…",
+        soloInputSource: "Перемикати джерело вводу; утримувати для Caps Lock",
+        mappingForeignMapping: "Прив’язка клавіш іншої програми використовує обрану клавішу. Видаліть її у тій програмі: просто закрити її недостатньо.",
+        mappingSystemRefused: "macOS відхилила прив’язку клавіш. Перепідключіть клавіатуру або перезавантажте Mac, потім увімкніть знову.",
+        keyboardTapRefused: "macOS не дозволила Vorssaint стежити за клавіатурою. Вимкніть і знову ввімкніть Vorssaint у розділі «Системні параметри › Приватність і безпека › Доступність», а потім знову ввімкніть цю функцію."
     )
 }

@@ -64,6 +64,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .uk: return .uk
         }
     }
 }
@@ -669,5 +670,47 @@ extension AppUpdateStrings {
         includeOnlineCaption: "支援時會直接向開發者查詢，再用公開目錄補充搜尋。更新由 App 自行安裝。",
         incompleteCheck: "檢查未完成",
         onlineUnavailable: "無法完成網上檢查。其他結果仍然會顯示。"
+    )
+    static let uk = AppUpdateStrings(
+        pageTitle: "Оновлення програм",
+        hubDescription: "Знаходьте та встановлюйте оновлення для ваших програм",
+        caption: "Шукає новіші версії програм на цьому Mac та допомагає завершити кожне оновлення з його першоджерела.",
+        panelCaption: "Подивіться, які програми мають новішу версію",
+        checkNow: "Перевірити зараз",
+        checking: "Перевірка",
+        lastCheckFormat: "Найновіша перевірка %@",
+        neverChecked: "Ще не перевірено",
+        upToDate: "Оновлень не знайдено",
+        partialUpToDate: "При частковій перевірці оновлень не знайдено",
+        coverageNote: "Перевіряє початкові джерела встановлених програм і публічний каталог. Оновлення встановлюються через їхнє початкове джерело.",
+        selectAll: "Вибрати все",
+        clearSelection: "Очистити",
+        updateSelectedFormat: "Оновити %d",
+        updateOne: "Оновити",
+        openAppStore: "Відкрити App Store",
+        appStoreBadge: "App Store",
+        storeHint: "Відкриває App Store, де встановлюється це оновлення",
+        frequencyLabel: "Перевіряти у фоновому режимі",
+        frequencyOff: "Вимкнено",
+        frequencyDaily: "Щодня",
+        frequencyWeekly: "Щотижня",
+        nextCheckFormat: "Наступна перевірка %@",
+        notifyToggle: "Повідомте мене, коли програма має оновлення",
+        includeStoreToggle: "Включити програми з App Store",
+        includeStoreCaption: "Перевіряє версії в магазині для регіону цього Mac. Apple встановлює ці оновлення.",
+        packageMissing: "Homebrew не встановлено, тому програми поки не можна оновити звідси.",
+        notificationBodyFormat: "Програм із новішою версією: %@.",
+        notificationBodyOne: "Одна програма має новішу версію.",
+        showInPanel: "Показати в панелі",
+        homebrewBadge: "Homebrew",
+        sourcesTitle: "Джерела",
+        includeHomebrewToggle: "Включити програми Homebrew",
+        onlineBadge: "Онлайн",
+        openApp: "Відкрити",
+        openAppHint: "Відкриває програму, щоб її власний оновлювач завершив роботу",
+        includeOnlineToggle: "Включити інші встановлені програми",
+        includeOnlineCaption: "Коли підтримується, перевіряє оновлення безпосередньо в розробників програм, а потім використовує публічний каталог. Оновлення встановлює власний механізм програми.",
+        incompleteCheck: "Перевірку не завершено",
+        onlineUnavailable: "Онлайн-перевірку не вдалося завершити. Інші результати все ще показуються."
     )
 }

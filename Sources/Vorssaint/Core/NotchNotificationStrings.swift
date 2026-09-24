@@ -173,6 +173,17 @@ extension FeatureStrings {
             unavailable: "此通知已無法執行此操作。",
             dismissSystemBanner: "收起系統通知",
             dismissSystemBannerHint: "在Dynamic Island顯示片刻後關閉原通知。較長的提示音仍可能被截斷。")
+        case .uk: return NotchNotificationStrings(
+            title: "Сповіщення",
+            description: "Нові системні сповіщення у Dynamic Island.",
+            privacy: "Показує лише нові видимі банери. Повідомлення залишаються в пам’яті та очищаються, коли ви блокуєте цей Mac або вимикаєте цю функцію.",
+            empty: "Нові сповіщення з’являться тут",
+            waiting: "Очікування на службу системних сповіщень",
+            open: "Відкрити",
+            dismiss: "Відхилити",
+            unavailable: "Це сповіщення більше не підтримує цю дію.",
+            dismissSystemBanner: "Закривати системний банер",
+            dismissSystemBannerHint: "Закриває оригінальний банер невдовзі після появи у Dynamic Island. Довші звуки все ще можуть обриватися.")
         }
     }
 }
