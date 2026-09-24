@@ -669,6 +669,23 @@ enum NotchSupport {
         return modules[(index + (backwards ? modules.count - 1 : 1)) % modules.count]
     }
 
+    /// The arrow keys step through a searched list without wrapping; the
+    /// first press, or one after the highlighted row left the list, lands on
+    /// the top result.
+    static func steppedItem<ID: Equatable>(from current: ID?, in ids: [ID], backwards: Bool) -> ID? {
+        guard !ids.isEmpty else { return nil }
+        guard let current, let index = ids.firstIndex(of: current) else { return ids.first }
+        return ids[min(max(index + (backwards ? -1 : 1), 0), ids.count - 1)]
+    }
+
+    /// The row a search leaves highlighted: the current one while it is still
+    /// listed, otherwise the top result of a typed search, so Return pastes it
+    /// like the history window does. An empty search waits for the first arrow.
+    static func searchHighlight<ID: Equatable>(keeping current: ID?, in ids: [ID], query: String) -> ID? {
+        if let current, ids.contains(current) { return current }
+        return query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : ids.first
+    }
+
     /// A working agent outranks the music it plays over: its turn ends on its
     /// own, while music is there all day.
     static func compactActivity(timer: Bool, downloads: Bool, agents: Bool = false, music: Bool) -> NotchCompactActivity? {
