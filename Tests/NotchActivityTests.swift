@@ -497,6 +497,26 @@ enum NotchActivityTests {
     }
 
     private static func compactTimerContracts(_ suite: TestSuite) {
+        suite.expect(NotchSupport.compactCompanion(timer: true, running: true, downloads: true, agents: true, music: true) == .downloads
+               && NotchSupport.compactCompanion(timer: true, running: true, downloads: false, agents: true, music: true) == .agents
+               && NotchSupport.compactCompanion(timer: true, running: true, downloads: false, agents: false, music: true) == .music
+               && NotchSupport.compactCompanion(timer: true, running: true, downloads: false, agents: false, music: false) == nil,
+               "a running timer shares the island with the next live activity, in the island's own order")
+        suite.expect(NotchSupport.compactCompanion(timer: true, running: false, downloads: false, agents: true, music: true) == nil
+               && NotchSupport.compactCompanion(timer: true, running: false, downloads: false, agents: false, music: true) == nil
+               && NotchSupport.compactCompanion(timer: true, running: false, downloads: true, agents: true, music: true) == .downloads,
+               "a paused or finished timer keeps its mark beside music or agents, and a download still takes the wing")
+        for running in [false, true] {
+            for downloads in [false, true] {
+                for agents in [false, true] {
+                    for music in [false, true] {
+                        suite.expect(NotchSupport.compactCompanion(timer: false, running: running, downloads: downloads,
+                                                                   agents: agents, music: music) == nil,
+                               "without a timer, one activity keeps both wings of the island")
+                    }
+                }
+            }
+        }
         let screen = CGRect(x: 0, y: 0, width: 1470, height: 956)
         for barHeight: CGFloat in [16, 22, 24, 32, 40, 64] {
             for notched in [false, true] {
@@ -514,6 +534,10 @@ enum NotchActivityTests {
                                 suite.expect(compact.compactActivityCameraGap == original.cameraWidth
                                        && compact.compactActivityContentHeight == original.stripHeight,
                                        "narrower timer wings still clear the camera and keep the cutout's height")
+                                let cover = compact.compactMusicArtworkSide
+                                suite.expect(compact.compactActivityEdgeInset(boxHeight: cover, radius: compact.compactMusicArtworkRadius)
+                                                + cover <= compact.compactActivityWingWidth,
+                                       "the playing track's cover fits the timer's left wing without touching its curve")
                             } else if notched {
                                 suite.expect(!compact.compactActivityUsesFooter && compact.compactActivityWingWidth == 0,
                                        "unavailable menu space retracts timer wings without drawing over adjacent menus")
