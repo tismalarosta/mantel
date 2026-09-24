@@ -303,6 +303,11 @@ def main():
           + "leftoverOwner(entry: url.lastPathComponent, url: url, usesContainerMetadata: metadata)\n}\n"
           + "static func canRemove(_ item: Item, installed: Set<String> = []) -> Bool {\n"
           + "mayRemove(item, installed: installed)\n}\n}\n")
+    write("CleanerScanFlow.swift", "import Foundation\nextension CleanerScanFlowTests {\n"
+          + declaration(cleaner, "    enum Phase:")
+          + "final class Scanner: ScannerState {\nstatic let shared = Scanner()\n"
+          + "".join(declaration(cleaner, prefix) for prefix in ["    func reset()", "    func scan()"])
+          + "}\n}\n")
 
     super_key = "Sources/Vorssaint/Services/SuperKey/SuperKeyService.swift"
     write("SuperKeyTap.swift", "import CoreGraphics\nimport Foundation\n"
