@@ -81,6 +81,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         // keyboard shortcuts (Cmd+H/M/W/Q and the Edit shortcuts Cmd+C/V/X/A) have
         // no menu items to fire and do nothing in the Settings window. Install one.
         installMainMenu()
+        HorizontalWheelScrolling.install()
         PanelLayout.resetCollapsedSectionsOnce(for: "2.15.1")
 
         statusController = StatusItemController()

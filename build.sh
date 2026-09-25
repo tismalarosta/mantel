@@ -466,6 +466,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/SessionActivity.swift
         Sources/Vorssaint/Services/SessionActivitySupport.swift
         Sources/Vorssaint/Services/ScrollWheelSupport.swift
+        Sources/Vorssaint/Services/HorizontalWheelScrolling.swift
         Sources/Vorssaint/Services/SmoothScrollSupport.swift
         Sources/Vorssaint/Services/MouseAcceleration/MouseAccelerationSupport.swift
         Sources/Vorssaint/Services/FocusFollowsMouse/FocusFollowsMouseSupport.swift

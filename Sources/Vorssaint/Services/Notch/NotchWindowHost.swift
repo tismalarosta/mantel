@@ -813,7 +813,8 @@ final class NotchPanel: NSPanel {
     }
 
     override func sendEvent(_ event: NSEvent) {
-        if event.type == .scrollWheel, handleScroll?(event) == true { return }
+        if event.type == .scrollWheel,
+           handleScroll?(event) == true || HorizontalWheelScrolling.handle(event) { return }
         super.sendEvent(event)
     }
 }

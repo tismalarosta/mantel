@@ -38,6 +38,7 @@ Dynamic Island gains optional calendar and music indicators, room for a timer be
 - Clipboard History loads image previews in the background, keeps pinned entries within its storage limit, and reports when a quick paste cannot reach its target. Command Bar reports failed copies and changes brightness on the display under the pointer.
 - App Switcher preserves focus order and avoids a second focus attempt after a window is already in front. It and Dock Preview no longer hit controls at the top-left of a window they activate; minimal Dock previews no longer leave empty bands.
 - Panels, captures and window drops follow the pointer's display even at its top edge. Floating panels stay out of tiling window managers.
+- A mouse wheel now scrolls sideways lists, such as the Dynamic Island mixer and App Switcher, when nothing around them scrolls vertically.
 - A window capture includes a sheet on macOS 27. Shelf files in Dynamic Island respond to the first click and can be dragged out; the screenshot preview responds to Command-W.
 - Settings search keeps keyboard focus. The capture tool picker and Dynamic Island settings fit narrow windows, and the Features hub and menu panel improve VoiceOver labels and explanations.
 - The Cleaner and Uninstaller can cancel a scan. Permission reset, complete uninstall, settings export, automatic cleanup, Super key access and partial microphone mute failures report when they could not finish. Permission reset now stops before revoking access if sleep restoration or system-service detachment fails.
