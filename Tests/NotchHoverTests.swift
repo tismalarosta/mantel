@@ -39,6 +39,8 @@ enum NotchHoverTests {
     final class Host {
         var visible = true
         var rect = CGRect.zero
+        var departsContent = true
+        func finishDeparture() { departsContent = false }
         var isConcealedForMissionControl = false
         var revealChecks = 0
         func blocksHoverReveal() -> Bool {
@@ -50,7 +52,7 @@ enum NotchHoverTests {
                 .contains(CGPoint(x: point.x - rect.minX, y: rect.maxY - point.y))
         }
     }
-    enum NotchContentTransition { case none, reveal, dismiss, replace }
+    enum NotchContentTransition { case none, reveal, dismiss, depart, replace }
     class State {
         var hiddenInFullscreen = false
         var showsSystemFeedback = true, routesNotices = true
@@ -60,6 +62,8 @@ enum NotchHoverTests {
         var captureControls: Bool?, notice: NotchNotice?
         var noticeExpanded = false
         var noticeWork: DispatchWorkItem?
+        var departingNotice: NotchNotice?
+        var departureWork: DispatchWorkItem?
         var compactActivity: NotchCompactActivity?
         var hoverState = NotchHoverState()
         var hiddenHoverMonitors: [Any] = []
