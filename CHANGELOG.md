@@ -7,14 +7,22 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island's closed timer takes less space beside music and other activity. Settings highlights linked sections as a single group.
+Settings is easier to navigate, highlights linked sections together, and preserves Dynamic Island preferences when importing older backups. Dynamic Island adds an optional outline, animates compact music as playback ends, and improves play/pause for video players. Its compact timer adapts to the space beside other activity.
+
+### Added
+- Dynamic Island can show an optional outline, white at rest and orange around a compact timer, including in the layout preview.
 
 ### Changed
 - The compact timer strip fits its wings to the reading and companion, places their content at the island's ends, and resizes when the reading or working agents change.
-- Settings outlines a linked section once instead of outlining each control separately. Thanks to @npcmail010.
+- Settings groups the sidebar into sections, opens tool options in focused pages, and makes the Features catalog and navigation easier to use. Linked settings receive one outline around the whole section.
+- Compact music stays visible while the island retracts, fades into another activity, and yields to new playback. Reduce Motion skips the animation.
 
 ### Fixed
 - Importing a backup from before Dynamic Island keeps this Mac's island settings and explains that a newer export is needed to copy them.
+- Dynamic Island play/pause works with the active video player even when its media session has no item identifier.
+
+### Contributors
+Thanks to @npcmail010.
 
 ## [3.4.0-beta.5] - 2026-09-25
 
