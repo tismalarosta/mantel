@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.4.0-beta.5] - 2026-09-25
 
 ### Summary
 Dynamic Island gains optional calendar and music indicators, room for a timer beside music or a working agent, and a spring animation. This beta also adds audio device priority, more window layouts, screenshot sharing, pinned Shelf items, and Slovak and Ukrainian. It fixes focus and permission-reset issues while reducing background work and screenshot editor memory use.
