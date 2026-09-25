@@ -7,12 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Settings is easier to navigate, highlights linked sections together, and preserves Dynamic Island preferences when importing older backups. Dynamic Island adds an optional outline, animates compact music as playback ends, and improves play/pause for video players. Its compact timer adapts to the space beside other activity.
+Settings is easier to navigate, highlights linked sections together, and preserves Dynamic Island preferences when importing older backups. New Dynamic Island setups start compact with their sections turned on, and the island adds an optional outline, animated compact music and better play/pause for video players. Features installed from the Features hub now start working right away.
 
 ### Added
 - Dynamic Island can show an optional outline, white at rest and orange around a compact timer, including in the layout preview.
 
 ### Changed
+- A new Dynamic Island setup starts compact, opens by click, keeps the app panel in its own window and installs its extensions, with lyrics, queue, notifications, agents, downloads and activity indicators turned on. Islands already set up keep their current behavior.
+- Installing a feature from its Features hub row, a preset or the first-run picker turns on its main behavior unless an earlier choice was saved, so tools such as Quit on Close work right away. Install all only makes features available.
 - The compact timer strip fits its wings to the reading and companion, places their content at the island's ends, and resizes when the reading or working agents change.
 - Settings groups the sidebar into sections, opens tool options in focused pages, and makes the Features catalog and navigation easier to use. Linked settings receive one outline around the whole section, and display brightness shortcuts show an icon.
 - Compact music stays visible while the island retracts, fades into another activity, and yields to new playback. Reduce Motion skips the animation.
