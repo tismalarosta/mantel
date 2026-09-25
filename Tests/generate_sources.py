@@ -511,7 +511,7 @@ def main():
           + "".join(declaration(notch, prefix).replace("    private ", "    ", 1) for prefix in [
               "    private func handleScroll(", "    private func handleSectionScroll("])
           + "}\n}\n")
-    write("NotchPresentationRefresh.swift", "import Foundation\nimport Combine\n"
+    write("NotchPresentationRefresh.swift", "import AppKit\nimport Foundation\nimport Combine\n"
           + "extension NotchPresentationRefreshContract {\nfinal class Service: State {\n"
           + "func hover(_ entered: Bool) {\nlet wasInside = inside\n"
           + "inside = windowHost?.containsHover(NSEvent.mouseLocation) == true\n"
@@ -527,6 +527,8 @@ def main():
           + declaration(notch, "    var showsSystemFeedback:")
           + declaration(notch, "    var usesGlassSurface:")
           + declaration(notch, "    var expandedGeometry:").replace("var expandedGeometry", "override var expandedGeometry", 1)
+          + declaration(notch, "    private func compactMusicTransition(").replace("private func", "func", 1)
+          + declaration(notch, "    private func rememberPresentedMusic(").replace("private func", "func", 1)
           + declaration(notch, "    func refreshPresentation(")
           + declaration(notch, "    private func applyMenuSpace(").replace("private func", "func", 1)
           + declaration(notch, "    func updateCaptureHeight(")
