@@ -10,6 +10,9 @@ import QuartzCore
 /// clipboard, keyboard input or hardware controls. Tests keep the window
 /// invisible; the separate, explicitly requested notice preview is visible.
 enum NotchPresentationProbe {
+    private static let silhouette = NotchSilhouette.current()
+    private static var contentTopInset: CGFloat { (silhouette.gap / 2).rounded(.down) }
+
     /// Exercise the production backdrop, including its native glass rendering,
     /// without changing the app's preferences or making the test windows visible.
     private static func surface(_ presentation: NotchBackdropPresentation) -> AnyView {
@@ -42,13 +45,15 @@ enum NotchPresentationProbe {
     private static func checkBackdrop(_ host: NotchWindowHost, failures: inout [String]) {
         host.synchronizeBackdropProbe()
         let background = host.backdropProbeFrame
-        if let silhouette = host.silhouetteProbePath,
-           host.backdropProbePath != silhouette {
+        if !host.backdropProbeFollowsSilhouette {
             failures.append("backdrop contour differs from the animated silhouette")
         }
         let visible = host.visibleFrame.size
-        if abs(background.width - visible.width) > 2 || abs(background.height - visible.height) > 2
-            || abs(background.minY) > 0.5 {
+        let side = silhouette == .capsule ? NotchLayout.capsuleSide(height: visible.height) : 0
+        let gap = min(silhouette.gap, visible.height)
+        if abs(background.width - (visible.width - 2 * side)) > 2
+            || abs(background.height - (visible.height - gap)) > 2
+            || abs(background.minY - gap) > 0.5 {
             failures.append("backdrop detached from the animated silhouette: \(background), visible \(visible)")
         }
         if !host.backdropProbeIndependent {
@@ -84,7 +89,7 @@ enum NotchPresentationProbe {
                     failures.append("hidden reveal has no intermediate frames (opening \(index), safe area \(safeArea))")
                 }
                 if abs(host.panel.frame.maxY - screen.frame.maxY) > 0.5
-                    || abs(host.contentTopOnScreen - screen.frame.maxY) > 0.5
+                    || abs(host.contentTopOnScreen - (screen.frame.maxY - contentTopInset)) > 0.5
                     || !host.containsHover(CGPoint(x: screen.frame.midX, y: screen.frame.maxY)) {
                     failures.append("hidden reveal detached from the screen edge or lost stationary hover")
                 }
@@ -154,6 +159,9 @@ enum NotchPresentationProbe {
             host.present(size: geometry.expanded, geometry: geometry, animated: true,
                          transitionContent: .reveal, usesGlass: true)
             let fadeStarted = host.contentProbeAnimating
+            if host.contentProbeBlurred || host.contentProbeGrowing {
+                failures.append("a page opened at once blurred or grew as if the island moved")
+            }
             host.panel.orderFrontRegardless()
             advance(0.02)
             if !fadeStarted || host.contentProbeOpacity > 0.01 {
@@ -377,10 +385,15 @@ enum NotchPresentationProbe {
             || host.panel.level.rawValue >= NSWindow.Level.popUpMenu.rawValue {
             failures.append("top-edge activation must outrank status items while leaving native menus above the island")
         }
-        if let mask = host.panel.contentView?.layer?.mask as? CAShapeLayer,
-           let path = mask.path {
-            if !path.contains(CGPoint(x: 12, y: 1))
-                || path.contains(CGPoint(x: 12, y: geometry.collapsed.height - 1)) {
+        if let path = host.silhouetteProbePath {
+            let box = path.boundingBoxOfPath
+            let inverted = silhouette == .capsule
+                ? abs(box.minY - silhouette.gap) > 0.5
+                    || path.contains(CGPoint(x: box.midX, y: silhouette.gap / 2))
+                    || !path.contains(CGPoint(x: box.midX, y: box.midY))
+                : !path.contains(CGPoint(x: 12, y: 1))
+                    || path.contains(CGPoint(x: 12, y: geometry.collapsed.height - 1))
+            if inverted {
                 failures.append("physical silhouette is inverted")
             }
         }
@@ -401,6 +414,8 @@ enum NotchPresentationProbe {
         var maxAnchorError: CGFloat = 0
         var maxContentError: CGFloat = 0
         var canvasChangedSize = false
+        var contentStage: CGSize?
+        var stageChanged = false
         var noticeHeightLimit: CGFloat?
         var lostStationaryHover = false
         var hoverHosts = [host]
@@ -415,8 +430,12 @@ enum NotchPresentationProbe {
                 closingGlassOpenness = host.backdropProbeOpenness
             }
             if host.contentCanvasSize != host.panel.frame.size { canvasChangedSize = true }
+            let stage = host.contentStageSize
+            if let first = contentStage, first != stage { stageChanged = true }
+            contentStage = stage
+            if stage.width < host.panel.frame.width || stage.height < host.panel.frame.height { stageChanged = true }
             maxAnchorError = max(maxAnchorError, abs(host.panel.frame.maxY - (screen.frame.maxY)))
-            maxContentError = max(maxContentError, abs(host.contentTopOnScreen - host.panel.frame.maxY))
+            maxContentError = max(maxContentError, abs(host.contentTopOnScreen - (host.panel.frame.maxY - contentTopInset)))
             if abs(host.visibleFrame.maxY - host.panel.frame.maxY) > 0.5 {
                 failures.append("visible silhouette detached from window top")
             }
@@ -438,9 +457,18 @@ enum NotchPresentationProbe {
                 sample()
             }
         }
+        let restingContour = host.backdropProbeContour
         host.present(size: geometry.expanded, geometry: geometry, animated: true, transitionContent: .reveal, usesGlass: true)
+        // SwiftUI draws the new contour a frame later; a window grown to
+        // open must not move what it already drew.
+        if !reduceMotion, host.backdropProbeContour != restingContour {
+            failures.append("growing the reserved area moved the drawn backdrop")
+        }
         if !reduceMotion, !host.contentProbeAnimating {
             failures.append("opening content has no reveal transition")
+        }
+        if !reduceMotion, !host.contentProbeGrowing || !host.contentProbeBlurred {
+            failures.append("opening content arrived without growing into focus")
         }
         if !reduceMotion, host.backdropProbeOpenness > 0.01 {
             failures.append("glass opened at full strength over the black strip it grows out of")
@@ -454,8 +482,13 @@ enum NotchPresentationProbe {
         if intermediate.height <= geometry.collapsed.height || intermediate.height >= geometry.expanded.height {
             if !reduceMotion { failures.append("opening has no intermediate frames") }
         }
+        if !reduceMotion, host.contentProbeGrowthDrift > 0.5 {
+            failures.append("growing content left the island's top centre: \(host.contentProbeGrowthDrift)")
+        }
         if !reduceMotion {
-            if !matchesNativeFrame(host.panel.frame, geometry.frame(for: geometry.expanded)) { failures.append("opening did not reserve its backing area") }
+            let reserved = NotchMotion.reservation(NotchMotion.envelope(from: geometry.collapsed, to: geometry.expanded),
+                                                   centring: geometry.expanded)
+            if !matchesNativeFrame(host.panel.frame, geometry.frame(for: reserved)) { failures.append("opening did not reserve its backing area") }
             let outside = CGPoint(x: host.panel.frame.minX + 12, y: host.panel.frame.minY + 4)
             if host.contains(outside) { failures.append("transparent transition area accepted an interaction") }
             if let canvas = host.panel.contentView {
@@ -477,6 +510,9 @@ enum NotchPresentationProbe {
         let openingResizes = nativeResizes
         if !reduceMotion, host.backdropProbeOpenness < 0.99 {
             failures.append("settled glass stayed partly closed")
+        }
+        if host.contentProbeBlurred || host.contentProbeGrowing {
+            failures.append("arrived content kept its blur or growth")
         }
         tracksClosingGlass = true
         host.present(size: geometry.notice, geometry: geometry, animated: true, transitionContent: .dismiss)
@@ -505,6 +541,9 @@ enum NotchPresentationProbe {
         }
         if host.contentProbeOpacity != 1 {
             failures.append("settled content remained hidden")
+        }
+        if host.contentProbeBlurred || host.contentProbeGrowing {
+            failures.append("content settled after closing kept its blur or growth")
         }
         if completedActions != 1 { failures.append("transition completion did not run exactly once") }
         // A leaving notice stays drawn while the shape closes around it, and
@@ -558,7 +597,7 @@ enum NotchPresentationProbe {
         }
         downloadHost.present(size: crowded.expanded, geometry: crowded, animated: true, usesGlass: true)
         advance(0.6)
-        if downloadHost.backdropProbeScheduled || downloadHost.backdropProbePath != downloadHost.silhouetteProbePath {
+        if downloadHost.backdropProbeScheduled || !downloadHost.backdropProbeFollowsSilhouette {
             failures.append("settled expanded backdrop kept an intermediate contour or scheduler")
         }
         downloadHost.panel.orderOut(nil)
@@ -573,7 +612,10 @@ enum NotchPresentationProbe {
             advance(0.04)
             let beforeReverse = host.visibleFrame
             host.present(size: geometry.collapsed, geometry: geometry, animated: true)
-            if !reduceMotion, abs(beforeReverse.height - host.visibleFrame.height) > 0.5 {
+            // The window is drawn with its new frame inside the call, and the
+            // island keeps moving meanwhile, so the reversal is judged by
+            // where its motion starts.
+            if !reduceMotion, abs(beforeReverse.height - (host.motionProbeStart?.height ?? .infinity)) > 0.5 {
                 failures.append("reversing the animation jumped to an endpoint")
             }
             advance(0.04)
@@ -599,6 +641,9 @@ enum NotchPresentationProbe {
         noticeHeightLimit = nil
         if maxAnchorError > 0.5 { failures.append("window detached from top: \(maxAnchorError)") }
         if canvasChangedSize { failures.append("content canvas escaped its stable native backing area") }
+        // SwiftUI redraws a resized hosting view a frame late; the island's
+        // content must never be resized with the window around it.
+        if stageChanged { failures.append("the content stage changed with the window or did not cover it") }
         if maxContentError > 0.5 { failures.append("content detached from window top: \(maxContentError)") }
         let pasteboard = NSPasteboard.withUniqueName()
         let fixture = URL(fileURLWithPath: "/tmp/notch-presentation-probe.txt")
@@ -698,7 +743,7 @@ enum NotchPresentationProbe {
                 || !screen.frame.contains(bubbles.panel.frame) {
                 failures.append("floating controls changed the notch content width or escaped the display")
             }
-            if abs(bubbles.contentTopOnScreen - bubbles.panel.frame.maxY) > 0.5 {
+            if abs(bubbles.contentTopOnScreen - (bubbles.panel.frame.maxY - contentTopInset)) > 0.5 {
                 failures.append("floating controls displaced the content below the top anchor")
             }
             if !bubbles.quickAccessProbeInteractive || bubbles.quickAccessProbeCenters.count != 3 {
@@ -849,7 +894,7 @@ enum NotchPresentationProbe {
                         RunLoop.current.run(until: Date().addingTimeInterval(0.008))
                         if abs(timerHost.panel.frame.maxY - screen.frame.maxY) > 0.5
                             || abs(timerHost.panel.frame.height - next.stripHeight) > 0.5
-                            || abs(timerHost.contentTopOnScreen - screen.frame.maxY) > 0.5 {
+                            || abs(timerHost.contentTopOnScreen - (screen.frame.maxY - contentTopInset)) > 0.5 {
                             failures.append("compact timer moved below the camera during a menu-space transition")
                             break
                         }
@@ -913,7 +958,7 @@ enum NotchPresentationProbe {
                                 || !host.panel.frame.insetBy(dx: -0.5, dy: -0.5).contains(visible) {
                                 failures.insert("an animated island or its shortcuts escaped the screen or backing window")
                             }
-                            if abs(host.contentTopOnScreen - host.panel.frame.maxY) > 0.5
+                            if abs(host.contentTopOnScreen - (host.panel.frame.maxY - contentTopInset)) > 0.5
                                 || !host.containsHover(CGPoint(x: screen.frame.midX, y: visible.maxY - 1)) {
                                 failures.insert("resizing displaced content or lost a stationary pointer inside the notch")
                             }
