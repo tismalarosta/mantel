@@ -80,23 +80,7 @@ enum NotchModule: String, CaseIterable, Identifiable {
 }
 
 enum NotchDisplay: String, CaseIterable {
-    /// `chosen` is one display the person picked by name, kept by its stable
-    /// identifier; while it is not connected the island falls back to automatic.
-    case automatic, builtIn, main, chosen
-}
-
-/// The island's outline: hanging from the top edge around the camera, or a
-/// capsule floating just below it, as on the phone.
-enum NotchSilhouette: String, CaseIterable {
-    case notch, capsule
-
-    static func current(in defaults: UserDefaults = .standard) -> NotchSilhouette {
-        NotchSilhouette(rawValue: defaults.string(forKey: DefaultsKey.notchSilhouette) ?? "") ?? .notch
-    }
-
-    /// Free space above a floating capsule. The window keeps the strip, so
-    /// the pointer at the screen's top edge still reaches the island.
-    var gap: CGFloat { self == .capsule ? NotchLayout.capsuleGap : 0 }
+    case automatic, builtIn, main
 }
 
 enum NotchSize: String, CaseIterable {
@@ -194,45 +178,6 @@ enum NotchLayout {
     /// rounder one; the open island reaches the full radius and shoulder.
     static func surfaceRadius(height: CGFloat) -> CGFloat { min(28, height * 0.34) }
     static func shoulder(height: CGFloat) -> CGFloat { min(shoulder, height * 0.19) }
-    static let capsuleGap: CGFloat = 5
-    /// A closed capsule is fully round at its ends; an open one keeps large,
-    /// soft corners.
-    static func capsuleRadius(height: CGFloat) -> CGFloat { min(height / 2, 38) }
-    /// How far a capsule's sides sit inside the attached island's, on whole points.
-    static func capsuleSide(height: CGFloat) -> CGFloat { shoulder(height: height).rounded() }
-
-    /// A capsule `gap` below the top of `rect`, as wide as the attached
-    /// island's body between its shoulders, which the content and floating
-    /// controls are laid out around. It has the same elements at every size,
-    /// even collapsed to a line, so any two frames of a resize blend.
-    static func capsulePath(in rect: CGRect, gap: CGFloat) -> CGPath {
-        // Its sides fall on whole points: a fractional edge is drawn a little
-        // differently in each reserved area and seemed to move a pixel as
-        // the window returned to the island's size.
-        let side = min(capsuleSide(height: rect.height), (rect.width / 2).rounded(.down))
-        let end = max(rect.minX + side, (rect.maxX - side).rounded(.down))
-        let body = CGRect(x: rect.minX + side, y: rect.minY + min(gap, rect.height), width: end - rect.minX - side,
-                          height: max(0, rect.height - gap))
-        let corner = min(capsuleRadius(height: body.height), body.width / 2)
-        let handle = corner * (1 - 0.55228475)
-        let (left, right, top, bottom) = (body.minX, body.maxX, body.minY, body.maxY)
-        let path = CGMutablePath()
-        path.move(to: CGPoint(x: left + corner, y: top))
-        path.addLine(to: CGPoint(x: right - corner, y: top))
-        path.addCurve(to: CGPoint(x: right, y: top + corner), control1: CGPoint(x: right - handle, y: top),
-                      control2: CGPoint(x: right, y: top + handle))
-        path.addLine(to: CGPoint(x: right, y: bottom - corner))
-        path.addCurve(to: CGPoint(x: right - corner, y: bottom), control1: CGPoint(x: right, y: bottom - handle),
-                      control2: CGPoint(x: right - handle, y: bottom))
-        path.addLine(to: CGPoint(x: left + corner, y: bottom))
-        path.addCurve(to: CGPoint(x: left, y: bottom - corner), control1: CGPoint(x: left + handle, y: bottom),
-                      control2: CGPoint(x: left, y: bottom - handle))
-        path.addLine(to: CGPoint(x: left, y: top + corner))
-        path.addCurve(to: CGPoint(x: left + corner, y: top), control1: CGPoint(x: left, y: top + handle),
-                      control2: CGPoint(x: left + handle, y: top))
-        path.closeSubpath()
-        return path
-    }
     /// Content clearance under a camera of the usual height.
     static let nominalContentTop: CGFloat = 42
 
@@ -956,15 +901,13 @@ enum NotchSupport {
         return min(1, max(0, current + Double(direction.signum()) / (fine ? 64 : 16)))
     }
 
-    static func screenIndex(preference: NotchDisplay, builtIn: [Bool], notched: [Bool], main: Int,
-                            chosen: Int? = nil) -> Int? {
+    static func screenIndex(preference: NotchDisplay, builtIn: [Bool], notched: [Bool], main: Int) -> Int? {
         guard !builtIn.isEmpty, builtIn.count == notched.count else { return nil }
         let fallback = builtIn.indices.contains(main) ? main : 0
         switch preference {
         case .main: return fallback
         case .builtIn: return builtIn.firstIndex(of: true) ?? fallback
-        case .chosen where chosen.map(builtIn.indices.contains) == true: return chosen
-        case .automatic, .chosen:
+        case .automatic:
             return builtIn.indices.first { builtIn[$0] && notched[$0] }
                 ?? notched.firstIndex(of: true) ?? fallback
         }

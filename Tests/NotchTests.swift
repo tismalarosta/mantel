@@ -829,7 +829,6 @@ enum NotchTests {
                                 DefaultsKey.notchCaptureControls, DefaultsKey.notchQuickPanel, DefaultsKey.notchAppPanel,
                                 DefaultsKey.notchHidesMenuBarIcon, DefaultsKey.notchScratchpad,
                                 DefaultsKey.notchHoverExpands, DefaultsKey.notchEnabled, DefaultsKey.notchDisplay,
-                                DefaultsKey.notchSilhouette,
                                 DefaultsKey.notchOpenOnHover, DefaultsKey.notchHoverDelay, DefaultsKey.notchHideUntilHover, DefaultsKey.notchHiddenModules,
                                 DefaultsKey.notchModuleOrder, DefaultsKey.notchQuickAccessLayout, DefaultsKey.notchQuickAccessSide, DefaultsKey.notchQuickAccessSecond, DefaultsKey.notchQuickAccessThird, DefaultsKey.notchVolume,
                                 DefaultsKey.notchBrightness, DefaultsKey.notchBattery,
@@ -1258,35 +1257,6 @@ enum NotchTests {
                "horizontal feedback never swings below the menu bar")
         suite.expect(NotchMotion.envelope(from: roomy.expanded, to: roomy.expanded) == roomy.expanded,
                "an unchanged size reserves nothing more")
-        func elements(_ path: CGPath) -> Int { var count = 0; path.applyWithBlock { _ in count += 1 }; return count }
-        let gap = NotchLayout.capsuleGap
-        let line = NotchLayout.capsulePath(in: CGRect(x: 0, y: 0, width: 180, height: 0), gap: gap)
-        for size in [CGSize(width: 200, height: 3), roomy.collapsed, roomy.notice, roomy.expanded] {
-            let capsule = NotchLayout.capsulePath(in: CGRect(origin: .zero, size: size), gap: gap)
-            suite.expect(elements(capsule) == elements(line),
-                   "every capsule frame has the same elements, so a resize blends between any two")
-            guard size.height > gap + 4 else { continue }
-            let box = capsule.boundingBoxOfPath
-            suite.expect(!capsule.contains(CGPoint(x: size.width / 2, y: gap / 2))
-                   && capsule.contains(CGPoint(x: size.width / 2, y: (size.height + gap) / 2))
-                   && !capsule.contains(CGPoint(x: box.minX + 1, y: gap + 1)) && box.minY == gap
-                   && box.minX == NotchLayout.shoulder(height: size.height).rounded() && box.maxX == box.maxX.rounded()
-                   && abs(box.midX - size.width / 2) <= 0.5,
-                   "the capsule floats below the top edge, round at its corners and as wide as the island's body")
-        }
-        for height in [CGFloat(24), 25, 32, 37, 180] {
-            let box = NotchLayout.capsulePath(in: CGRect(x: 0, y: 0, width: 300, height: height), gap: gap).boundingBoxOfPath
-            suite.expect(box.width + 2 * NotchLayout.capsuleSide(height: height) == 300,
-                   "a capsule's drawn width gives back the island's size, so a resize starts where the island rests")
-        }
-        let closed = NotchLayout.capsulePath(in: CGRect(origin: .zero, size: roomy.collapsed), gap: gap)
-        let closedBox = closed.boundingBoxOfPath
-        suite.expect(!closed.contains(CGPoint(x: closedBox.minX + closedBox.height / 2 * 0.2, y: gap + 1))
-               && closed.contains(CGPoint(x: closedBox.minX + 1, y: closedBox.midY)),
-               "a closed capsule is fully round at its ends")
-        suite.expect(NotchSilhouette.notch.gap == 0 && NotchSilhouette.capsule.gap == gap
-               && NotchSilhouette(rawValue: "unknown") == nil,
-               "only the capsule leaves space above the island")
         for reserved in [CGSize(width: 571, height: 336), CGSize(width: 571.5, height: 40), CGSize(width: 300, height: 32)] {
             for size in [CGSize(width: 278, height: 32), CGSize(width: 277.5, height: 38), CGSize(width: 300, height: 32)] {
                 let centred = NotchMotion.reservation(reserved, centring: size)
@@ -1461,17 +1431,9 @@ enum NotchTests {
                                        notched: [false], main: 0) == 0, "closed-lid mode falls back to an attached screen")
         suite.expect(NotchSupport.screenIndex(preference: .main, builtIn: [], notched: [], main: 0) == nil,
                "no connected displays means no panel")
-        suite.expect(NotchSupport.screenIndex(preference: .chosen, builtIn: [true, false, false],
-                                       notched: [true, false, false], main: 0, chosen: 2) == 2,
-               "a chosen display shows the island without becoming the main display")
-        suite.expect(NotchSupport.screenIndex(preference: .chosen, builtIn: [false, true],
-                                       notched: [false, true], main: 0, chosen: nil) == 1
-               && NotchSupport.screenIndex(preference: .chosen, builtIn: [false, true],
-                                           notched: [false, true], main: 0, chosen: 5) == 1,
-               "a chosen display that is not connected falls back to the automatic choice")
-        suite.expect(NotchSupport.screenIndex(preference: .builtIn, builtIn: [false, true],
-                                       notched: [false, true], main: 0, chosen: 0) == 1,
-               "a remembered display does not override another placement")
+        suite.expect(NotchSupport.screenIndex(preference: .main, builtIn: [true, false, false],
+                                       notched: [true, false, false], main: 2) == 2,
+               "the main display choice follows the display with the menu bar, even beside a notched built-in screen")
         suite.expect(NotchSupport.shouldReplace(.volume, with: .brightness), "continuous controls can replace each other")
         suite.expect(!NotchSupport.shouldReplace(.volume, with: .clipboard), "copy does not interrupt a volume adjustment")
         suite.expect(NotchSupport.shouldReplace(.battery, with: .capture), "a capture takes precedence over passive battery status")

@@ -117,9 +117,6 @@ enum SettingsBackupSupport {
         // protected-folder prompt without a fresh choice.
         DefaultsKey.commandBarFileScopes,
         DefaultsKey.notchDownloadsFolderBookmark,
-        // The display identity and its fallback name belong to one Mac.
-        DefaultsKey.notchChosenDisplay,
-        DefaultsKey.notchChosenDisplayName,
         DefaultsKey.wallpaperOwnBookmarks,
         DefaultsKey.wallpaperExcludedOwnPaths,
         // A local watermark file is authority on this Mac, not portable data.
@@ -188,11 +185,11 @@ enum SettingsBackupSupport {
             portableMouseExceptions(portableMediaSettings(filtered))))
     }
 
-    /// A display UUID cannot travel with a backup, so its selected mode must
-    /// not activate a stale local UUID on the destination Mac either.
+    /// A display mode this version does not offer, such as one kept by an
+    /// earlier development build, restores as the automatic choice.
     private static func portableNotchDisplay(_ settings: [String: Any]) -> [String: Any] {
         var result = settings
-        if result[DefaultsKey.notchDisplay] as? String == NotchDisplay.chosen.rawValue {
+        if let mode = result[DefaultsKey.notchDisplay] as? String, NotchDisplay(rawValue: mode) == nil {
             result[DefaultsKey.notchDisplay] = NotchDisplay.automatic.rawValue
         }
         return result

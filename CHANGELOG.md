@@ -7,10 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island gains a floating capsule, display selection, optional calendar and music indicators, and room for a timer beside music or a working agent. This beta also adds audio device priority, more window layouts, screenshot sharing, pinned Shelf items, and Slovak and Ukrainian. It fixes focus and permission-reset issues while reducing background work and screenshot editor memory use.
+Dynamic Island gains optional calendar and music indicators, room for a timer beside music or a working agent, and a spring animation. This beta also adds audio device priority, more window layouts, screenshot sharing, pinned Shelf items, and Slovak and Ukrainian. It fixes focus and permission-reset issues while reducing background work and screenshot editor memory use.
 
 ### Added
-- Dynamic Island can use a floating capsule shape or a specific display. The existing notch shape and automatic display selection remain the defaults.
 - An optional calendar indicator counts down the hour before the next timed event; a separate, optional New track indicator briefly shows each song. Both are off by default.
 - A running timer can share the closed island with music or a working agent. An option can hide the menu bar icon while Dynamic Island is available; the icon returns when the island is off and still appears for updates or a muted microphone.
 - Clipboard History images can open in the Screenshot Editor without replacing the clipboard, and copied color values show a swatch.
@@ -40,7 +39,7 @@ Dynamic Island gains a floating capsule, display selection, optional calendar an
 - App Switcher preserves focus order and avoids a second focus attempt after a window is already in front. It and Dock Preview no longer hit controls at the top-left of a window they activate; minimal Dock previews no longer leave empty bands.
 - Panels, captures and window drops follow the pointer's display even at its top edge. Floating panels stay out of tiling window managers.
 - A window capture includes a sheet on macOS 27. Shelf files in Dynamic Island respond to the first click and can be dragged out; the screenshot preview responds to Command-W.
-- Settings search keeps keyboard focus. The capture tool picker and Dynamic Island settings fit narrow windows, and the Features hub and menu panel improve VoiceOver labels and explanations. A chosen Dynamic Island display becomes Automatic in settings backups because its identity belongs to one Mac.
+- Settings search keeps keyboard focus. The capture tool picker and Dynamic Island settings fit narrow windows, and the Features hub and menu panel improve VoiceOver labels and explanations.
 - The Cleaner and Uninstaller can cancel a scan. Permission reset, complete uninstall, settings export, automatic cleanup, Super key access and partial microphone mute failures report when they could not finish. Permission reset now stops before revoking access if sleep restoration or system-service detachment fails.
 - Homebrew uninstall refuses stale confirmations. Mic Mute restores each input channel's own level, and switching to an already-active output no longer reports failure.
 - Closed-lid dimming applies immediately when enabled with the lid already closed. CPU readings recover after a long pause, and refreshing AI usage totals while an agent works uses about a quarter of its previous CPU. Bluetooth power is queried only when a restore is owed.

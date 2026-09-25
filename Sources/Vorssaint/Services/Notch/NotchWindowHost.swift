@@ -138,7 +138,6 @@ final class NotchWindowHost: NSObject, CAAnimationDelegate {
     func present(size: CGSize, geometry: NotchGeometry, animated: Bool, transitionContent: NotchContentTransition = .none,
                  quickAccess: NotchQuickAccessConfiguration? = nil, revealFromHidden: Bool = false,
                  hideWhenSettled: Bool = false, usesGlass: Bool = false) {
-        canvas.setOutline(NotchSilhouette.current())
         hidesWhenSettled = hideWhenSettled
         if hideWhenSettled {
             if mouseEventsBeforeHide == nil {
@@ -207,7 +206,7 @@ final class NotchWindowHost: NSObject, CAAnimationDelegate {
         // reveal at the screen edge, even when reopening at that same size.
         let previousWidth = revealing ? geometry.collapsed.width : canvas.bounds.width
         let previousPath = revealing
-            ? NotchShape(attached: true, radius: 0, floatingGap: NotchSilhouette.current().gap)
+            ? NotchShape(attached: true, radius: 0)
                 .path(in: CGRect(x: 0, y: 0, width: previousWidth, height: 0)).cgPath
             : canvas.visiblePath
         let sameScreen = geometry.screen == currentGeometry.screen
@@ -674,8 +673,8 @@ enum NotchStage {
     }
 
     /// A stage of `stage` size centred on the top of `bounds`.
-    static func frame(_ stage: CGSize, in bounds: CGRect, dy: CGFloat = 0) -> CGRect {
-        CGRect(x: bounds.midX - stage.width / 2, y: bounds.minY + dy, width: stage.width, height: stage.height)
+    static func frame(_ stage: CGSize, in bounds: CGRect) -> CGRect {
+        CGRect(x: bounds.midX - stage.width / 2, y: bounds.minY, width: stage.width, height: stage.height)
     }
 }
 
@@ -938,18 +937,8 @@ private final class NotchCanvas: NSView {
     private var dropActions: NotchFileDropActions?
     private var acceptingDrag = false
     private var contentSize: CGSize
-    private(set) var outline = NotchSilhouette.current()
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { false }
-
-    /// Switching outlines redraws the resting island at once.
-    func setOutline(_ next: NotchSilhouette) {
-        guard outline != next else { return }
-        outline = next
-        stopMotion()
-        needsLayout = true
-        layoutSubtreeIfNeeded()
-    }
 
     init(content: AnyView, background: (NotchBackdropPresentation) -> AnyView, size: CGSize) {
         contentSize = size
@@ -1121,25 +1110,16 @@ private final class NotchCanvas: NSView {
         return path.copy(using: &offset) ?? path
     }
 
-    /// The island's size as drawn, from the top edge: a floating capsule
-    /// still counts the space above it, as its window and hover do.
+    /// The island's size as drawn, from the top edge.
     func surfaceSize(of path: CGPath) -> CGSize {
         let box = path.boundingBoxOfPath
-        let height = max(0, box.maxY)
-        guard outline.gap > 0 else { return CGSize(width: box.width, height: height) }
-        return CGSize(width: box.width + 2 * min(NotchLayout.capsuleSide(height: height), box.width), height: height)
+        return CGSize(width: box.width, height: max(0, box.maxY))
     }
 
     var visibleSize: CGSize? { visiblePath.map(surfaceSize) }
 
-    /// Clicks in the space above a floating capsule still reach it, as they
-    /// reach the top of the attached island.
     func containsVisiblePoint(_ point: CGPoint) -> Bool {
-        guard let path = visiblePath else { return false }
-        if path.contains(point) { return true }
-        let box = path.boundingBoxOfPath
-        return outline.gap > 0 && !box.isEmpty && point.y >= 0 && point.y <= box.minY + 1
-            && point.x >= box.minX && point.x <= box.maxX
+        visiblePath?.contains(point) ?? false
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -1171,8 +1151,7 @@ private final class NotchCanvas: NSView {
     /// in the mask layer's own coordinates.
     func silhouettePath(for size: CGSize) -> CGPath {
         var translation = CGAffineTransform(translationX: islandX(size) - silhouette.frame.minX, y: 0)
-        let path = NotchShape(attached: true, radius: NotchLayout.surfaceRadius(height: size.height),
-                              floatingGap: outline.gap)
+        let path = NotchShape(attached: true, radius: NotchLayout.surfaceRadius(height: size.height))
             .path(in: CGRect(origin: .zero, size: size)).cgPath
         return path.copy(using: &translation) ?? path
     }
@@ -1483,9 +1462,7 @@ private final class NotchCanvas: NSView {
         edge.opacity = contentSize.height > 64 ? 1 : 0
         // Keep foreground layout fixed inside the reserved reveal area. Only
         // the separate backdrop's contour changes on animation frames.
-        // A floating capsule starts below the top edge; its content keeps
-        // the middle of the capsule, not of the strip above it.
-        var hostFrame = NotchStage.frame(stage, in: bounds, dy: (outline.gap / 2).rounded(.down))
+        var hostFrame = NotchStage.frame(stage, in: bounds)
         hostFrame.origin.x = centre - stage.width / 2
         if host.frame != hostFrame { host.frame = hostFrame }
         contentVisibility.frame = host.bounds

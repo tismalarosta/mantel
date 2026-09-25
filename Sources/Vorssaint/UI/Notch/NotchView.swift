@@ -11,7 +11,6 @@ struct NotchView: View {
     @ObservedObject private var launcher = QuickLauncherService.shared
     @ObservedObject private var updates = UpdateService.shared
     @AppStorage(DefaultsKey.liquidGlassEnabled) private var glass = false
-    @AppStorage(DefaultsKey.notchSilhouette) private var silhouetteStyle = NotchSilhouette.notch.rawValue
     @Environment(\.colorSchemeContrast) private var contrast
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
@@ -57,12 +56,9 @@ struct NotchView: View {
         return false
     }
 
-    private var silhouette: NotchSilhouette { NotchSilhouette(rawValue: silhouetteStyle) ?? .notch }
-
     private var shape: NotchShape {
         NotchShape(attached: true,
-                   radius: NotchLayout.surfaceRadius(height: service.surfaceSize.height),
-                   floatingGap: silhouette.gap)
+                   radius: NotchLayout.surfaceRadius(height: service.surfaceSize.height))
     }
 
     @ViewBuilder private var surface: some View {
@@ -512,9 +508,6 @@ private extension UpdateService.State {
 struct NotchShape: Shape {
     var attached: Bool
     var radius: CGFloat
-    /// Above zero, a capsule floating this far below the top edge, with its
-    /// own corners.
-    var floatingGap: CGFloat = 0
     var animatableData: CGFloat {
         get { radius }
         set { radius = newValue }
@@ -522,7 +515,6 @@ struct NotchShape: Shape {
 
     func path(in rect: CGRect) -> Path {
         guard attached else { return Path(roundedRect: rect, cornerRadius: radius) }
-        guard floatingGap <= 0 else { return Path(NotchLayout.capsulePath(in: rect, gap: floatingGap)) }
         let shoulder = NotchLayout.shoulder(height: rect.height)
         let bottom = min(radius, rect.height / 2, (rect.width - shoulder * 2) / 2)
         let tangent: CGFloat = 0.55228475
