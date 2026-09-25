@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Summary
+Dynamic Island's closed timer takes less space beside music and other activity.
+
+### Changed
+- The compact timer strip fits its wings to the reading and companion, places their content at the island's ends, and resizes when the reading or working agents change.
+
 ## [3.4.0-beta.5] - 2026-09-25
 
 ### Summary
