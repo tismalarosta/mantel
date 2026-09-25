@@ -23,9 +23,10 @@ Settings is easier to navigate, highlights linked sections together, and preserv
 - Importing a backup from before Dynamic Island keeps this Mac's island settings and explains that a newer export is needed to copy them.
 - Dynamic Island play/pause works with the active video player even when its media session has no item identifier.
 - Homebrew search results offer a direct install button in Dynamic Island and the menu panel, and reflect the installed state after a package changes.
+- Clipboard History keeps recording after the macOS pasteboard service restarts, instead of silently stopping until Vorssaint is relaunched.
 
 ### Contributors
-Thanks to @npcmail010.
+Thanks to @npcmail010 and @zorahrel.
 
 ## [3.4.0-beta.5] - 2026-09-25
 
