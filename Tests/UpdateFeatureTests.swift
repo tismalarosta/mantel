@@ -1299,6 +1299,15 @@ enum UpdateFeatureTests {
         suite.expect(AppUpdatesSupport.versionCore("3.5.262,260717dcrpwg7m0") == "3.5.262"
                 && AppUpdatesSupport.versionCore("0.0.402") == "0.0.402",
                "the revision after a comma is not part of the version")
+        suite.expect(AppUpdatesSupport.versionCore(" v2.0.11.1,260925abc ") == "2.0.11.1"
+                && AppUpdatesSupport.versionCore("V2.0.11.1") == "2.0.11.1"
+                && !AppUpdatesSupport.isNewer("v2.0.11.1", than: "2.0.11.1")
+                && !AppUpdatesSupport.isNewer("2.0.11.1", than: "V2.0.11.1"),
+               "a leading v/V and surrounding whitespace normalize before numeric comparison")
+        suite.expect(!AppUpdatesSupport.isNewer("2.0.11.1", than: "v2.0.11.1")
+                && AppUpdatesSupport.isNewer("v2.0.11.2", than: "2.0.11.1")
+                && AppUpdatesSupport.versionCore("version1") == "version1",
+               "only a v/V directly before a number is removed, and prefixed versions compare by value")
         suite.expect(AppUpdatesSupport.isNewer("3.5.262,260717dcrpwg7m0", than: "3.5.230")
                 && !AppUpdatesSupport.isNewer("1.130.0", than: "1.130.0"),
                "an update is only newer when the number really grew")
