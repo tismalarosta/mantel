@@ -519,6 +519,41 @@ enum FeatureCatalogTests {
                "mouse acceleration uses linear mode when supported and the legacy fallback otherwise")
         suite.expect(AppFeature.switcher.availabilityKey == "featureAvailable.switcher",
                "availability key derives from the raw value")
+
+        let installSuiteName = "com.vorssaint.tests.feature-install.\(UUID().uuidString)"
+        if let installDefaults = UserDefaults(suiteName: installSuiteName) {
+            func savedValues() -> [String: Any] {
+                installDefaults.persistentDomain(forName: installSuiteName) ?? [:]
+            }
+            for feature in AppFeature.allCases where !feature.enabledKeys.isEmpty {
+                feature.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
+                suite.expect(feature.enabledKeys.contains {
+                    savedValues()[$0] as? Bool == true
+                }, "a new \(feature.rawValue) install saves an enabled main control")
+                for key in feature.enabledKeys { installDefaults.removeObject(forKey: key) }
+            }
+            AppFeature.windowLayout.enableOnFirstInstall(in: installDefaults,
+                                                          savedValues: savedValues())
+            suite.expect(installDefaults.bool(forKey: DefaultsKey.windowLayoutShortcutsEnabled),
+                   "a new window layout install enables its shortcuts")
+            installDefaults.set(false, forKey: DefaultsKey.autoQuitEnabled)
+            AppFeature.autoQuit.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
+            suite.expect(!installDefaults.bool(forKey: DefaultsKey.autoQuitEnabled),
+                   "reinstalling Quit on close preserves an explicit off choice")
+            installDefaults.set(true, forKey: DefaultsKey.dockClickHide)
+            AppFeature.dockClick.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
+            suite.expect(!installDefaults.bool(forKey: DefaultsKey.dockClickMinimize),
+                   "a saved alternative does not activate another Dock click action")
+            installDefaults.removePersistentDomain(forName: installSuiteName)
+        } else {
+            suite.expect(false, "feature install defaults suite can be created")
+        }
+        let runtimeSource = (try? String(contentsOfFile: "Sources/Vorssaint/App/FeatureRuntime.swift",
+                                         encoding: .utf8)) ?? ""
+        suite.expect(runtimeSource.contains(
+            "setAvailable(AppFeature.allCases, available, enablingFirstInstalls: false)"),
+               "install all makes features available without switching on their behavior")
+
         suite.expect(AppFeature.availabilityDefaults.count == AppFeature.allCases.count
                 && (AppFeature.availabilityDefaults[AppFeature.fanControl.availabilityKey] as? Bool) == false
                 && (AppFeature.availabilityDefaults[AppFeature.diskImageInstaller.availabilityKey] as? Bool) == false
