@@ -115,6 +115,7 @@ Settings lists tools on shared pages by name in the sidebar, and keyboard bright
 - The Cleaner and the Uninstaller can stop a running scan with a Cancel button or the panel's X, instead of scanning on in the background and showing Scanning again when reopened. Thanks to @KumarSashank.
 - Window Layout shortcuts and timers such as the recorder's keep running while the Disk Image Installer's install prompt or result alert is open, instead of waiting until it closes. Thanks to @shlok1806.
 - Dynamic Island fades out in Mission Control and App Exposé instead of covering the desktop names, and comes back with its hover and clicks as they were. It stays on Show Desktop for file drops.
+- The AI section of Dynamic Island uses about a quarter of the CPU it did to refresh its totals while Claude Code or Codex is working, which it does every few seconds. The totals are the same. Thanks to Azelance for the feedback.
 
 ## [3.4.0-beta.4] - 2026-09-23
 
