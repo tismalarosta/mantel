@@ -350,6 +350,45 @@ enum NotchPresentationProbe {
         exit(failures.isEmpty ? 0 : 1)
     }
 
+    /// Asks the window server, not AppKit, where a click would land: a pixel
+    /// it does not count as the window's own passes the click to the app
+    /// behind even when the view would take it. Needs a visible window, so it
+    /// is a separate, explicitly requested check.
+    private static func runQuickAccessClicksAndExit() -> Never {
+        let app = NSApplication.shared
+        app.setActivationPolicy(.prohibited)
+        guard let screen = NSScreen.main else { print("QUICK ACCESS CLICKS FAILED: no display"); exit(1) }
+        let geometry = NotchGeometry(screen: screen.frame, safeAreaTop: screen.safeAreaInsets.top,
+                                     cameraWidth: screen.safeAreaInsets.top > 0 ? 210 : 0)
+        let host = NotchWindowHost(content: AnyView(Color.clear), geometry: geometry, size: geometry.collapsed, background: surface,
+                                   quickAccess: quickAccess)
+        host.panel.orderFrontRegardless()
+        var failures: [String] = []
+        func lands(_ point: CGPoint) -> Bool {
+            NSWindow.windowNumber(at: point, belowWindowWithWindowNumber: 0) == host.panel.windowNumber
+        }
+        for side in NotchQuickAccessSide.allCases {
+            let configuration = NotchQuickAccessConfiguration(side: side, actions: [.explore, .settings, .module(.timer)])
+            host.present(size: geometry.expanded, geometry: geometry, animated: false, quickAccess: configuration, usesGlass: true)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            for point in host.quickAccessProbeCenters {
+                let missed = (0..<16).first { step in
+                    let angle = CGFloat(step) * .pi / 8
+                    let radius = NotchQuickAccessLayout.diameter / 2 - 2
+                    return !lands(CGPoint(x: point.x + cos(angle) * radius, y: point.y + sin(angle) * radius))
+                }
+                if let missed { failures.append("a \(side) control passed a click near its rim at \(missed * 45 / 2)° to the app behind") }
+                let gap = side == .bottom ? CGPoint(x: point.x, y: point.y + 28)
+                    : CGPoint(x: point.x + (side == .left ? 28 : -28), y: point.y)
+                if lands(gap) { failures.append("the transparent gap beside a \(side) control kept a click from the app behind") }
+            }
+        }
+        host.close()
+        print(failures.isEmpty ? "QUICK ACCESS CLICKS OK glass=\(quickAccessGlass)"
+              : "QUICK ACCESS CLICKS FAILED glass=\(quickAccessGlass)\n" + failures.joined(separator: "\n"))
+        exit(failures.isEmpty ? 0 : 1)
+    }
+
     static func runAndExit() -> Never {
         if CommandLine.arguments.contains("--media-layout") { NotchMediaPresentationProbe.runAndExit() }
         if CommandLine.arguments.contains("--mission-control") { runMissionControlAndExit() }
@@ -358,6 +397,7 @@ enum NotchPresentationProbe {
             previewNoticeAndExit(title: CommandLine.arguments[index + 1])
         }
         if CommandLine.arguments.contains("--profile-only") { runProfileAndExit() }
+        if CommandLine.arguments.contains("--quick-access-clicks") { runQuickAccessClicksAndExit() }
         let app = NSApplication.shared
         app.setActivationPolicy(.prohibited)
         guard let screen = NSScreen.main else { print("NOTCH PROBE FAILED: no display"); exit(1) }
@@ -771,6 +811,16 @@ enum NotchPresentationProbe {
                 let local = bubbles.panel.convertPoint(fromScreen: point)
                 if !bubbles.contains(point) || bubbles.panel.contentView?.hitTest(local) == nil {
                     failures.append("a floating control could not receive a click")
+                }
+                // The whole circle takes the click, up to just inside its rim.
+                for step in 0..<16 {
+                    let angle = CGFloat(step) * .pi / 8
+                    let radius = NotchQuickAccessLayout.diameter / 2 - 2
+                    let rim = CGPoint(x: point.x + cos(angle) * radius, y: point.y + sin(angle) * radius)
+                    if !bubbles.contains(rim) || bubbles.panel.contentView?.hitTest(bubbles.panel.convertPoint(fromScreen: rim)) == nil {
+                        failures.append("a floating control on the \(side) side missed a click near its rim")
+                        break
+                    }
                 }
                 let gap = side == .bottom ? CGPoint(x: point.x, y: point.y + 28)
                     : CGPoint(x: point.x + (side == .left ? 28 : -28), y: point.y)

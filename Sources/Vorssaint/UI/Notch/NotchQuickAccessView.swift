@@ -142,8 +142,11 @@ struct NotchQuickAccessView: View {
             Image(systemName: symbol)
                 .font(.system(size: 17, weight: .medium))
                 .frame(width: NotchQuickAccessLayout.diameter, height: NotchQuickAccessLayout.diameter)
-                // In glass the drop beneath carries the island's shade.
-                .background(followsGlass ? Color.clear : Color.black, in: Circle())
+                // In glass the drop beneath carries the island's shade, which
+                // the window server does not count as the window's own pixels:
+                // a faint fill keeps the whole circle from passing clicks to
+                // the app behind, not just the glyph.
+                .background(followsGlass ? Color.black.opacity(0.02) : Color.black, in: Circle())
                 .overlay {
                     Circle().strokeBorder(.white.opacity(selected || contrast == .increased ? 0.6 : 0.16), lineWidth: 0.75)
                         .allowsHitTesting(false)
