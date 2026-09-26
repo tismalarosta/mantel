@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Summary
+Dynamic Island adds more reopening choices.
+
+### Changed
+- Dynamic Island can reopen directly to the app panel or Explore, alongside its section choices.
+
 ## [3.4.0-beta.7] - 2026-09-26
 
 ### Summary

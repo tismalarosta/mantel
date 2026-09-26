@@ -469,13 +469,19 @@ struct NotchView: View {
         .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: revealed)
     }
 
+    private var navigationTitle: String {
+        let destination = service.reopeningDestination
+        return destination.appPanel || destination.sections
+            ? text.sectionsTitle : destination.module.title(l10n.language)
+    }
+
     private var navigation: some View {
         Button(action: service.toggleSections) {
             HStack(spacing: 9) {
                 Image(systemName: "square.grid.2x2")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(.white.opacity(0.7))
-                Text(service.reopeningModule.title(l10n.language))
+                Text(navigationTitle)
                     .font(.system(size: 16, weight: .semibold))
                     .lineLimit(1)
             }
@@ -485,7 +491,7 @@ struct NotchView: View {
         }
         .buttonStyle(NotchButtonStyle(cornerRadius: 12, lifts: false))
         .accessibilityLabel(text.switchSection)
-        .accessibilityValue(service.reopeningModule.title(l10n.language))
+        .accessibilityValue(navigationTitle)
         .accessibilityIdentifier("notch.navigation")
         .help(text.switchSection + "  ⌘K")
     }

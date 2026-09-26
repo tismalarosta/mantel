@@ -79,6 +79,10 @@ enum NotchModule: String, CaseIterable, Identifiable {
     }
 }
 
+enum NotchReopeningDestination: String, CaseIterable {
+    case appPanel, explore
+}
+
 /// ⌘1 to ⌘9 on the island's clipboard page paste the entry at that place in
 /// the visible list, as in the quick panel.
 struct NotchClipboardPastePress: Equatable {

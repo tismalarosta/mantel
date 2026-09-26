@@ -449,12 +449,17 @@ struct NotchSettings: View {
                 switchRow("waveform.path", text.hapticFeedback, isOn: $hapticFeedback)
                 SettingsRow(symbol: "arrow.uturn.backward", title: editor.reopening) {
                     Picker(editor.reopening, selection: Binding(get: {
-                        returnHome ? (NotchModule(rawValue: homeModule) ?? .controls).rawValue : ""
+                        guard returnHome else { return "" }
+                        return NotchModule(rawValue: homeModule) != nil
+                            || NotchReopeningDestination(rawValue: homeModule) != nil
+                            ? homeModule : NotchModule.controls.rawValue
                     }, set: { value in
                         returnHome = !value.isEmpty
                         if returnHome { homeModule = value }
                     })) {
                         Text(editor.lastPage).tag("")
+                        Text(text.panel).tag(NotchReopeningDestination.appPanel.rawValue)
+                        Text(text.sectionsTitle).tag(NotchReopeningDestination.explore.rawValue)
                         ForEach(NotchSupport.modules()) { module in
                             Text(module.title(l10n.language)).tag(module.rawValue)
                         }

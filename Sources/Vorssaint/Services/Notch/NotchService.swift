@@ -680,16 +680,26 @@ final class NotchService: ObservableObject {
 
     /// Opening without a page shows what the closed island is already
     /// presenting. Only at rest does the reopening preference decide.
-    var reopeningModule: NotchModule {
+    var reopeningDestination: (module: NotchModule, appPanel: Bool, sections: Bool) {
         if !expanded {
             let activity = notice?.notificationID != nil ? NotchModule.notifications : compactActivity?.module
-            if let activity, modules.contains(activity) { return activity }
+            if let activity, modules.contains(activity) { return (activity, false, false) }
             if UserDefaults.standard.bool(forKey: DefaultsKey.notchReturnHome) {
-                let home = NotchModule(rawValue: UserDefaults.standard.string(forKey: DefaultsKey.notchHomeModule) ?? "") ?? .controls
-                return modules.contains(home) ? home : modules.first ?? .controls
+                let saved = UserDefaults.standard.string(forKey: DefaultsKey.notchHomeModule) ?? ""
+                switch NotchReopeningDestination(rawValue: saved) {
+                case .appPanel: return (modules.contains(.controls) ? .controls : modules.first ?? .controls, true, false)
+                case .explore: return (selected, false, true)
+                case nil:
+                    let home = NotchModule(rawValue: saved) ?? .controls
+                    return (modules.contains(home) ? home : modules.first ?? .controls, false, false)
+                }
             }
         }
-        return selected
+        return (selected, false, false)
+    }
+
+    var reopeningModule: NotchModule {
+        reopeningDestination.module
     }
 
     func open(_ module: NotchModule? = nil, pinned: Bool = false, takeFocus: Bool = true,
@@ -698,7 +708,17 @@ final class NotchService: ObservableObject {
         if !running || self.panel == nil { syncWithPreferences() }
         else { refreshModules() }
         guard let panel else { return }
-        let destination = module.flatMap { modules.contains($0) ? $0 : nil } ?? reopeningModule
+        let reopening = reopeningDestination
+        let useReopeningSurface = module == nil && !expanded && !appPanel && !sections && metric == nil
+        let destination = module.flatMap { modules.contains($0) ? $0 : nil } ?? reopening.module
+        let appPanel = appPanel || (useReopeningSurface && reopening.appPanel)
+        let sections = sections || (useReopeningSurface && reopening.sections)
+        if useReopeningSurface && reopening.appPanel { MenuPanelFocus.shared.showNormalPanel() }
+        if useReopeningSurface && reopening.sections {
+            sectionQuery = ""
+            sectionRow = 0
+            highlightedSection = destination
+        }
         let metric = metric.flatMap { metricIsAvailable($0) ? $0 : nil }
         let changesPresentation = !expanded || selected != destination
             || showingAppPanel != appPanel || selectedMetric != metric || showingSections != sections
