@@ -280,6 +280,11 @@ struct NotchView: View {
         return notice
     }
 
+    /// The fan card opens Fan Control, so its page shares that title.
+    private func detailTitle(_ metric: MetricDetailKind) -> String {
+        metric == .fan ? FeatureStrings.fanControl(l10n.language).title : metric.title(l10n.s)
+    }
+
     private var header: some View {
         HStack(spacing: service.expandedGeometry.headerCameraGap > 0 ? 0 : 6) {
             let quickActions = NotchQuickAccessConfiguration.current().actions
@@ -302,7 +307,7 @@ struct NotchView: View {
                     if showsDetail {
                         NotchIconButton(symbol: "chevron.left", title: l10n.s.obBack, action: service.goBack)
                     }
-                    Text(service.showingAppPanel ? "Vorssaint" : service.selectedMetric?.title(l10n.s) ?? text.title)
+                    Text(service.showingAppPanel ? "Vorssaint" : service.selectedMetric.map(detailTitle) ?? text.title)
                         .font(.system(size: 15, weight: .semibold))
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -468,7 +473,11 @@ struct NotchView: View {
         if service.showingAppPanel {
             MenuPanelView(notchSize: pageSize)
         } else if let metric = service.selectedMetric {
-            MetricDetailView(kind: metric)
+            if metric == .fan {
+                NotchFanControlView()
+            } else {
+                MetricDetailView(kind: metric)
+            }
         } else if service.modules.isEmpty {
             NotchEmptyView(symbol: "slider.horizontal.3", message: text.empty)
         } else {
@@ -496,6 +505,15 @@ struct NotchView: View {
             case .agents: NotchAgentsView(size: pageSize)
             }
         }
+    }
+}
+
+/// Read-only RPM telemetry stays available when the protected fan helper fails.
+private struct NotchFanControlView: View {
+    @ObservedObject private var monitor = SystemMonitor.shared
+
+    var body: some View {
+        FanControlSection(collapsible: false, fallbackFanSpeeds: monitor.snapshot.fanSpeeds)
     }
 }
 
