@@ -11,6 +11,7 @@ Dynamic Island responds to hover and uses supported playback commands for radio 
 
 ### Added
 - Clipboard History's separate window resizes by dragging an edge or corner, and remembers the chosen size. Thanks to @1119350264.
+- External monitors with readable brightness control offer optional Extra dimming. The lower part of the slider dims the picture below the monitor's hardware minimum, while the rest keeps using hardware brightness.
 
 ### Changed
 - The closed Dynamic Island gently grows on hover before a click or a configured hover opening, while respecting Reduce Motion and available menu bar space.
