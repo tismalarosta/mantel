@@ -115,6 +115,7 @@ final class NotchService: ObservableObject {
     private var captureClose: (() -> Void)?
     private var captureHover: ((Bool) -> Void)?
     private var inside = false
+    private var hoverEmphasized = false
     private var hoverState = NotchHoverState()
     private var openedByHover = false
     /// A click inside the open island, which may be what brings another app forward.
@@ -399,8 +400,12 @@ final class NotchService: ObservableObject {
                 contentHeight: notice.previewContentHeight(width: geometry.notificationPreviewContentWidth))
         }
         if peeking { return geometry.peek }
-        if compactActivity != nil { return compactActivityGeometry.compactActivitySize }
-        return geometry.restingSize(showsContent: idleContent != .none)
+        if compactActivity != nil {
+            let resting = compactActivityGeometry.compactActivitySize
+            return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
+        }
+        let resting = geometry.restingSize(showsContent: idleContent != .none)
+        return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
     var presentationWindow: NSPanel? { panel }
@@ -567,6 +572,7 @@ final class NotchService: ObservableObject {
         highlightedSection = nil
         sectionRow = 0
         inside = false
+        hoverEmphasized = false
         hoverState = NotchHoverState()
         openedByHover = false
         removeEventMonitors()
@@ -678,6 +684,13 @@ final class NotchService: ObservableObject {
             && windowHost?.isConcealedForMissionControl == false
             : windowHost?.containsHover(point) == true
         hoverState.update(pointerInside: inside)
+        let emphasize = inside && !hiddenUntilHover && !expanded && !peeking && !dragPlaceholder
+            && notice == nil && captureControls == nil
+            && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if hoverEmphasized != emphasize {
+            hoverEmphasized = emphasize
+            refreshPresentation()
+        }
         captureHover?(entered)
         if captureControls != nil {
             updateCaptureControlsHover(wasInside: wasInside)
@@ -1785,6 +1798,7 @@ final class NotchService: ObservableObject {
         hiddenInFullscreen = hidden
         if hidden {
             hoverWork?.cancel(); hoverWork = nil
+            hoverEmphasized = false
             heldDrag = false
             dragPlaceholder = false
             cancelCaptureControls()

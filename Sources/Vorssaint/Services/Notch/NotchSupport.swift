@@ -328,6 +328,16 @@ struct NotchHoverState {
     }
 }
 
+enum NotchHoverEmphasis {
+    static func size(from resting: CGSize, geometry: NotchGeometry) -> CGSize {
+        // Keep the pulse inside the measured free menu-bar space on each side.
+        let occupiedWing = max(0, (resting.width - geometry.cameraWidth) / 2)
+        let freeSide = max(0, (geometry.compactSideRoom ?? 0) - occupiedWing)
+        let growth = min(10, freeSide)
+        return CGSize(width: resting.width + growth * 2, height: resting.height + 5)
+    }
+}
+
 enum NotchCompactActivity: Equatable {
     case timer, downloads, agents, calendar, music
 

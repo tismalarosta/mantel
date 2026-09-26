@@ -36,6 +36,10 @@ enum NotchHoverTests {
         static var active = false
         static func ownsCocoaPoint(_ point: CGPoint) -> Bool { active }
     }
+    final class NSWorkspace {
+        static let shared = NSWorkspace()
+        var accessibilityDisplayShouldReduceMotion = false
+    }
     final class Host {
         var visible = true
         var rect = CGRect.zero
@@ -56,7 +60,7 @@ enum NotchHoverTests {
     class State {
         var hiddenInFullscreen = false
         var showsSystemFeedback = true, routesNotices = true
-        var running = true, suspended = false, inside = false
+        var running = true, suspended = false, inside = false, hoverEmphasized = false
         var pinned = false, heldDrag = false, keepsWorkingSurface = false
         var expanded = false, peeking = false, dragPlaceholder = false, openedByHover = false
         var captureControls: Bool?, notice: NotchNotice?
@@ -81,7 +85,10 @@ enum NotchHoverTests {
                 return geometry.notificationPreviewSize(
                     contentHeight: notice.previewContentHeight(width: geometry.notificationPreviewContentWidth))
             }
-            return expanded ? geometry.expanded : peeking ? geometry.peek : geometry.collapsed
+            if expanded { return geometry.expanded }
+            if peeking { return geometry.peek }
+            let resting = compactActivity == nil ? geometry.collapsed : compactActivityGeometry.compactActivitySize
+            return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
         }
         var openings = 0, closures = 0, feedbacks = 0
         var requestedModule: NotchModule?
@@ -98,6 +105,7 @@ enum NotchHoverTests {
             updateBounds()
         }
         func mutatePresentation(transitionContent: NotchContentTransition, _ change: () -> Void) { change(); updateBounds() }
+        func refreshPresentation() { updateBounds() }
         func provideHapticFeedback() { feedbacks += 1 }
         func updateBounds() { windowHost?.rect = geometry.frame(for: surfaceSize) }
     }
@@ -111,6 +119,7 @@ enum NotchHoverTests {
             DispatchQueue.main = NotchScreenRefreshContract.Scheduler()
             UserDefaults.standard = UserDefaults.Preferences()
             AssistiveKeyboard.active = false
+            NSWorkspace.shared.accessibilityDisplayShouldReduceMotion = false
             let service = Service()
             if physical {
                 service.geometry = NotchGeometry(screen: CGRect(x: 0, y: 0, width: 1470, height: 956),
@@ -124,6 +133,42 @@ enum NotchHoverTests {
             NSEvent.mouseLocation = CGPoint(x: service.geometry.screen.minX, y: service.geometry.screen.minY)
             service.hover(false)
         }
+        for physical in [false, true] {
+            let clickOnly = fixture(physical: physical)
+            UserDefaults.standard.enabled = false
+            let resting = clickOnly.surfaceSize
+            clickOnly.hover(true)
+            let emphasized = clickOnly.surfaceSize
+            suite.expect(emphasized.height == resting.height + 5 && emphasized.width >= resting.width
+                         && emphasized.width <= resting.width + 20 && clickOnly.hoverWork == nil,
+                         "click-only islands pulse within available menu space without scheduling an opening")
+            leave(clickOnly)
+            suite.expect(clickOnly.surfaceSize == resting,
+                         "leaving restores the resting island size")
+        }
+        let hiddenPulse = fixture()
+        UserDefaults.standard.hides = true
+        hiddenPulse.windowHost?.visible = false
+        let hiddenResting = hiddenPulse.surfaceSize
+        hiddenPulse.hover(true)
+        suite.expect(hiddenPulse.surfaceSize == hiddenResting,
+                     "an invisible island does not pulse before its hover reveal")
+        let reducedMotion = fixture()
+        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion = true
+        let reducedResting = reducedMotion.surfaceSize
+        reducedMotion.hover(true)
+        suite.expect(reducedMotion.surfaceSize == reducedResting,
+                     "Reduce Motion leaves the resting island still on hover")
+        let compactPulse = fixture(physical: true)
+        compactPulse.compactActivity = .music
+        compactPulse.updateBounds()
+        let compactResting = compactPulse.surfaceSize
+        compactPulse.hover(true)
+        suite.expect(compactPulse.surfaceSize.height == compactResting.height + 5,
+                     "a visible compact activity responds to hover without replacing its content")
+        leave(compactPulse)
+        suite.expect(compactPulse.surfaceSize == compactResting,
+                     "the compact activity returns to its original size on exit")
         for physical in [false, true] {
             let service = fixture(physical: physical)
             service.hover(true)
