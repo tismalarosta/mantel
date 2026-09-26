@@ -16,6 +16,7 @@ Dynamic Island responds to hover and uses supported playback commands for radio 
 - The closed Dynamic Island gently grows on hover before a click or a configured hover opening, while respecting Reduce Motion and available menu bar space.
 - App Switcher can skip highlight, scrolling and panel resize animations while browsing, with smooth selection still the default.
 - App shortcuts now allow up to 64 bindings, enough for every letter and other commands.
+- The mouse extra-click filter shows its window directly in Settings and can be tuned in 1 ms steps.
 
 ### Fixed
 - Dynamic Island sends a player's supported Play or Pause command when available, improving control of radio streams.
