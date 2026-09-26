@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-External monitors can dim below their hardware minimum, and the Clipboard History window can be resized. Dynamic Island adds ⌘1–⌘9 paste on its Clipboard page, its own Liquid Glass switch, a hover response and better play/pause for radio streams. App Switcher offers instant selection, and Command Bar accepts up to 64 shortcuts.
+External monitors can dim below their hardware minimum, and the Clipboard History window can be resized. Dynamic Island adds ⌘1–⌘9 paste on its Clipboard page, its own Liquid Glass switch, a hover response and better play/pause for radio streams. Its simulated cutout stays visible through focus changes when menu coverage is on. App Switcher offers instant selection, Command Bar accepts up to 64 shortcuts, and Quit on Close warns about apps that keep working without a window.
 
 ### Added
 - External monitors with readable brightness control offer optional Extra dimming in Settings. The lower part of the slider dims the picture below the monitor's hardware minimum, while the rest keeps using hardware brightness.
@@ -17,9 +17,11 @@ External monitors can dim below their hardware minimum, and the Clipboard Histor
 
 ### Changed
 - The closed Dynamic Island gently grows on hover before a click or a configured hover opening, while respecting Reduce Motion and available menu bar space.
+- On displays without a camera cutout, Dynamic Island stays visible through app and display focus changes when Show over the menus is enabled, including at rest. With that option off, it uses measured free space only after finding menu geometry on the chosen display.
 - Liquid Glass has separate switches for Dynamic Island and for other windows and panels. The island keeps its current look after updating.
 - Command Bar shortcuts allow up to 64 bindings, enough for every letter and other commands.
 - The mouse extra-click filter shows its window directly in Settings and can be tuned in 1 ms steps.
+- Quit on Close's Settings warns that apps such as screen recorders may keep working after their last window closes, and points to Exceptions to prevent an unwanted quit.
 
 ### Fixed
 - Dynamic Island sends a player's supported Play or Pause command when available, improving control of radio streams.
@@ -28,7 +30,7 @@ External monitors can dim below their hardware minimum, and the Clipboard Histor
 - Clipboard History no longer refreshes the whole list when the pointer moves between entries.
 
 ### Contributors
-Thanks to @1119350264, @ranak8811, @ruvelro, @Samuel61904 and @stephansann.
+Thanks to @1119350264, @loburets, @ranak8811, @ruvelro, @Samuel61904 and @stephansann.
 
 ## [3.4.0-beta.6] - 2026-09-25
 
