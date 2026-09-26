@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-External monitors can dim below their hardware minimum, and the Clipboard History window can be resized. Dynamic Island adds ⌘1–⌘9 paste on its Clipboard page, its own Liquid Glass switch, a hover response and Fan Control from its fan card, and keeps a clickable cutout over the camera in full screen. App Switcher offers instant selection, Command Bar accepts up to 64 shortcuts, and Quit on Close warns about apps that keep working without a window. Volume mixer keeps watching for stalled audio during playback.
+External monitors gain extra dimming, and Clipboard History gains a resizable window. Dynamic Island improves clipboard access, full-screen controls and everyday feedback. Screen capture is more responsive, and the volume mixer can recover stalled audio.
 
 ### Added
 - External monitors with readable brightness control offer optional Extra dimming in Settings. The lower part of the slider dims the picture below the monitor's hardware minimum, while the rest keeps using hardware brightness.
@@ -17,6 +17,7 @@ External monitors can dim below their hardware minimum, and the Clipboard Histor
 - Dynamic Island's fan card opens Fan Control with its manual speed and curve controls, and still shows each fan's speed when the fan helper is unavailable.
 
 ### Changed
+- AI agent usage reads large logs with less temporary memory and avoids unnecessary display updates. Alerts queued by a stopped session no longer appear after restarting the feature.
 - The closed Dynamic Island gently grows on hover before a click or a configured hover opening, while respecting Reduce Motion and available menu bar space.
 - On displays without a camera cutout, Dynamic Island stays visible through app and display focus changes when Show over the menus is enabled, including at rest. With that option off, it uses measured free space only after finding menu geometry on the chosen display.
 - With Hide content in full screen enabled, Dynamic Island keeps a black, clickable cutout over the camera in full screen, and clicking, hovering or a shortcut opens its tools. A simulated cutout stays hidden until a shortcut opens it.
@@ -27,6 +28,8 @@ External monitors can dim below their hardware minimum, and the Clipboard Histor
 - Quit on Close's Settings warns that apps such as screen recorders may keep working after their last window closes, and points to Exceptions to prevent an unwanted quit.
 
 ### Fixed
+- Scrolling screenshots respond faster to wheel, keyboard and scrollbar movement, preserve completed content after later capture failures and avoid transparent seams. The screenshot preview releases focus before opening the editor.
+- Long window titles in App Switcher and Dock previews stay still when Reduce Motion is enabled.
 - Dynamic Island stays off external monitors in closed-lid mode when Built-in display is selected, and returns to the laptop display when it becomes available again. While hidden it does no background work, and a finished timer rings once the island is back. Macs without a built-in display keep the island on the main display.
 - Dynamic Island sends a player's supported Play or Pause command when available, improving control of radio streams.
 - Temperature alerts show their limits and notifications in the selected temperature unit.
