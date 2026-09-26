@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.4.0-beta.6] - 2026-09-25
 
 ### Summary
 Settings is easier to navigate and highlights linked sections together. New Dynamic Island setups start compact with their sections turned on, and the island adds an optional outline, animated compact music and better play/pause for video players. Features installed from the Features hub now start working right away.
