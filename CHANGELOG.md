@@ -4,10 +4,10 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [3.4.0-beta.7] - 2026-09-26
 
 ### Summary
-External monitors gain extra dimming, and Clipboard History gains a resizable window. Dynamic Island improves clipboard access, full-screen controls and everyday feedback. Screen capture is more responsive, and the volume mixer can recover stalled audio.
+External monitors gain extra dimming, and Clipboard History gains a resizable window. Dynamic Island lets you choose the activity to display or combine a timer with another activity, and improves clipboard access and full-screen controls. Screen capture is more responsive, and the volume mixer can recover stalled audio.
 
 ### Added
 - External monitors with readable brightness control offer optional Extra dimming in Settings. The lower part of the slider dims the picture below the monitor's hardware minimum, while the rest keeps using hardware brightness.
@@ -15,6 +15,7 @@ External monitors gain extra dimming, and Clipboard History gains a resizable wi
 - Dynamic Island's Clipboard page pastes the first nine entries with ⌘1–⌘9, as the separate window does, and shows the shortcuts while the island has the keyboard.
 - App Switcher can skip highlight, scrolling and panel resize animations while browsing, with smooth selection still the default.
 - Dynamic Island's fan card opens Fan Control with its manual speed and curve controls, and still shows each fan's speed when the fan helper is unavailable.
+- When several activities are active, hovering over the closed Dynamic Island reveals named choices. Select one activity on its own, or use Combine to show a timer beside music, a working agent or a download; the choice lasts while that activity remains available.
 
 ### Changed
 - AI agent usage reads large logs with less temporary memory and avoids unnecessary display updates. Alerts queued by a stopped session no longer appear after restarting the feature.

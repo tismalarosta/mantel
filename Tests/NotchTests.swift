@@ -4,6 +4,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
+import SwiftUI
 
 enum NotchTests {
     private static func railContracts(_ suite: TestSuite) {
@@ -438,7 +439,98 @@ enum NotchTests {
         }
     }
 
+    private static func activitySelectionContracts(_ suite: TestSuite) {
+        for mask in 0..<32 {
+            let available = NotchSupport.compactActivities(
+                timer: mask & 1 != 0, downloads: mask & 2 != 0, agents: mask & 4 != 0,
+                calendar: mask & 8 != 0, music: mask & 16 != 0)
+            var selection = NotchActivitySelection()
+            suite.expect(selection.current(available: available) == available.first,
+                         "available activities keep automatic priority until a choice is made")
+            for activity in available {
+                selection.select(activity, available: available)
+                selection.reconcile(available: available)
+                suite.expect(selection.current(available: available) == activity,
+                             "every live activity can remain selected through refreshes")
+                let remaining = available.filter { $0 != activity }
+                selection.reconcile(available: remaining)
+                suite.expect(selection.preferred == nil
+                             && selection.current(available: remaining) == remaining.first,
+                             "ending or disabling the chosen activity restores automatic selection")
+                suite.expect(selection.current(available: available) == available.first,
+                             "a returning activity does not revive an old choice")
+            }
+        }
+        var selection = NotchActivitySelection()
+        selection.select(.music, available: [.agents, .music])
+        selection.reconcile(available: [.timer, .agents, .music])
+        suite.expect(selection.current(available: [.timer, .agents, .music]) == .music,
+                     "starting another activity does not steal an explicit choice")
+        selection.select(.downloads, available: [.agents, .music])
+        suite.expect(selection.preferred == .music, "a late click on a removed choice is ignored")
+        let all: [NotchCompactActivity] = [.timer, .downloads, .agents, .calendar, .music]
+        let pairs: [NotchCompactActivity] = [.downloads, .agents, .music]
+        for companion in pairs {
+            selection.select(.timer, companion: companion, available: all, companions: pairs)
+            selection.reconcile(available: all, companions: pairs)
+            suite.expect(selection.current(available: all) == .timer && selection.companion == companion,
+                         "each supported pair is an explicit, stable choice")
+            selection.select(.timer, available: all)
+            suite.expect(selection.companion == nil, "choosing Timer always means Timer alone")
+            selection.select(.timer, companion: companion, available: all, companions: pairs)
+            selection.select(.music, available: all)
+            suite.expect(selection.companion == nil && selection.preferred == .music,
+                         "an individual choice always replaces the combination")
+            selection.select(.timer, companion: companion, available: all, companions: pairs)
+            selection.reconcile(available: all.filter { $0 != companion }, companions: [])
+            suite.expect(selection.preferred == .timer && selection.companion == nil,
+                         "a missing companion leaves the timer alone")
+            selection.select(.timer, companion: companion, available: all, companions: pairs)
+            selection.reconcile(available: all.filter { $0 != .timer }, companions: [])
+            suite.expect(selection.preferred == nil && selection.companion == nil,
+                         "a dismissed timer clears the entire combination")
+        }
+        selection.select(.music, available: all)
+        selection.select(.timer, companion: .calendar, available: all, companions: pairs)
+        suite.expect(selection.preferred == .music, "unsupported pairs cannot displace the current choice")
+        for height: CGFloat in [16, 22, 32, 40, 64] {
+            for width: CGFloat in [200, 320, 560] {
+                for combinations in [false, true] {
+                    let strip = CGSize(width: width, height: height)
+                    let layout = NotchActivityPickerLayout(count: 2, labelWidth: 60, stripSize: strip,
+                                                           screenWidth: 1024, hasCombinations: combinations)
+                    let shape = NotchShape(attached: true, radius: NotchLayout.surfaceRadius(height: layout.size.height))
+                        .path(in: CGRect(origin: .zero, size: layout.size))
+                    let inset = (layout.size.width - width) / 2
+                    for x in [inset, inset + width] {
+                        for y in [CGFloat(1), height - 1] {
+                            suite.expect(shape.contains(CGPoint(x: x, y: y)),
+                                         "the full strip, including edge artwork and timer suffixes, fits inside the picker silhouette")
+                        }
+                    }
+                }
+            }
+        }
+        for language in AppLanguage.allCases {
+            let activities: [NotchCompactActivity] = [.timer, .downloads, .agents, .calendar, .music]
+            let font = NSFont.systemFont(ofSize: 12, weight: .medium)
+            let width = activities.map {
+                ($0.title(language) as NSString).size(withAttributes: [.font: font]).width
+            }.max()!
+            for count in 2...5 {
+                let layout = NotchActivityPickerLayout(count: count, labelWidth: width,
+                    stripSize: CGSize(width: 300, height: 32), screenWidth: 1024)
+                let cell = (layout.size.width - NotchActivityPickerLayout.horizontalInset * 2
+                            - CGFloat(layout.columns - 1) * 6) / CGFloat(layout.columns)
+                suite.expect(cell >= width + 48 && layout.size.width <= 1000
+                             && layout.headerHeight == 32,
+                             "named activity buttons fit without truncation below the camera in \(language.rawValue)")
+            }
+        }
+    }
+
     static func run(_ suite: TestSuite) {
+        activitySelectionContracts(suite)
         railContracts(suite)
         presentationSpacingContracts(suite)
         noticeLayoutContracts(suite)

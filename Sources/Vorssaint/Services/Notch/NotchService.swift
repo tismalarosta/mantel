@@ -123,6 +123,8 @@ final class NotchService: ObservableObject {
     private var captureHover: ((Bool) -> Void)?
     private var inside = false
     private var hoverEmphasized = false
+    private var activitySelection = NotchActivitySelection()
+    private var activityPickerMenuOpen = false
     private var hoverState = NotchHoverState()
     private var openedByHover = false
     /// A click inside the open island, which may be what brings another app forward.
@@ -218,15 +220,66 @@ final class NotchService: ObservableObject {
     }
 
     var compactActivity: NotchCompactActivity? {
-        NotchSupport.compactActivity(timer: hasTimerActivity, downloads: hasDownloadActivity,
-                                     agents: hasAgentActivity, calendar: hasCalendarActivity,
-                                     music: hasMusicActivity)
+        activitySelection.current(available: compactActivities)
     }
 
-    /// What shares the closed island with the timer, left of the camera.
+    var compactActivities: [NotchCompactActivity] {
+        NotchSupport.compactActivities(timer: hasTimerActivity, downloads: hasDownloadActivity,
+                                      agents: hasAgentActivity, calendar: hasCalendarActivity,
+                                      music: hasMusicActivity)
+    }
+
+    var showsCompactActivityPicker: Bool {
+        (inside || activityPickerMenuOpen) && !hiddenInFullscreen && !hiddenUntilHover && !expanded && !peeking
+            && !dragPlaceholder && notice == nil && captureControls == nil
+            && compactActivities.count > 1
+    }
+
+    var compactActivityPickerLayout: NotchActivityPickerLayout {
+        let activities = compactActivities
+        let font = NSFont.systemFont(ofSize: 12, weight: .medium)
+        let labelWidth = activities.map {
+            ($0.title(L10n.shared.language) as NSString).size(withAttributes: [.font: font]).width
+        }.max() ?? 0
+        let sizes = activities.map { compactGeometry(for: $0).compactActivitySize }
+            + compactActivityCompanions.map { compactGeometry(for: .timer, companion: $0).compactActivitySize }
+        // Switching the chosen strip must not move the buttons under the pointer.
+        let strip = CGSize(width: sizes.map(\.width).max() ?? geometry.cameraWidth,
+                           height: sizes.map(\.height).max() ?? geometry.stripHeight)
+        return NotchActivityPickerLayout(count: activities.count, labelWidth: labelWidth,
+                                         stripSize: strip, screenWidth: geometry.screen.width,
+                                         hasCombinations: !compactActivityCompanions.isEmpty)
+    }
+
+    func selectCompactActivity(_ activity: NotchCompactActivity) {
+        guard compactActivities.contains(activity) else { return }
+        hoverWork?.cancel(); hoverWork = nil
+        mutatePresentation(transitionContent: .replace) {
+            objectWillChange.send()
+            activitySelection.select(activity, available: compactActivities)
+        }
+    }
+
+    func selectCompactCombination(_ companion: NotchCompactActivity) {
+        guard compactActivityCompanions.contains(companion) else { return }
+        hoverWork?.cancel(); hoverWork = nil
+        mutatePresentation(transitionContent: .replace) {
+            objectWillChange.send()
+            activitySelection.select(.timer, companion: companion, available: compactActivities,
+                                     companions: compactActivityCompanions)
+        }
+    }
+
+    var compactActivityCompanions: [NotchCompactActivity] {
+        NotchSupport.compactCompanions(timer: hasTimerActivity, running: NotchTimerService.shared.session.isRunning,
+                                       downloads: hasDownloadActivity, agents: hasAgentActivity, music: hasMusicActivity)
+    }
+
+    /// A single activity never borrows another activity's wing implicitly.
     var compactCompanion: NotchCompactActivity? {
-        NotchSupport.compactCompanion(timer: hasTimerActivity, running: NotchTimerService.shared.session.isRunning,
-                                      downloads: hasDownloadActivity, agents: hasAgentActivity, music: hasMusicActivity)
+        guard compactActivity == .timer, let companion = activitySelection.companion,
+              compactActivityCompanions.contains(companion) else { return nil }
+        return companion
     }
 
     private var compactActivityIsVisible: Bool {
@@ -237,11 +290,21 @@ final class NotchService: ObservableObject {
     private var compactMusicIsVisible: Bool { compactActivityIsVisible && compactActivity == .music }
 
     var compactActivityGeometry: NotchGeometry {
-        switch compactActivity {
+        compactGeometry(for: compactActivity, companion: compactCompanion)
+    }
+
+    private func compactGeometry(for activity: NotchCompactActivity?, companion: NotchCompactActivity? = nil) -> NotchGeometry {
+        var geometry = self.geometry
+        if showsCompactActivityPicker {
+            let room = max(0, (geometry.screen.width - 24 - NotchActivityPickerLayout.horizontalInset * 2
+                               - geometry.cameraWidth) / 2)
+            geometry.compactSideRoom = min(geometry.compactSideRoom ?? 0, room)
+        }
+        switch activity {
         case .music: return geometry.compactMusicGeometry
         case .timer:
-            return geometry.compactTimerGeometry(showsDownloads: hasDownloadActivity,
-                                                 wing: hasDownloadActivity ? 0 : timerStripWing)
+            return geometry.compactTimerGeometry(showsDownloads: companion == .downloads,
+                                                 wing: timerStripWing(for: companion))
         case .downloads:
             let name = NotchDownloadService.shared.items.first { $0.active && !$0.completed }?.name
             return geometry.compactDownloadGeometry(wing: NotchDownloadSupport.compactWing(for: name, in: geometry))
@@ -279,7 +342,7 @@ final class NotchService: ObservableObject {
     /// The wider of the two sides, the timer's reading or what shares the
     /// island with it, drawn as the strip draws them, with the clearance
     /// from the silhouette's curve and air beside the camera.
-    private var timerStripWing: CGFloat {
+    private func timerStripWing(for companion: NotchCompactActivity?) -> CGFloat {
         let provisional = geometry.compactTimerGeometry(showsDownloads: false,
                                                         wing: NotchTimerSupport.stripWingRange.lowerBound)
         let height = provisional.compactActivityContentHeight
@@ -291,7 +354,7 @@ final class NotchService: ObservableObject {
             .font: NSFont.monospacedDigitSystemFont(ofSize: size, weight: .medium)
         ]).width.rounded(.up) + provisional.compactActivityEdgeInset(boxHeight: size * 0.72, radius: 0)
         let mark: CGFloat
-        switch compactCompanion {
+        switch companion {
         case .music:
             mark = provisional.compactMusicArtworkSide + provisional.compactMusicArtworkInset
         case .agents:
@@ -417,6 +480,7 @@ final class NotchService: ObservableObject {
                 contentHeight: notice.previewContentHeight(width: geometry.notificationPreviewContentWidth))
         }
         if peeking { return geometry.peek }
+        if showsCompactActivityPicker { return compactActivityPickerLayout.size }
         if compactActivity != nil {
             let resting = compactActivityGeometry.compactActivitySize
             return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
@@ -599,6 +663,8 @@ final class NotchService: ObservableObject {
         sectionRow = 0
         inside = false
         hoverEmphasized = false
+        activitySelection = NotchActivitySelection()
+        activityPickerMenuOpen = false
         hoverState = NotchHoverState()
         openedByHover = false
         removeEventMonitors()
@@ -707,6 +773,7 @@ final class NotchService: ObservableObject {
         guard running, !suspended, !hiddenAtRestInFullscreen else { return }
         let point = NSEvent.mouseLocation
         let wasInside = inside
+        let showedPicker = showsCompactActivityPicker
         inside = hiddenUntilHover ? geometry.contains(point, in: geometry.collapsed)
             && windowHost?.isConcealedForMissionControl == false
             : windowHost?.containsHover(point) == true
@@ -714,7 +781,7 @@ final class NotchService: ObservableObject {
         let emphasize = inside && !hiddenInFullscreen && !hiddenUntilHover && !expanded && !peeking && !dragPlaceholder
             && notice == nil && captureControls == nil
             && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
-        if hoverEmphasized != emphasize {
+        if hoverEmphasized != emphasize || showedPicker != showsCompactActivityPicker {
             hoverEmphasized = emphasize
             refreshPresentation()
         }
@@ -733,6 +800,9 @@ final class NotchService: ObservableObject {
         // Keep the first deadline until the pointer actually crosses the boundary.
         if inside == wasInside, let hoverWork, !hoverWork.isCancelled { return }
         hoverWork?.cancel(); hoverWork = nil
+        // The visible choices replace automatic opening while several
+        // activities compete. Clicking the strip still opens its full page.
+        if showsCompactActivityPicker { return }
         if inside {
             if holdsNotification, let id = notice?.notificationID { holdNotification(id); return }
             guard !hoverState.suppressed, (notice == nil || hiddenUntilHover), !expanded, !peeking, !dragPlaceholder,
@@ -744,6 +814,7 @@ final class NotchService: ObservableObject {
                 self.hoverWork = nil
                 guard self.running, !self.suspended, self.inside, !self.hoverState.suppressed,
                       !self.expanded, !self.peeking, !self.pinned, !self.heldDrag, !self.keepsWorkingSurface,
+                      !self.showsCompactActivityPicker,
                       self.captureControls == nil, (self.notice == nil || self.hiddenUntilHover), !self.dragPlaceholder,
                       UserDefaults.standard.bool(forKey: DefaultsKey.notchOpenOnHover),
                       self.windowHost?.blocksHoverReveal() == false,
@@ -1508,6 +1579,7 @@ final class NotchService: ObservableObject {
     }
 
     func refreshPresentation(animated: Bool = true, transitionContent: NotchContentTransition = .none) {
+        activitySelection.reconcile(available: compactActivities, companions: compactActivityCompanions)
         if fullscreenCompact {
             finishMusicDeparture()
             presentedMusic = nil
@@ -1558,6 +1630,11 @@ final class NotchService: ObservableObject {
             activationRect = captureControlsCollapsed ? CGRect(origin: .zero, size: size) : .zero
         } else if notice != nil || dragPlaceholder {
             activationRect = .zero
+        } else if showsCompactActivityPicker {
+            let strip = compactActivityGeometry.compactActivitySize
+            activationRect = compactActivityGeometry.activationArea(
+                in: strip, hasHeader: false, compactActivity: true)
+                .offsetBy(dx: (size.width - strip.width) / 2, dy: 0)
         } else {
             activationRect = (expanded ? expandedGeometry : compactActivityIsVisible ? compactActivityGeometry : geometry)
                 .activationArea(in: size, hasHeader: expanded || peeking, compactActivity: compactActivityIsVisible, expandedHeader: expanded)
@@ -1893,11 +1970,18 @@ final class NotchService: ObservableObject {
     }
 
     private func installObservers() {
-        observe(.default, NSMenu.didBeginTrackingNotification) { [weak self] in self?.trackingMenu = true; self?.hoverWork?.cancel() }
+        observe(.default, NSMenu.didBeginTrackingNotification) { [weak self] in
+            guard let self else { return }
+            self.activityPickerMenuOpen = self.showsCompactActivityPicker
+            self.trackingMenu = true
+            self.hoverWork?.cancel()
+        }
         observe(.default, NSMenu.didEndTrackingNotification) { [weak self] in
             guard let self else { return }
             self.trackingMenu = false
+            self.activityPickerMenuOpen = false
             self.hover(self.windowHost?.contains(NSEvent.mouseLocation) == true)
+            self.refreshPresentation()
         }
         observe(.default, NSApplication.didChangeScreenParametersNotification) { [weak self] in
             self?.screenParametersDidChange()

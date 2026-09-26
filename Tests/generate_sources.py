@@ -47,6 +47,9 @@ def availability_declaration(path, prefix):
 
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    write("NotchActivityPicker.swift", "import SwiftUI\n"
+          + declaration("Sources/Vorssaint/UI/Notch/NotchView.swift", "struct NotchShape: Shape {")
+          + declaration("Sources/Vorssaint/UI/Notch/NotchView.swift", "struct NotchActivityPicker: View {"))
     write("ScrollingCaptureLoop.swift", "import AppKit\nimport CoreGraphics\n"
           + "extension ScreenshotScrollingCaptureTests {\n"
           + declaration("Sources/Vorssaint/Services/QuickTools/ScreenshotScrollingCapture.swift",
@@ -100,6 +103,7 @@ def main():
               "    private struct Route", "    private enum DDCProbe"])
           + "final class Service: Fixture {\n"
           + declaration(brightness, "    private func step(").replace("private ", "", 1)
+          + declaration(brightness, "    private func writeExtendedBrightness(").replace("private ", "", 1)
           + "}\n}\n")
     activator = "Sources/Vorssaint/Services/Switcher/WindowActivator.swift"
     write("SwitcherActivationBodies.swift", "import AppKit\nimport ApplicationServices\n"
@@ -471,6 +475,7 @@ def main():
           + declaration(notch, "    func show(_ incoming:").replace("NotchSupport.routes(incoming.event)", "true")
           + "".join(declaration(notch, prefix).replace("    private ", "    ", 1) for prefix in [
               "    private var hiddenUntilHover:", "    private var hiddenAtRestInFullscreen:", "    func hover(",
+              "    var showsCompactActivityPicker:",
               "    private func missionControlDidRestore()",
               "    private var holdsNotification:", "    private func holdNotification(",
               "    private func syncNoticeWithPreferences(",
@@ -481,7 +486,9 @@ def main():
           + "}\n}\n")
     music_visibility = "".join(declaration(notch, prefix).replace("    private ", "    ", 1) for prefix in [
         "    private var hiddenUntilHover:", "    var fullscreenCompact:", "    var idleContent:", "    var hasMusicActivity:", "    var compactActivity:",
-        "    var compactActivityGeometry:", "    var surfaceSize:", "    func collapse(", "    func endCaptureControls(",
+        "    var compactActivityGeometry:", "    private func compactGeometry(", "    var compactActivities:",
+        "    var compactCompanion:",
+        "    var surfaceSize:", "    func collapse(", "    func endCaptureControls(",
         "    private func syncVisibleConsumers(", "    private func releaseMonitor("])
     for call in ["NotchSupport.controls", "NotchSupport.watchesMusicActivity", "NotchSupport.idleContent"]:
         music_visibility = music_visibility.replace(call + "()", call + "(in: ReviewDefaults.current)")
