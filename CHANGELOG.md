@@ -16,6 +16,7 @@ Dynamic Island responds to hover and uses supported playback commands for radio 
 
 ### Fixed
 - Dynamic Island sends a player's supported Play or Pause command when available, improving control of radio streams.
+- Clipboard History no longer refreshes the whole list when the pointer moves between entries, including with the preview closed.
 
 ### Contributors
 Thanks to @stephansann for the report.
