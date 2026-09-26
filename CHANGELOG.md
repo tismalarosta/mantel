@@ -9,6 +9,9 @@ All notable changes to this project are documented here. The format follows
 ### Summary
 Dynamic Island responds to hover and uses supported playback commands for radio streams.
 
+### Added
+- Clipboard History's separate window resizes by dragging an edge or corner, and remembers the chosen size. Thanks to @1119350264.
+
 ### Changed
 - The closed Dynamic Island gently grows on hover before a click or a configured hover opening, while respecting Reduce Motion and available menu bar space.
 - App Switcher can skip highlight, scrolling and panel resize animations while browsing, with smooth selection still the default.
