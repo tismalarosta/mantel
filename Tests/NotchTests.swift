@@ -1591,6 +1591,11 @@ enum NotchTests {
         suite.expect(seekable?.seekPosition(95.5) == 95.5
                && seekable?.seekPosition(-10) == 0 && seekable?.seekPosition(300) == 180,
                "scrubbing retains fractions and stays within the current track")
+        let videoReply = Data(String(decoding: playingReply, as: UTF8.self)
+            .replacingOccurrences(of: "\"pid\":12", with: "\"pid\":12,\"canSkipNext\":false,\"canSkipPrevious\":true").utf8)
+        let video = NotchPlayback.decode(videoReply, now: now)
+        suite.expect(video?.canSkipNext == false && video?.canSkipPrevious == true && playing?.canSkipNext == nil,
+               "the player's own skip commands reach playback, and a missing list stays unknown")
         suite.expect(playing?.seekPosition(30) == nil && seekable?.seekPosition(.nan) == nil
                && seekable?.seekPosition(.infinity) == nil,
                "unsupported playback and non-finite positions cannot produce seek commands")

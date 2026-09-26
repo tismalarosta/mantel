@@ -858,6 +858,7 @@ def main():
           + declaration(music, "    private struct AutomationAction {").replace("private struct", "struct", 1)
           + declaration(music, "    var canSeek:")
           + declaration(music, "    func canPerform(")
+          + declaration(music, "    func lacksTrackSkipping(")
           + declaration(music, "    func requestAutomationAccess()")
           + declaration(music, "    private func beginAutomation(").replace("private func", "func", 1)
           + declaration(music, "    private func receiveValidation(").replace("private func", "func", 1)

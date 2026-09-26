@@ -264,9 +264,13 @@ private struct NotchMusicTransport: View {
 
     private var transportButtons: some View {
         HStack(spacing: compact ? 14 : 22) {
-            playbackButton("backward.end.fill", title: text.mediaPrevious, command: .previous)
+            if !service.lacksTrackSkipping(.previous) {
+                playbackButton("backward.end.fill", title: text.mediaPrevious, command: .previous)
+            }
             toggleButton
-            playbackButton("forward.end.fill", title: text.mediaNext, command: .next)
+            if !service.lacksTrackSkipping(.next) {
+                playbackButton("forward.end.fill", title: text.mediaNext, command: .next)
+            }
         }
         .frame(height: height)
     }

@@ -151,6 +151,8 @@ public func vorssaintNowPlayingGet() {
     }
     // Only expose seeking when the current player advertises that command.
     // Missing symbols keep the timeline read-only without affecting playback.
+    // Track skipping is reported the same way, so a player without a next or
+    // previous command (a video, say) does not show buttons that do nothing.
     typealias CommandID = @convention(c) (AnyObject) -> Int32
     typealias CommandEnabled = @convention(c) (AnyObject) -> Bool
     let capabilities = DispatchGroup()
@@ -161,9 +163,16 @@ public func vorssaintNowPlayingGet() {
        NotchNativePlayback.stringConstant("kMRMediaRemoteOptionPlaybackPosition") != nil {
         capabilities.enter()
         NotchNativePlayback.supportedCommands(selected, queue: queue) { commands in
-            set("canSeek", commands?.contains(where: {
-                commandID($0 as AnyObject) == 24 && commandEnabled($0 as AnyObject)
-            }) == true)
+            func supports(_ command: Int32) -> Bool {
+                commands?.contains(where: {
+                    commandID($0 as AnyObject) == command && commandEnabled($0 as AnyObject)
+                }) == true
+            }
+            set("canSeek", supports(24))
+            if commands != nil {
+                set("canSkipNext", supports(4))
+                set("canSkipPrevious", supports(5))
+            }
             capabilities.leave()
         }
     }

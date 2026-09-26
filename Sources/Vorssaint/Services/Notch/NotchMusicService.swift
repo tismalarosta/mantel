@@ -449,10 +449,20 @@ final class NotchMusicService: ObservableObject {
     func canPerform(_ command: Command) -> Bool {
         guard let playback, playback.commandContext != nil, !commandPending else { return false }
         if case .seek = command { return canSeek }
-        if playback.canSendCommandsDirectly { return true }
+        if playback.canSendCommandsDirectly { return !lacksTrackSkipping(command) }
         guard let available = automationAvailability, available.access == .granted else { return false }
         if command == .toggle { return available.capabilities.canToggle }
         return available.capabilities.event(for: command, isPlaying: playback.isPlaying) != nil
+    }
+
+    /// The player itself says it cannot skip this way, so the button is hidden.
+    func lacksTrackSkipping(_ command: Command) -> Bool {
+        guard let playback, playback.canSendCommandsDirectly else { return false }
+        switch command {
+        case .next: return playback.canSkipNext == false
+        case .previous: return playback.canSkipPrevious == false
+        default: return false
+        }
     }
 
     func refreshAutomation() {
