@@ -525,13 +525,18 @@ enum FeatureCatalogTests {
             func savedValues() -> [String: Any] {
                 installDefaults.persistentDomain(forName: installSuiteName) ?? [:]
             }
-            for feature in AppFeature.allCases where !feature.enabledKeys.isEmpty {
+            for feature in AppFeature.allCases
+            where !feature.enabledKeys.isEmpty && feature != .notchLiveEqualizer {
                 feature.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
                 suite.expect(feature.enabledKeys.contains {
                     savedValues()[$0] as? Bool == true
                 }, "a new \(feature.rawValue) install saves an enabled main control")
                 for key in feature.enabledKeys { installDefaults.removeObject(forKey: key) }
             }
+            AppFeature.notchLiveEqualizer.enableOnFirstInstall(in: installDefaults,
+                                                                savedValues: savedValues())
+            suite.expect(savedValues()[DefaultsKey.notchLiveEqualizer] == nil,
+                   "installing the live equalizer leaves its audio recording switch off")
             AppFeature.windowLayout.enableOnFirstInstall(in: installDefaults,
                                                           savedValues: savedValues())
             suite.expect(installDefaults.bool(forKey: DefaultsKey.windowLayoutShortcutsEnabled),
@@ -1956,6 +1961,31 @@ enum FeatureCatalogTests {
                 && historyRouter.pendingDestinationRequest == nil
                 && historyRouter.pendingFeatureTarget == nil,
                "direct page navigation synchronizes the destination and clears stale reveal requests")
+
+        let generalToolRouter = SettingsRouter()
+        let mixerDestination = FeatureSettingsDestination(.general, sectionAnchor: .mixer)
+        let musicBlockingDestination = FeatureSettingsDestination(.general, sectionAnchor: .musicBlocking)
+        generalToolRouter.request(mixerDestination)
+        generalToolRouter.request(musicBlockingDestination)
+        generalToolRouter.request(musicBlockingDestination)
+        generalToolRouter.goBack()
+        suite.expect(generalToolRouter.destination == mixerDestination,
+               "Settings Back returns to the previous General tool")
+        generalToolRouter.goBack()
+        suite.expect(generalToolRouter.destination == FeatureSettingsDestination(.general),
+               "Settings Back returns from a General tool to the General overview")
+        generalToolRouter.goForward()
+        generalToolRouter.goForward()
+        suite.expect(generalToolRouter.destination == musicBlockingDestination,
+               "Settings Forward retraces General tools")
+        generalToolRouter.page = .energy
+        generalToolRouter.request(FeatureSettingsDestination(.energy, sectionAnchor: .keepAwake))
+        generalToolRouter.request(FeatureSettingsDestination(.energy, sectionAnchor: .brightness))
+        generalToolRouter.request(FeatureSettingsDestination(.energy, sectionAnchor: .extraBrightness),
+                                  replacingVisit: true)
+        generalToolRouter.goBack()
+        suite.expect(generalToolRouter.destination == FeatureSettingsDestination(.energy, sectionAnchor: .keepAwake),
+               "Settings Back returns to the previous Energy tool, and a fallback replaces the visit")
 
         let hiddenHistoryRouter = SettingsRouter()
         hiddenHistoryRouter.page = .mouse

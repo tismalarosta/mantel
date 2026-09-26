@@ -49,6 +49,7 @@ struct NotchLayoutEditor: View {
                                 .overlay {
                                     if outlineEnabled {
                                         shape.stroke(.white.opacity(0.65), lineWidth: 2).clipShape(shape)
+                                            .mask(Rectangle().padding(.top, 1))
                                     }
                                 }
                         }

@@ -412,6 +412,9 @@ enum NotchPresentationProbe {
         if host.outlineProbeOpacity != 1 || host.outlineProbeWidth != 2 {
             failures.append("the optional outline is not visible around the compact island")
         }
+        if !host.outlineProbeTopOpen {
+            failures.append("the outline draws a line along the top of the screen")
+        }
         host.setOutline(enabled: false, color: .white)
         if host.outlineProbeOpacity != 0 || host.outlineProbeWidth != 0.5 {
             failures.append("turning off the outline did not restore the compact island")

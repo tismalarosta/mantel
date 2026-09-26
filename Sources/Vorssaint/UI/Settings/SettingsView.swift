@@ -506,12 +506,12 @@ struct SettingsView: View {
         switch router.page {
         case .general:
             // General stays visible when one of its tools is uninstalled.
-            router.request(FeatureSettingsDestination(.general))
+            router.request(FeatureSettingsDestination(.general), replacingVisit: true)
         case .energy:
             // Energy has no overview row. A history visit to an uninstalled
             // tool should show another available tool, not an empty detail.
             if let available = sidebarItems.first(where: { $0.destination.page == .energy }) {
-                router.request(available.destination)
+                router.request(available.destination, replacingVisit: true)
             }
         default:
             break

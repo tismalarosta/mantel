@@ -285,11 +285,14 @@ extension AppFeature {
 
     /// Turn on the feature's main behavior at install time. Features with
     /// several independent controls start with one useful behavior, except
-    /// audio priority, whose output and input controls work together.
+    /// audio priority, whose output and input controls work together. The
+    /// live equalizer stays off: it asks for system audio recording on the
+    /// first song, so only the user's own switch turns it on.
     private var initialEnableKeys: [String] {
         switch self {
         case .windowLayout: return [DefaultsKey.windowLayoutShortcutsEnabled]
         case .audioPriority: return enabledKeys
+        case .notchLiveEqualizer: return []
         default: return enabledKeys.first.map { [$0] } ?? []
         }
     }

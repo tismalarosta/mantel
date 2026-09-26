@@ -602,6 +602,7 @@ final class NotchWindowHost: NSObject, CAAnimationDelegate {
     var backdropProbeOpenness: Double { canvas.backdropPresentation.openness }
     var outlineProbeOpacity: Float { canvas.outlineProbeOpacity }
     var outlineProbeWidth: CGFloat { canvas.outlineProbeWidth }
+    var outlineProbeTopOpen: Bool { canvas.outlineProbeTopOpen }
     /// Nil where this macOS has no overlay Spaces to offer.
     var overlayProbeHolds: Bool? { overlaySpace.map { $0.probeHolds(panel) } }
     var backdropProbeScheduled: Bool { canvas.backdropDisplayLink != nil }
@@ -978,6 +979,12 @@ private final class NotchCanvas: NSView {
         edge.fillColor = nil
         updateContrast()
         edge.zPosition = 2
+        // The island hangs from the top of the screen, so its outline leaves
+        // that side open instead of drawing a line along the screen's edge.
+        let edgeMask = CALayer()
+        edgeMask.backgroundColor = NSColor.black.cgColor
+        edgeMask.frame = CGRect(x: -10_000, y: Self.outlineTopGap, width: 20_000, height: 20_000)
+        edge.mask = edgeMask
         layer?.addSublayer(edge)
         contentVisibility.name = "notch.contentVisibility"
         contentVisibility.backgroundColor = NSColor.black.cgColor
@@ -1026,8 +1033,15 @@ private final class NotchCanvas: NSView {
         updateContrast()
     }
 
+    /// The inner half of the widest outline stroke, left undrawn at the top.
+    static let outlineTopGap: CGFloat = 1
+
     var outlineProbeOpacity: Float { edge.opacity }
     var outlineProbeWidth: CGFloat { edge.lineWidth }
+    var outlineProbeTopOpen: Bool {
+        guard let mask = edge.mask else { return false }
+        return mask.frame.minY >= edge.lineWidth / 2 && mask.frame.minY <= Self.outlineTopGap
+    }
 
     func setFileDropActions(_ actions: NotchFileDropActions?) {
         let wasEnabled = dropActions != nil

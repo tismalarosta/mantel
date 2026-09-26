@@ -506,11 +506,13 @@ enum NotchTests {
         let enabledByDefault = [DefaultsKey.notchNotificationsEnabled, DefaultsKey.notchCameraEnabled,
                                 DefaultsKey.notchAgentsEnabled, DefaultsKey.notchDownloadsEnabled,
                                 DefaultsKey.notchLyricsEnabled, DefaultsKey.notchQueueEnabled,
-                                DefaultsKey.notchLiveEqualizer, DefaultsKey.notchKeyboardLight,
+                                DefaultsKey.notchKeyboardLight,
                                 DefaultsKey.notchAccessoriesEnabled, DefaultsKey.notchClipboard,
                                 DefaultsKey.notchCapture, DefaultsKey.notchTrackChange]
         suite.expect(enabledByDefault.allSatisfy { firstDefaults[$0] as? Bool == true },
                      "installed island sections and activity indicators start enabled")
+        suite.expect(firstDefaults[DefaultsKey.notchLiveEqualizer] as? Bool == false,
+                     "the live equalizer starts off because it asks for system audio recording")
 
         let priorInstall = "com.vorssaint.tests.notch-existing-\(UUID().uuidString)"
         let existing = UserDefaults(suiteName: priorInstall)!
