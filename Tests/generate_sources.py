@@ -65,6 +65,14 @@ def main():
                         "    static func imageCapture(")
           + "}\n")
     panel = "Sources/Vorssaint/App/AppDelegate.swift"
+    write("UpdateIntroFlow.swift", "import AppKit\nimport Foundation\n"
+          + "extension UpdateIntroFlowTests {\nfinal class Host: Fixture {\n"
+          + "".join(declaration(panel, prefix).replace("    private ", "    ", 1) for prefix in [
+              "    private func presentUpdateIntros()", "    private func showUpdateHighlightsIfNeeded()",
+              "    private func markUpdateHighlightsSeen()", "    private func showSupportUpdateIntroIfNeeded()",
+              "    func windowShouldClose(", "    func windowWillClose(", "    private func markOnboardingComplete()",
+              "    private func markSupportUpdateIntroSeenIfCurrentUpdate()", "    private func markSupportUpdateIntroSeen()"])
+          + "}\n}\n")
     write("PostUpdateStatusItemRecovery.swift", "import AppKit\nimport Foundation\n"
           + "extension PostUpdateStatusItemRecoveryTests {\nfinal class Host: Fixture {\n"
           + "".join(declaration(panel, prefix).replace("private ", "") for prefix in [

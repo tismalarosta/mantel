@@ -866,8 +866,8 @@ enum OnboardingInfo {
 
 /// The one-time tour of this release's headline feature, shown after updating.
 enum UpdateHighlightsInfo {
-    /// One tour shared by the betas and final release.
-    static let releaseVersion = "3.4.0-beta.1"
+    static let releaseVersion = "3.4.0"
+    static let betaSeenVersion = "3.4.0-beta.1"
 
     static func matchesRelease(_ appVersion: String) -> Bool {
         guard let version = UpdateServiceSupport.SemanticVersion(raw: appVersion),
@@ -883,7 +883,13 @@ enum UpdateHighlightsInfo {
     }
 
     static func shouldShow(appVersion: String, lastSeenVersion: String?) -> Bool {
-        matchesRelease(appVersion) && lastSeenVersion != releaseVersion
+        guard let marker = seenVersion(for: appVersion) else { return false }
+        return lastSeenVersion != marker
+    }
+
+    static func seenVersion(for appVersion: String) -> String? {
+        guard matchesRelease(appVersion) else { return nil }
+        return appVersion == releaseVersion ? releaseVersion : betaSeenVersion
     }
 }
 
@@ -913,8 +919,12 @@ enum SupportUpdateIntroInfo {
     /// release only shows it when this constant is deliberately bumped.
     static let releaseVersion = "3.4.0"
 
+    // Older beta onboarding wrote the release version before this screen was
+    // available. A distinct completion marker keeps those upgraders eligible.
+    static let seenVersion = "3.4.0-support"
+
     static func shouldShow(appVersion: String, lastSeenVersion: String?) -> Bool {
-        appVersion == releaseVersion && lastSeenVersion != releaseVersion
+        appVersion == releaseVersion && lastSeenVersion != seenVersion
     }
 }
 
