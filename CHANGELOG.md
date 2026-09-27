@@ -7,9 +7,10 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island adds reopening choices, improves music gestures and playback selection, keeps brightness feedback white, and reduces repeated processing during agent activity and Mission Control monitoring. The menu bar panel and Settings open on the display where they are invoked in multi-monitor setups.
+Dynamic Island adds reopening choices, improves music gestures and playback selection, keeps brightness feedback white, and reduces repeated processing during agent activity and Mission Control monitoring. The menu bar panel and Settings open on the display where they are invoked in multi-monitor setups. The update tour gains an animated demo and simpler setup.
 
 ### Changed
+- The Dynamic Island update tour uses an animated demo, and Set up installs the feature when needed. The final 3.4.0 release shows the tour only if it was not seen during beta, followed by a single Buy Me a Coffee screen.
 - Dynamic Island can reopen directly to the app panel or Explore, alongside its section choices.
 - Dynamic Island automatically follows music apps by default. Music settings can also include videos and other apps; manually chosen playback sources still work.
 
