@@ -1896,6 +1896,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     func showUpdateHighlights() {
         closePopover()
         if let window = updateHighlightsWindow {
+            centerIntroWindow(window)
             NSApp.activate(ignoringOtherApps: true)
             window.makeKeyAndOrderFront(nil)
             return
@@ -2060,12 +2061,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     /// inside the visible area, so a window taller than the screen starts at
     /// the top instead of hanging below it.
     private func centerIntroWindow(_ window: NSWindow) {
+        let visible = (window.screen ?? popover.contentViewController?.view.window?.screen)?.visibleFrame ?? NSScreen.pointerVisibleFrame
+        if let host = window.contentViewController as? NSHostingController<UpdateHighlightsView>,
+           host.rootView.availableSize != visible.size {
+            host.rootView.availableSize = visible.size
+        }
         window.contentView?.layoutSubtreeIfNeeded()
         if let fitting = window.contentViewController?.view.fittingSize,
            fitting.width > 0, fitting.height > 0 {
             window.setContentSize(fitting)
         }
-        let visible = (window.screen ?? popover.contentViewController?.view.window?.screen)?.visibleFrame ?? NSScreen.pointerVisibleFrame
         let size = window.frame.size
         let x = min(max(visible.midX - size.width / 2, visible.minX), max(visible.minX, visible.maxX - size.width))
         let y = min(max(visible.midY - size.height / 2, visible.minY), max(visible.minY, visible.maxY - size.height))

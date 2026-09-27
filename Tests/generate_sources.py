@@ -477,6 +477,12 @@ def main():
           + "final class Service: Fixture {\n"
           + declaration(update, "    private func launchAdminInstaller(").replace("private ", "", 1)
           + "}\n}\n")
+    highlights = "Sources/Vorssaint/UI/UpdateHighlightsView.swift"
+    write("UpdateHighlights.swift", "import AppKit\nimport SwiftUI\nextension UpdateHighlightsTests {\n"
+          + "".join(declaration(highlights, prefix) for prefix in [
+              "struct UpdateHighlightsView:", "enum UpdateHighlightsLayout", "private struct UpdateHighlightsGIF:"])
+              .replace("private struct UpdateHighlightsGIF", "struct UpdateHighlightsGIF")
+          + "}\n")
     canvas = "Sources/Vorssaint/Services/Notch/NotchWindowHost.swift"
     write("NotchMissionControlPolling.swift", "import Foundation\n"
           + "extension NotchMissionControlPollingTests {\nfinal class Host: State {\n"
