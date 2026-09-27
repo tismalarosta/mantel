@@ -130,6 +130,7 @@ struct MetricsTests {
             ("switcher", {
                 SwitcherScrollContract.run(suite)
                 SwitcherActivationTests.run(suite)
+                WindowServerCaptureContract.run(suite)
             }),
             ("keep-awake", {
                 KeepAwakeCatalogContract.run(suite)
