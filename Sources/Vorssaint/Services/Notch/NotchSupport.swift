@@ -701,7 +701,11 @@ enum NotchQuickAccessLayout {
             indices[button.side] = index + 1
             let count = configuration.buttons.filter { $0.side == button.side }.count
             let edge = button.side == .bottom ? body.maxY : button.side == .left ? body.minX : body.maxX
-            let top = button.side == .bottom ? body.midX - CGFloat(count - 1) * rowSpacing / 2 : headerTop
+            let span = CGFloat(count - 1) * rowSpacing
+            // Short pages lift a crowded column to balance its top and bottom
+            // margins. Keep the usual header alignment when there is room.
+            let sideTop = max(body.minY + diameter / 2 + gap, min(headerTop, body.midY - span / 2))
+            let top = button.side == .bottom ? body.midX - span / 2 : sideTop
             return NotchQuickAccessPlacement(button: button, index: index, edge: edge, top: top)
         }
     }

@@ -1270,7 +1270,7 @@ enum Defaults {
         DefaultsKey.notchHiddenControls: NotchControlItem.defaultHidden,
         DefaultsKey.notchScratchpadControlHidden: false,
         DefaultsKey.notchControlOrder: "",
-        DefaultsKey.notchSize: NotchSize.compact.rawValue,
+        DefaultsKey.notchSize: NotchSize.spacious.rawValue,
         DefaultsKey.notchOutlineEnabled: false,
         DefaultsKey.notchCustomWidth: NotchSize.defaultWidth,
         DefaultsKey.notchCustomHeight: NotchSize.defaultHeight,
@@ -1785,12 +1785,19 @@ enum Defaults {
     }
 
     /// Keep the previous implicit choices for people who already configured
-    /// the island. A fresh setup gets the new registered defaults instead.
+    /// the island. A fresh setup gets the new profile instead.
     static func migrateExistingNotchDefaults(in defaults: UserDefaults,
                                              domainName: String? = Bundle.main.bundleIdentifier) {
         guard let domainName else { return }
         let saved = defaults.persistentDomain(forName: domainName) ?? [:]
-        guard saved[DefaultsKey.notchDefaultProfileInitialized] == nil else { return }
+        guard saved[DefaultsKey.notchDefaultProfileInitialized] == nil else {
+            // The previous profile registered Compact without persisting it.
+            // Preserve that implicit choice before registering Spacious.
+            if saved[DefaultsKey.notchSize] == nil {
+                defaults.set(NotchSize.compact.rawValue, forKey: DefaultsKey.notchSize)
+            }
+            return
+        }
         let automaticKeys: Set<String> = [DefaultsKey.notchScratchpadControlHidden,
                                           DefaultsKey.notchHidesMenuBarIcon]
         let wasConfigured = saved.keys.contains {
@@ -1820,6 +1827,11 @@ enum Defaults {
             for (key, value) in previous where saved[key] == nil {
                 defaults.set(value, forKey: key)
             }
+        }
+        if !wasConfigured {
+            // Pin the new choice so subsequent launches cannot mistake this
+            // setup for an older profile with an implicit Compact size.
+            defaults.set(NotchSize.spacious.rawValue, forKey: DefaultsKey.notchSize)
         }
         defaults.set(true, forKey: DefaultsKey.notchDefaultProfileInitialized)
     }

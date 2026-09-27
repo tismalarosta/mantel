@@ -585,12 +585,12 @@ enum NotchTests {
         fresh.set(true, forKey: DefaultsKey.notchScratchpadControlHidden)
         Defaults.migrateExistingNotchDefaults(in: fresh, domainName: firstInstall)
         let firstDefaults = Defaults.registeredDefaults
-        suite.expect(fresh.persistentDomain(forName: firstInstall)?[DefaultsKey.notchSize] == nil
+        suite.expect(fresh.string(forKey: DefaultsKey.notchSize) == NotchSize.spacious.rawValue
                      && !fresh.bool(forKey: DefaultsKey.notchInitialExtensionsInstalled)
-                     && firstDefaults[DefaultsKey.notchSize] as? String == NotchSize.compact.rawValue
+                     && firstDefaults[DefaultsKey.notchSize] as? String == NotchSize.spacious.rawValue
                      && firstDefaults[DefaultsKey.notchOpenOnHover] as? Bool == false
                      && firstDefaults[DefaultsKey.notchAppPanel] as? Bool == false,
-                     "a first island setup starts compact, opens by click and uses a separate app panel")
+                     "a first island setup starts spacious, opens by click and uses a separate app panel")
         suite.expect(firstDefaults[DefaultsKey.notchGesturesEnabled] as? Bool == true
                      && firstDefaults[DefaultsKey.notchHapticFeedback] as? Bool == true
                      && firstDefaults[DefaultsKey.notchReturnHome] as? Bool == false
@@ -623,6 +623,19 @@ enum NotchTests {
                      && existing.bool(forKey: DefaultsKey.notchAppPanel)
                      && !existing.bool(forKey: DefaultsKey.notchAgentsEnabled),
                      "updating a configured island keeps explicit choices and previous implicit defaults")
+        Defaults.migrateExistingNotchDefaults(in: fresh, domainName: firstInstall)
+        suite.expect(fresh.string(forKey: DefaultsKey.notchSize) == NotchSize.spacious.rawValue,
+                     "a new Spacious setup keeps its size on subsequent launches")
+        for size in NotchSize.allCases {
+            existing.set(size.rawValue, forKey: DefaultsKey.notchSize)
+            Defaults.migrateExistingNotchDefaults(in: existing, domainName: priorInstall)
+            suite.expect(existing.string(forKey: DefaultsKey.notchSize) == size.rawValue,
+                         "every explicit island size survives the default change")
+        }
+        existing.removeObject(forKey: DefaultsKey.notchSize)
+        Defaults.migrateExistingNotchDefaults(in: existing, domainName: priorInstall)
+        suite.expect(existing.string(forKey: DefaultsKey.notchSize) == NotchSize.compact.rawValue,
+                     "an initialized profile preserves its previous implicit Compact size")
         existing.removeObject(forKey: DefaultsKey.notchAppPanel)
         Defaults.migrateExistingNotchDefaults(in: existing, domainName: priorInstall)
         suite.expect(!existing.bool(forKey: DefaultsKey.notchAppPanel),
@@ -694,9 +707,9 @@ enum NotchTests {
         defaults.set(true, forKey: DefaultsKey.notchEnabled)
         suite.expect(NotchSupport.usesHapticFeedback(in: defaults), "disabling the notch preserves the user's tactile preference")
         suite.expect(NotchSupport.idleContent(in: defaults) == .music, "a new island shows playing music at rest")
-        suite.expect(defaults.string(forKey: DefaultsKey.notchSize) == NotchSize.compact.rawValue
+        suite.expect(defaults.string(forKey: DefaultsKey.notchSize) == NotchSize.spacious.rawValue
                && !defaults.bool(forKey: DefaultsKey.notchOpenOnHover),
-               "a new island starts compact and opens by click")
+               "a new island starts spacious and opens by click")
         suite.expect(!defaults.bool(forKey: DefaultsKey.notchHideUntilHover), "hidden hover is opt-in")
         suite.expect(!defaults.bool(forKey: DefaultsKey.notchOutlineEnabled), "the island outline is opt-in")
         suite.expect(defaults.double(forKey: DefaultsKey.notchHoverDelay) == 0.25,
@@ -1070,6 +1083,36 @@ enum NotchTests {
                 suite.expect(pathIsCovered, "hover remains continuous through gaps, between buttons and around their edges")
                 let outside = CGPoint(x: side == .left ? region.minX - 1 : region.maxX + 1, y: first.y)
                 suite.expect(!region.contains(outside), "moving beyond the forgiving hover region still permits closing")
+            }
+        }
+        for side in NotchQuickAccessSide.allCases {
+            for count in 1...3 {
+                for height: CGFloat in [120, 190, 280, 400] {
+                    let body = CGRect(x: 72, y: 0, width: 440, height: height)
+                    let configuration = NotchQuickAccessConfiguration(buttons:
+                        (0..<count).map { _ in NotchQuickButton(action: .settings, side: side) })
+                    let values = NotchQuickAccessLayout.placements(configuration, body: body, headerTop: 61)
+                    let first = values.first!.center(progress: 1)
+                    let last = values.last!.center(progress: 1)
+                    if side == .bottom {
+                        suite.expect((first.x + last.x) / 2 == body.midX && first.y == body.maxY + 34,
+                                     "bottom actions stay centered beneath the island")
+                    } else {
+                        suite.expect(first.y >= 34 && first.y <= 61 && last.y - first.y == CGFloat(count - 1) * 54,
+                                     "side actions retain their size and spacing without crossing the top edge")
+                        if height == 190 && count == 3 {
+                            suite.expect(first.y == 41 && last.y == 149,
+                                         "three actions balance the margins of a short compact page")
+                        }
+                        if height >= 280 {
+                            suite.expect(first.y == 61, "roomy pages retain their header-aligned actions")
+                        }
+                        let hover = NotchQuickAccessLayout.hoverRect(count: count, edge: values[0].edge,
+                                                                    top: values[0].top, side: side)
+                        suite.expect(values.allSatisfy { hover.contains($0.center(progress: 1)) },
+                                     "the hover corridor follows the adapted button positions")
+                    }
+                }
             }
         }
         let legacy = NotchQuickAccessConfiguration.stored(in: defaults)

@@ -1915,7 +1915,7 @@ final class NotchService: ObservableObject {
         } else { cameraWidth = 0 }
         var next = NotchGeometry(screen: screen.frame, safeAreaTop: screen.safeAreaInsets.top,
                                  cameraWidth: cameraWidth,
-                                 layout: NotchSize(rawValue: UserDefaults.standard.string(forKey: DefaultsKey.notchSize) ?? "") ?? .compact,
+                                 layout: NotchSize(rawValue: UserDefaults.standard.string(forKey: DefaultsKey.notchSize) ?? "") ?? .spacious,
                                  menuBarHeight: menuBarMeasurements.height(
                                     displayID: screen.notchDisplayID, frame: screen.frame,
                                     visibleTop: screen.visibleFrame.maxY, scale: screen.backingScaleFactor,
