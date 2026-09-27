@@ -1604,7 +1604,7 @@ enum SwitcherModelFeatureTests {
         suite.expect(registeredDefaults[DefaultsKey.updateShowcaseMediaOverride] as? String == "",
                "update showcase media override is empty by default")
         suite.expect(SupportUpdateIntroInfo.releaseVersion == "3.4.0",
-               "support prompt is deliberately pinned to the 3.4 final release")
+               "support prompt is deliberately pinned to the 3.4 stable series")
         suite.expect(SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.0", lastSeenVersion: "3.3.2")
                && SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.0", lastSeenVersion: nil),
                "support prompt shows once after updating to its pinned release")
@@ -1614,8 +1614,8 @@ enum SwitcherModelFeatureTests {
                "premature support markers from beta onboarding do not suppress the stable invitation")
         suite.expect(!SupportUpdateIntroInfo.shouldShow(appVersion: "3.3.2", lastSeenVersion: nil)
                && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.0-beta.7", lastSeenVersion: nil)
-               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.4.1", lastSeenVersion: nil),
-               "support prompt never leaks into another release")
+               && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.5.0", lastSeenVersion: nil),
+               "support prompt never leaks into another release series")
         suite.expect(AppInfo.discordURL.absoluteString == "https://discord.gg/M6BwWH4BJp",
                "the community action uses the permanent Discord invitation")
         suite.expect(AppInfo.coffeeURL.absoluteString == "https://buymeacoffee.com/vorssaint",
@@ -1654,10 +1654,20 @@ enum SwitcherModelFeatureTests {
         suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: "3.4.0",
                                                       lastSeenVersion: UpdateHighlightsInfo.betaSeenVersion),
                "beta tour viewers also see the final release tour")
-        for version in ["3.3.5", "3.4.1", "3.4.0-rc.1", "3.4.0-beta.0", "3.4.0-beta.no", "3.4.0-beta.2.no", "3.4.0-beta.2.1.1", "3.5.0-beta.1", "4.0.0"] {
+        for version in ["3.3.5", "3.5.0", "3.4.1-beta.1", "3.4.0-rc.1", "3.4.0-beta.0", "3.4.0-beta.no", "3.4.0-beta.2.no", "3.4.0-beta.2.1.1", "3.5.0-beta.1", "4.0.0"] {
             suite.expect(!UpdateHighlightsInfo.matchesRelease(version)
                    && !UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: nil),
                    "previewing from the current build and other release cycles cannot consume the future beta tour")
+        }
+        for version in ["3.4.0", "3.4.1", "3.4.2", "3.4.10", "3.4.99"] {
+            suite.expect(UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: nil)
+                   && UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: UpdateHighlightsInfo.betaSeenVersion)
+                   && SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: "3.4.0"),
+                   "direct hotfix upgraders still receive the stable tour and support invitation")
+            suite.expect(UpdateHighlightsInfo.seenVersion(for: version) == UpdateHighlightsInfo.releaseVersion
+                   && !UpdateHighlightsInfo.shouldShow(appVersion: version, lastSeenVersion: UpdateHighlightsInfo.releaseVersion)
+                   && !SupportUpdateIntroInfo.shouldShow(appVersion: version, lastSeenVersion: SupportUpdateIntroInfo.seenVersion),
+                   "all stable patches share completion markers and never repeat completed introductions")
         }
         let tourGIF = URL(fileURLWithPath: "Resources/Gifs/highlights-notch.gif")
         let tourFrames = CGImageSourceCreateWithURL(tourGIF as CFURL, nil).map(CGImageSourceGetCount)

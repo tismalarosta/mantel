@@ -2004,9 +2004,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     private func showSupportUpdateIntroIfNeeded() -> Bool {
-        // Same shape as the showcase gate: the window belongs to one specific
-        // release. Any other version never shows it, so an update that is not
-        // that release cannot resurrect the ask.
+        // Stable patches share one invitation, even if the first installed
+        // version in this release series is a hotfix.
         guard SupportUpdateIntroInfo.shouldShow(
             appVersion: AppInfo.version,
             lastSeenVersion: UserDefaults.standard.string(forKey: DefaultsKey.supportUpdateIntroVersion)
@@ -2235,7 +2234,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     private func markSupportUpdateIntroSeenIfCurrentUpdate() {
-        guard AppInfo.version == SupportUpdateIntroInfo.releaseVersion else { return }
+        guard SupportUpdateIntroInfo.matchesRelease(AppInfo.version) else { return }
         markSupportUpdateIntroSeen()
     }
 
