@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island adds reopening choices, improves music gestures and playback selection, keeps brightness feedback white, and reduces repeated processing during agent activity and Mission Control monitoring. The menu bar panel and Settings open on the display where they are invoked in multi-monitor setups. The update tour gains an animated demo and simpler setup.
+Dynamic Island adds reopening choices, improves music gestures and playback selection, keeps brightness feedback white, and reduces repeated processing during agent activity and Mission Control monitoring. The menu bar panel and Settings open on the display where they are invoked in multi-monitor setups. The update tour gains an animated demo and simpler setup. Window previews handle slow captures and cancellation more reliably.
 
 ### Changed
 - The Dynamic Island update tour uses an animated demo, and Set up installs the feature when needed. The final 3.4.0 release shows the tour only if it was not seen during beta, followed by a single Buy Me a Coffee screen.
@@ -15,6 +15,7 @@ Dynamic Island adds reopening choices, improves music gestures and playback sele
 - Dynamic Island automatically follows music apps by default. Music settings can also include videos and other apps; manually chosen playback sources still work.
 
 ### Fixed
+- App Switcher, Dock Preview and window screenshots serialize their shared window-server captures without blocking other background tasks. Cancelled preview requests skip queued capture work. Thanks to @trac3r00 and @cdbrandt729-code.
 - The menu bar panel follows the display where its icon was clicked, including vertically arranged displays. Settings opens on the panel's display or the pointer's display and moves there when reopened.
 - Music swipes ignore small initial direction changes and can close the expanded player from its surface. Accepted track skips show brief directional feedback, respecting Reduce Motion.
 - Screen and keyboard brightness feedback stays white in compact notices and the expanded header.
