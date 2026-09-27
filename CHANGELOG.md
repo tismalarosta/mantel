@@ -4,12 +4,12 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
-
-## [3.4.0]
+## [3.4.0] - 2026-09-27
 
 ### Summary
 Dynamic Island brings music, live activities and everyday tools together at the top of your screen, including a dedicated view of your AI agents. Version 3.4.0 also expands window management, capture and clipboard tools, adds automatic audio device switching, and improves everyday reliability and performance.
+
+If you use Extra Brightness on 3.3.5, turn it off before updating so it cannot cover the administrator password prompt.
 
 ### Dynamic Island
 - An optional, experimental island for Macs with or without a camera cutout, with customizable layouts, click or hover opening, gestures and keyboard navigation.
