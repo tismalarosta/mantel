@@ -550,6 +550,7 @@ enum NotchTests {
         NotchDestinationContract.run(suite)
         NotchMusicVisibilityTests.run(suite)
         NotchEqualizerTests.run { suite.expect($0, $1) }
+        WindowVisibilityTests.run { suite.expect($0, $1) }
         NotchLyricsTimelineTests.run { suite.expect($0, $1) }
         NotchUpdateTests.run(suite)
         NotchCaptureKeyboardTests.run(suite)
