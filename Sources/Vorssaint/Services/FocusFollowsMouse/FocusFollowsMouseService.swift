@@ -148,11 +148,16 @@ final class FocusFollowsMouseService {
             ) { self.target(at: evaluation.point, processID: $0) }
             guard let target else { return }
             DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 let targetAppIsFrontmost = NSWorkspace.shared.frontmostApplication?.processIdentifier
                     == target.processID
-                guard let self, self.isRunning, self.nothingIsHeldDown,
-                      self.state.isCurrent(evaluation),
-                      Self.receivingWindow(at: evaluation.point) == pointerWindowID,
+                let isCurrent = { [weak self] in
+                    guard let self else { return false }
+                    return self.isRunning && self.nothingIsHeldDown
+                        && self.state.isCurrent(evaluation)
+                        && Self.receivingWindow(at: evaluation.point) == pointerWindowID
+                }
+                guard isCurrent(),
                       let app = NSRunningApplication(processIdentifier: target.processID),
                       app.activationPolicy == .regular, !app.isTerminated,
                       FocusFollowsMouseSupport.shouldActivate(
@@ -169,7 +174,8 @@ final class FocusFollowsMouseService {
                 guard UserDefaults.standard.bool(forKey: DefaultsKey.focusFollowsMouseRaise) else {
                     SpaceWindowBridge.focusWithoutRaise(
                         target.windowID, ownerPID: target.processID,
-                        replacing: targetAppIsFrontmost ? target.focusedWindowID : nil)
+                        replacing: targetAppIsFrontmost ? target.focusedWindowID : nil,
+                        while: isCurrent)
                     return
                 }
                 WindowActivator.activate(pid: target.processID,
