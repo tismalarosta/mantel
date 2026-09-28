@@ -2265,6 +2265,15 @@ enum SwitcherModelFeatureTests {
                    && panelBodyCode("private var metricPanel: some View {").contains(".panelGlassSurface()"),
                "both the navigable panel and the metric panel wear that surface")
 
+        // The popover window is the panel plus 13 pt for the arrow and 13 pt
+        // below it. A window taller than the usable height opens beside the
+        // icon (issue #2225), so the height cap has to leave at least 26 pt.
+        let panelCapMargin = panelBodyCode("private var maxHeight: CGFloat {")
+            .components(separatedBy: "?? 760) - ").dropFirst().first
+            .flatMap { Int($0.prefix(while: \.isNumber)) } ?? 0
+        suite.expect(panelCapMargin >= 26,
+               "a panel at its height cap still fits under its icon, arrow and bottom margin included")
+
         // The panel keeps its top edge and its center while its content resizes.
         let panelArea = CGRect(x: 0, y: 0, width: 1470, height: 932)
         let shortPanel = StatusItemAnchorSupport.pinnedPanelFrame(size: CGSize(width: 332, height: 375),
