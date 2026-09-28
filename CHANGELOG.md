@@ -23,6 +23,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 ### Changed
 - Keep Awake starts with one click from duration chips or an end time; the switch and shortcut restart the last choice, and the panel explains when battery protection prevents a session.
 - Dynamic Island notification banners fit their message instead of always using the same wide strip, and keep one width while several messages arrive in a row.
+- Escape in Dynamic Island steps back one level, closing the mixer options, month grid, lyrics or queue, or leaving a detail opened inside the island, before it closes the island.
 
 ### Fixed
 - Keyboard and mouse debounce now honor the configured interval on Apple silicon; scrolling features also use consistent event timing.
