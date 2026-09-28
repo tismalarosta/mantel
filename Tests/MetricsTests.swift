@@ -101,6 +101,7 @@ struct MetricsTests {
                 ScratchpadStoreContractTests.run(suite)
             }),
             ("quit-protection", { QuitProtectionHUD.progressChecks(suite) }),
+            ("scratchpad", { ScratchpadMarkTests.run { suite.expect($0, $1) } }),
             ("recording", {
                 RecorderSampleTimingTests.run(suite)
                 RecorderWriterTests.run(suite)
