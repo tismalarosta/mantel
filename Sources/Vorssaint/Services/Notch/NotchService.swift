@@ -692,10 +692,13 @@ final class NotchService: ObservableObject {
     }
 
     /// Opening without a page shows what the closed island is already
-    /// presenting. Only at rest does the reopening preference decide.
+    /// presenting: a mirrored banner, or an activity unless the user turned
+    /// that off. Otherwise the reopening preference decides.
     var reopeningDestination: (module: NotchModule, appPanel: Bool, sections: Bool) {
         if !expanded {
-            let activity = notice?.notificationID != nil ? NotchModule.notifications : compactActivity?.module
+            let opensActivity = UserDefaults.standard.object(forKey: DefaultsKey.notchOpensActivity) as? Bool ?? true
+            let activity = notice?.notificationID != nil ? NotchModule.notifications
+                : opensActivity ? compactActivity?.module : nil
             if let activity, modules.contains(activity) { return (activity, false, false) }
             if UserDefaults.standard.bool(forKey: DefaultsKey.notchReturnHome) {
                 let saved = UserDefaults.standard.string(forKey: DefaultsKey.notchHomeModule) ?? ""
@@ -713,6 +716,14 @@ final class NotchService: ObservableObject {
 
     var reopeningModule: NotchModule {
         reopeningDestination.module
+    }
+
+    /// A compact strip opens its activity's page, as opening the island does:
+    /// unless the user turned off opening the visible activity, in which case
+    /// the reopening choice decides here too.
+    func openActivity(_ module: NotchModule) {
+        let opensActivity = UserDefaults.standard.object(forKey: DefaultsKey.notchOpensActivity) as? Bool ?? true
+        if opensActivity { open(module) } else { open() }
     }
 
     func open(_ module: NotchModule? = nil, pinned: Bool = false, takeFocus: Bool = true,
