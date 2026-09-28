@@ -220,10 +220,10 @@ final class NotchService: ObservableObject {
     }
 
     var hasCalendarActivity: Bool {
-        guard NotchCalendarSupport.showsCountdown(),
-              let event = NotchCalendarService.shared.countdownEvent else { return false }
-        let now = Date()
-        return event.start > now && event.start.timeIntervalSince(now) <= NotchCalendarSupport.countdownLeadTime
+        guard let countdown = NotchCalendarService.shared.countdown,
+              countdown.ongoing ? NotchCalendarSupport.showsTimeLeft() : NotchCalendarSupport.showsCountdown()
+        else { return false }
+        return countdown.isShown(at: Date())
     }
 
     var compactActivity: NotchCompactActivity? {
@@ -322,10 +322,10 @@ final class NotchService: ObservableObject {
         }
     }
 
-    /// The wider of the two sides, the event's title or its clock and start
-    /// time, measured with the strip's fonts and its clearance from the curve.
+    /// The wider of the two sides, the event's title or its clock and the
+    /// time beside it, measured with the strip's fonts and its clearance from the curve.
     private var calendarStripWing: CGFloat {
-        guard let event = NotchCalendarService.shared.countdownEvent else {
+        guard let countdown = NotchCalendarService.shared.countdown else {
             return NotchGeometry.calendarWingRange.upperBound
         }
         let provisional = geometry.compactCalendarGeometry(wing: NotchGeometry.calendarWingRange.lowerBound)
@@ -334,7 +334,7 @@ final class NotchService: ObservableObject {
             (text as NSString).size(withAttributes: [.font: font]).width.rounded(.up)
         }
         let language = L10n.shared.language
-        let trimmed = event.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = countdown.event.title.trimmingCharacters(in: .whitespacesAndNewlines)
         let title = trimmed.isEmpty ? FeatureStrings.notchCalendar(language).untitled : trimmed
         let titleSide = NotchCalendarSupport.stripDotWidth + NotchCalendarSupport.stripTitleSpacing
             + width(title, .systemFont(ofSize: 11, weight: .semibold))
@@ -342,7 +342,7 @@ final class NotchService: ObservableObject {
         // while the minutes count down.
         let clockSide = width("00:00", .monospacedDigitSystemFont(ofSize: 13, weight: .medium))
             + NotchCalendarSupport.stripClockSpacing
-            + width(NotchCalendarSupport.startText(event.start, locale: language.formattingLocale()),
+            + width(NotchCalendarSupport.timeText(countdown, locale: language.formattingLocale()),
                     .monospacedDigitSystemFont(ofSize: 11, weight: .medium))
         return inset + max(titleSide, clockSide)
     }
@@ -2409,7 +2409,7 @@ final class NotchService: ObservableObject {
                 }.store(in: &subscriptions)
         }
         if modules.contains(.calendar) {
-            NotchCalendarService.shared.$countdownEvent.removeDuplicates()
+            NotchCalendarService.shared.$countdown.removeDuplicates()
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
                     self?.syncMenuSpaceMonitoring()

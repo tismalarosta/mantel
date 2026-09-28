@@ -17,6 +17,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Scratchpad adds a formatting toolbar in both the floating pad and Dynamic Island, native text search and an adjustable text size.
 - Mouse settings add optional linear scrolling with a fixed distance per wheel notch and a separate list of app exceptions.
 - Dynamic Island's Controls page shows a running timer's clock and your next appointment on their shortcuts.
+- Dynamic Island can count down the last hour of the calendar event in progress, alongside or instead of the countdown to the next one.
 
 ### Changed
 - Keep Awake starts with one click from duration chips or an end time; the switch and shortcut restart the last choice, and the panel explains when battery protection prevents a session.
@@ -35,7 +36,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
 
 ### Contributors
-Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged and @Yahddyyp.
+Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1 and @Yahddyyp.
 
 ## [3.4.0] - 2026-09-27
 
