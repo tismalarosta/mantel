@@ -20,6 +20,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Dynamic Island can count down the last hour of the calendar event in progress, alongside or instead of the countdown to the next one.
 - Dynamic Island can keep opening on the page chosen in When reopening while music, a timer or another activity is showing.
 - Menu bar settings can replace the Vorssaint icon with any SF Symbol.
+- Brightness keys and display brightness shortcuts can move in half or quarter steps, chosen in Displays settings.
 
 ### Changed
 - Keep Awake starts with one click from duration chips or an end time; the switch and shortcut restart the last choice, and the panel explains when battery protection prevents a session.
@@ -46,7 +47,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Mouse side buttons go back and forward again in Safari, Finder and other apps on keyboard layouts such as German and French.
 
 ### Contributors
-Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @cedigang, @daniel-dosiper, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1 and @Yahddyyp.
+Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @cedigang, @daniel-dosiper, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1, @Yahddyyp and @zxedacus. Feedback: Brain.
 
 ## [3.4.0] - 2026-09-27
 
