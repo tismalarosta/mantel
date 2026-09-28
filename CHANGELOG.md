@@ -34,6 +34,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Homebrew commands and app update checks use proxy and mirror settings exported by the user's shell, allowing package operations on networks where direct access is blocked.
 - Scrolling the Features page in Settings no longer stutters or freezes the app.
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
+- Setting the volume from Command Bar no longer adds a floating confirmation under the volume notice in Dynamic Island.
 
 ### Contributors
 Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1 and @Yahddyyp.
