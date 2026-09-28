@@ -12,6 +12,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 ### Added
 - App Updates can ignore one release or exclude an app from update results and alerts.
 - Dynamic Island lets you choose which calendars appear, grouped by account; hiding a calendar clears its events immediately.
+- Dynamic Island shows microphone mute and unmute notices in place of the separate popup, with a Microphone switch in its Indicators settings.
 - App Switcher can browse apps using a mouse wheel or trackpad, with precise wheel movement and consistent scroll direction.
 - Scratchpad adds a formatting toolbar in both the floating pad and Dynamic Island, native text search and an adjustable text size.
 - Mouse settings add optional linear scrolling with a fixed distance per wheel notch and a separate list of app exceptions.
@@ -33,7 +34,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
 
 ### Contributors
-Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged and @Yahddyyp.
+Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged and @Yahddyyp.
 
 ## [3.4.0] - 2026-09-27
 
