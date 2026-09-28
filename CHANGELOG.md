@@ -17,6 +17,7 @@ Everyday controls and package management behave more reliably across desktop lay
 - Scratchpad warns in both views when notes cannot be saved and shows a warning if the final save fails while closing.
 - Extra Brightness no longer hides purchase confirmations in the system app store or administrator password prompts.
 - Homebrew commands and app update checks use proxy and mirror settings exported by the user's shell, allowing package operations on networks where direct access is blocked.
+- Keep Awake's running-app trigger can now use helper apps such as Citrix Viewer, and notices them starting and quitting without a restart.
 
 ### Contributors
 Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @IanHollow, @iva-zhu, @Kernel-Hunter, @PathGao, @shlok1806, @trac3r00, @tyteachestech and @Yahddyyp.
