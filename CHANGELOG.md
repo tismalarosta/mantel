@@ -35,6 +35,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Scrolling the Features page in Settings no longer stutters or freezes the app.
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
 - Setting the volume from Command Bar no longer adds a floating confirmation under the volume notice in Dynamic Island.
+- Dynamic Island keeps the current song on screen while a player loads the next one, instead of briefly showing an empty music page and changing size. With the New track indicator on, the compact island keeps the previous song until the indicator shows the next one.
 
 ### Contributors
 Thanks to @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1 and @Yahddyyp.
