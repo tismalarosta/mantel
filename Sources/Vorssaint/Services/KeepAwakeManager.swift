@@ -444,8 +444,9 @@ final class KeepAwakeManager: ObservableObject {
         if enabled {
             guard runningAppsObservation == nil else { return }
             // The running-apps list rather than launch and terminate
-            // notifications: macOS posts neither for some helper apps, such as
-            // Citrix Viewer, while the list still gains and loses them (#1468).
+            // notifications: macOS posts neither for some background helper
+            // apps nested in another app's bundle, while the list still gains
+            // and loses them (#1468).
             runningAppsObservation = NSWorkspace.shared.observe(\.runningApplications) { [weak self] _, _ in
                 DispatchQueue.main.async {
                     self?.scheduleAutomationEvaluation(after: 0.1)
