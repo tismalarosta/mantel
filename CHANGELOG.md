@@ -21,6 +21,7 @@ Scratchpad gains easier formatting and search, Keep Awake starts with one click 
 - Dynamic Island can keep opening on the page chosen in When reopening while music, a timer or another activity is showing.
 - Menu bar settings can replace the Vorssaint icon with any SF Symbol.
 - Brightness keys and display brightness shortcuts can move in half or quarter steps, chosen in Displays settings.
+- Dynamic Island can be fitted to the notch's width and height on Macs where an edge of the notch shows around it.
 
 ### Changed
 - Keep Awake starts with one click from duration chips or an end time; the switch and shortcut restart the last choice, and the panel explains when battery protection prevents a session.

@@ -2036,10 +2036,15 @@ final class NotchService: ObservableObject {
                                     visibleTop: screen.visibleFrame.maxY, scale: screen.backingScaleFactor,
                                     statusBarThickness: NSStatusBar.system.thickness),
                                  customWidth: UserDefaults.standard.double(forKey: DefaultsKey.notchCustomWidth),
-                                 customHeight: UserDefaults.standard.double(forKey: DefaultsKey.notchCustomHeight))
-        if next.hasSameMenuBar(as: geometry) { next.compactSideRoom = geometry.compactSideRoom }
+                                 customHeight: UserDefaults.standard.double(forKey: DefaultsKey.notchCustomHeight),
+                                 cameraFit: NotchCameraFit.current())
+        let sameMenuBar = next.hasSameMenuBar(as: geometry)
+        if sameMenuBar { next.compactSideRoom = geometry.compactSideRoom }
         next.quickAccessBottomInset = NotchQuickAccessConfiguration.current().hasBottom ? NotchQuickAccessLayout.gutter : 0
         if next != geometry { menuSpaceGeneration += 1; geometry = next }
+        // A new camera or bar, such as a notch fit being adjusted, measures the
+        // menus again at once rather than leaving the wings off until the timer.
+        if !sameMenuBar { readMenuSpace() }
         if windowHost == nil {
             windowHost = NotchWindowHost(content: AnyView(NotchView(service: self)), geometry: geometry, size: surfaceSize,
                                         background: { AnyView(NotchWindowBackground(presentation: $0)) },
