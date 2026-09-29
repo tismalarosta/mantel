@@ -35,6 +35,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Dynamic Island keeps the current song on screen while a player loads the next one, instead of briefly showing an empty music page and changing size. With the New track indicator on, the compact island keeps the previous song until the indicator shows the next one.
 - Clicking the Now Playing cover in Dynamic Island, or the radial menu's Now Playing card, brings the playing app to the front instead of doing nothing, and shows its window again when it was closed.
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
+- On Macs without a battery, Dynamic Island settings no longer offer Battery at rest or among its indicators, and an island already set to show the battery at rest stays empty instead of showing a battery icon with no charge.
 - Setting the volume from Command Bar no longer adds a floating confirmation under the volume notice in Dynamic Island.
 - Dynamic Island's Fan Control page is as tall as its card, instead of opening a tall, mostly empty page even with the Compact size.
 - Some Mac mini, Mac Studio and iMac models no longer show an empty Battery card in Dynamic Island, or battery readings, alerts and settings they cannot use.
