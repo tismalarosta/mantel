@@ -352,7 +352,10 @@ enum SettingsDirectory {
                                                  FeatureStrings.notchAgents(language).title, "Claude", "Codex", "AI", "tokens",
                                                  FeatureStrings.notchAgents(language).resetsCard]
                                           // The fit card only appears with a camera housing to fit.
-                                          + (NotchSupport.hasNotchedDisplay ? [FeatureStrings.notch(language).cameraFit] : [])),
+                                          + (NotchSupport.hasNotchedDisplay ? [FeatureStrings.notch(language).cameraFit] : [])
+                                          + (NotchSupport.hasDisplayWithoutNotch
+                                             ? [FeatureStrings.notch(language).withoutNotch,
+                                                FeatureStrings.notch(language).capsuleFit] : [])),
                 SettingsDirectoryItem(page: .commandBar,
                                       title: FeatureStrings.commandBar(language).pageTitle,
                                       icon: "command",
