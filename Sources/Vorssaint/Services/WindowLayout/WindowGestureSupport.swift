@@ -733,6 +733,50 @@ enum WindowDirectionalModifierTapSupport {
     }
 }
 
+/// Native modifier-click, scroll and keyboard input always wins over a
+/// modifier-only pointer layout. Kept pure so input custody stays covered
+/// without manufacturing system-wide events in tests.
+enum WindowDirectionalModifierInputPolicy {
+    static func canBegin(mouseButtonPressed: Bool,
+                         pointerInputSinceArm: Bool) -> Bool {
+        !mouseButtonPressed && !pointerInputSinceArm
+    }
+
+    static func cancelsAndPassesThrough(_ type: CGEventType) -> Bool {
+        switch type {
+        case .scrollWheel, .leftMouseDown, .rightMouseDown, .otherMouseDown, .keyDown: return true
+        default: return false
+        }
+    }
+}
+
+/// Event-source counters catch a quick click or scroll that completes while
+/// the main queue is still waiting to start the deferred gesture. Reading the
+/// counters does not subscribe the idle tap to pointer events.
+struct WindowDirectionalModifierPointerSnapshot: Equatable {
+    let leftMouseDown: UInt32
+    let rightMouseDown: UInt32
+    let otherMouseDown: UInt32
+    let scrollWheel: UInt32
+
+    static func current() -> Self {
+        Self(
+            leftMouseDown: CGEventSource.counterForEventType(
+                .combinedSessionState, eventType: .leftMouseDown),
+            rightMouseDown: CGEventSource.counterForEventType(
+                .combinedSessionState, eventType: .rightMouseDown),
+            otherMouseDown: CGEventSource.counterForEventType(
+                .combinedSessionState, eventType: .otherMouseDown),
+            scrollWheel: CGEventSource.counterForEventType(
+                .combinedSessionState, eventType: .scrollWheel)
+        )
+    }
+
+    func hasPointerInput(since earlier: Self) -> Bool {
+        self != earlier
+    }
+}
+
 /// A modifier chord starts once, finishes on its first required-key release,
 /// and cannot restart until all its keys are up. Extra modifiers cancel it.
 struct WindowDirectionalModifierHold {
