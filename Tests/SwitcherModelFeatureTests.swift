@@ -4208,28 +4208,28 @@ enum SwitcherModelFeatureTests {
                                                  systemDragGestureEnabled: true) == .passThrough,
                "middle click stands down while the system three-finger drag owns the gesture")
 
-        expectEqual(QuickToolsSupport.colorString(red: 1, green: 0, blue: 0, format: .hex), "#FF0000",
+        expectEqual(ColorValue.string(red: 1, green: 0, blue: 0, format: .hex), "#FF0000",
                     "color picker formats pure red as hex")
-        expectEqual(QuickToolsSupport.colorString(red: 0.2, green: 0.4, blue: 0.6, format: .rgb),
+        expectEqual(ColorValue.string(red: 0.2, green: 0.4, blue: 0.6, format: .rgb),
                     "rgb(51, 102, 153)",
                     "color picker formats components as CSS rgb")
-        expectEqual(QuickToolsSupport.colorString(red: 1, green: 0, blue: 0, format: .hsl),
+        expectEqual(ColorValue.string(red: 1, green: 0, blue: 0, format: .hsl),
                     "hsl(0, 100%, 50%)",
                     "color picker formats pure red as hsl")
-        expectEqual(QuickToolsSupport.colorString(red: 0, green: 0.5, blue: 0, format: .hsl),
+        expectEqual(ColorValue.string(red: 0, green: 0.5, blue: 0, format: .hsl),
                     "hsl(120, 100%, 25%)",
                     "color picker formats dark green as hsl")
-        expectEqual(QuickToolsSupport.colorString(red: 0.25, green: 0.5, blue: 0.75, format: .swiftui),
+        expectEqual(ColorValue.string(red: 0.25, green: 0.5, blue: 0.75, format: .swiftui),
                     "Color(red: 0.250, green: 0.500, blue: 0.750)",
                     "color picker formats components as SwiftUI code")
-        expectEqual(QuickToolsSupport.colorString(red: 1.4, green: -0.2, blue: 0.5, format: .hex), "#FF0080",
+        expectEqual(ColorValue.string(red: 1.4, green: -0.2, blue: 0.5, format: .hex), "#FF0080",
                     "color picker clamps extended-gamut components")
         suite.expect(ColorCopyFormat.sanitized("banana") == .hex,
                "color picker falls back to hex for unknown stored formats")
-        expectEqual(QuickToolsSupport.colorString(red: 1, green: 0, blue: 0, format: .hex, bareHex: true),
+        expectEqual(ColorValue.string(red: 1, green: 0, blue: 0, format: .hex, bareHex: true),
                     "FF0000",
                     "color picker drops the leading # when the bare hex option is on")
-        expectEqual(QuickToolsSupport.colorString(red: 0.2, green: 0.4, blue: 0.6, format: .rgb, bareHex: true),
+        expectEqual(ColorValue.string(red: 0.2, green: 0.4, blue: 0.6, format: .rgb, bareHex: true),
                     "rgb(51, 102, 153)",
                     "bare hex option leaves the other copy formats untouched")
 
@@ -4254,10 +4254,10 @@ enum SwitcherModelFeatureTests {
                 suite.expectClose(sampled.greenComponent, expected.greenComponent, "sampled green respects \(profile)")
                 suite.expectClose(sampled.blueComponent, expected.blueComponent, "sampled blue respects \(profile)")
                 if profile == CGColorSpace.sRGB {
-                    expectEqual(QuickToolsSupport.colorString(red: sampled.redComponent,
-                                                             green: sampled.greenComponent,
-                                                             blue: sampled.blueComponent,
-                                                             format: .hex),
+                    expectEqual(ColorValue.string(red: sampled.redComponent,
+                                                 green: sampled.greenComponent,
+                                                 blue: sampled.blueComponent,
+                                                 format: .hex),
                                 "#336699", "color picker preserves a known sRGB hex")
                 }
             }
