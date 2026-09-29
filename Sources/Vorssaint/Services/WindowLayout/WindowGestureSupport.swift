@@ -768,3 +768,15 @@ struct WindowDirectionalModifierHold {
         return .none
     }
 }
+
+enum WindowDirectionalModifierCancellation {
+    case cancelHold
+    case preserveHold
+
+    func applied(to hold: WindowDirectionalModifierHold) -> WindowDirectionalModifierHold {
+        guard self == .cancelHold else { return hold }
+        var cancelled = hold
+        cancelled.cancel()
+        return cancelled
+    }
+}
