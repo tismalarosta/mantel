@@ -519,6 +519,19 @@ enum NotchCompactActivity: String, Identifiable {
     }
 }
 
+/// Two activities sharing the closed island: the primary keeps its reading
+/// right of the camera and the companion's mark takes the left.
+struct NotchActivityCombination: Hashable, Identifiable {
+    let primary: NotchCompactActivity
+    let companion: NotchCompactActivity
+
+    var id: String { primary.rawValue + "+" + companion.rawValue }
+
+    func title(_ language: AppLanguage) -> String {
+        primary.title(language) + " + " + companion.title(language)
+    }
+}
+
 /// The closed island on a display it is not on, when it shows on every
 /// display: that display's geometry, and what the island shows closed at
 /// the size it takes there. The service updates it as the island changes.
@@ -560,10 +573,11 @@ struct NotchActivitySelection {
     private(set) var preferred: NotchCompactActivity?
     private(set) var companion: NotchCompactActivity?
 
+    /// `companions` are the pairs `activity` supports now.
     mutating func select(_ activity: NotchCompactActivity, companion: NotchCompactActivity? = nil,
                          available: [NotchCompactActivity], companions: [NotchCompactActivity] = []) {
         guard available.contains(activity) else { return }
-        if let companion, activity != .timer || !companions.contains(companion) { return }
+        if let companion, !companions.contains(companion) { return }
         preferred = activity
         self.companion = companion
     }
@@ -575,8 +589,9 @@ struct NotchActivitySelection {
     }
 
     /// The chosen pair's companion while it is there to pair with.
+    /// `companions` are the pairs the preferred activity supports now.
     func companion(available companions: [NotchCompactActivity]) -> NotchCompactActivity? {
-        guard preferred == .timer, let companion, companions.contains(companion) else { return nil }
+        guard preferred != nil, let companion, companions.contains(companion) else { return nil }
         return companion
     }
 
@@ -749,8 +764,9 @@ enum NotchCapsuleLayout {
         return surface(content: content, leading: artworkInset(geometry), maximum: Maximum.music, geometry: geometry)
     }
 
-    /// A timer's mark, or the mark of what shares the capsule with it: a
-    /// download's arrow and percentage, the working agents or the cover.
+    /// A timer's mark, or the mark of what shares the capsule with a timer
+    /// or an event: a download's arrow and percentage, the working agents,
+    /// the cover or the event's dot and countdown.
     static func timerMarkWidth(companion: NotchCompactActivity?, workingAgents: Int, downloadPercent: Bool,
                                geometry: NotchGeometry, language: AppLanguage) -> CGFloat {
         switch companion {
@@ -758,9 +774,17 @@ enum NotchCapsuleLayout {
             return symbolWidth + (downloadPercent ? markSpacing + downloadPercentWidth(language) : 0)
         case .agents: return agentMarksWidth(working: workingAgents)
         case .music: return artworkSide(geometry)
+        case .calendar: return calendarClockWidth
         default: return symbolWidth
         }
     }
+
+    /// An event's dot and its countdown at its widest, as a pair shows it.
+    static var calendarClockWidth: CGFloat { calendarDotSide + markSpacing + width("00:00", font: readingFont) }
+
+    /// Between a mark and the reading beside it; an event's countdown is a
+    /// group of its own, so a pair with one keeps two clocks apart.
+    static func markGap(_ companion: NotchCompactActivity?) -> CGFloat { companion == .calendar ? groupSpacing : spacing }
 
     /// A timer's reading beside its mark, measured by its shape, so the
     /// capsule only moves when a character comes or goes.
@@ -768,8 +792,20 @@ enum NotchCapsuleLayout {
                              downloadPercent: Bool, geometry: NotchGeometry, language: AppLanguage) -> CGSize {
         let mark = timerMarkWidth(companion: companion, workingAgents: workingAgents, downloadPercent: downloadPercent,
                                   geometry: geometry, language: language)
-        let content = mark + spacing + width(NotchAgentSupport.readingShape(reading), font: readingFont)
+        let content = mark + markGap(companion) + width(NotchAgentSupport.readingShape(reading), font: readingFont)
         return surface(content: content, leading: companion == .music ? artworkInset(geometry) : endPadding,
+                       maximum: Maximum.activity, geometry: geometry)
+    }
+
+    /// An event beside what shares the capsule with it: that activity's
+    /// mark, then the event's dot and countdown. Its title moves to the
+    /// tooltip and VoiceOver.
+    static func calendarPairSurface(companion: NotchCompactActivity, workingAgents: Int, downloadPercent: Bool,
+                                    geometry: NotchGeometry, language: AppLanguage) -> CGSize {
+        let mark = timerMarkWidth(companion: companion, workingAgents: workingAgents, downloadPercent: downloadPercent,
+                                  geometry: geometry, language: language)
+        return surface(content: mark + markGap(.calendar) + calendarClockWidth,
+                       leading: companion == .music ? artworkInset(geometry) : endPadding,
                        maximum: Maximum.activity, geometry: geometry)
     }
 
@@ -1280,13 +1316,24 @@ enum NotchSupport {
         return candidates.compactMap { $0.0 ? $0.1 : nil }
     }
 
-    /// Supported, explicit pairs. A paused or finished timer needs its own
-    /// mark beside music or agents; downloads already carry their status.
-    static func compactCompanions(timer: Bool, running: Bool, downloads: Bool, agents: Bool,
-                                  music: Bool) -> [NotchCompactActivity] {
-        guard timer else { return [] }
-        return [(downloads, NotchCompactActivity.downloads), (running && agents, .agents),
-                (running && music, .music)].compactMap { $0.0 ? $0.1 : nil }
+    /// Supported, explicit pairs for the activity that keeps its reading
+    /// right of the camera. A paused or finished timer needs its own mark
+    /// beside agents, an event or music; downloads already carry their
+    /// status. An event's clock always runs, so a download, agents or music
+    /// can take the side its title had.
+    static func compactCompanions(of primary: NotchCompactActivity, timer: Bool, running: Bool, downloads: Bool,
+                                  agents: Bool, calendar: Bool, music: Bool) -> [NotchCompactActivity] {
+        let pairs: [(Bool, NotchCompactActivity)]
+        switch primary {
+        case .timer where timer:
+            pairs = [(downloads, .downloads), (running && agents, .agents), (running && calendar, .calendar),
+                     (running && music, .music)]
+        case .calendar where calendar:
+            pairs = [(downloads, .downloads), (agents, .agents), (music, .music)]
+        default:
+            pairs = []
+        }
+        return pairs.compactMap { $0.0 ? $0.1 : nil }
     }
 
     static func gestureIsOverHeader(expanded: Bool, peeking: Bool, fromTop: CGFloat, safeTop: CGFloat,

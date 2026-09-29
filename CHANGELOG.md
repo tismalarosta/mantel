@@ -19,6 +19,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Dynamic Island lets you choose which calendars appear, grouped by account; hiding a calendar clears its events immediately.
 - Dynamic Island's Controls page shows a running timer's clock and your next appointment on their shortcuts.
 - Dynamic Island can count down the last hour of the calendar event in progress, alongside or instead of the countdown to the next one.
+- Dynamic Island can count down to only the calendar events you choose from their right-click menu, and can combine the event countdown with a timer, music, a download or working AI agents.
 - Dynamic Island shows microphone mute and unmute notices in place of the separate popup, with a Microphone switch in its Indicators settings.
 - Dynamic Island can keep opening on the page chosen in When reopening while music, a timer or another activity is showing.
 - Dynamic Island can follow the pointer between displays, so files dropped on it on one display can be dragged out on another.
@@ -37,6 +38,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Dynamic Island notification banners fit their message instead of always using the same wide strip, and keep one width while several messages arrive in a row.
 - Dynamic Island's screen capture controls start compact, open while the pointer rests on them and close when it leaves; open, they place their title and buttons in the top row, beside the camera when they fit, and keep them away from the island's edges, so less of the screen is covered.
 - Escape in Dynamic Island steps back one level, closing the mixer options, month grid, lyrics or queue, or leaving a detail opened inside the island, before it closes the island.
+- Timer and event countdown digits in Dynamic Island roll to each new value, unless Reduce Motion is on.
 - On macOS 27, Dynamic Island's Hide the system banner option, formerly Dismiss the system banner, takes the original off screen as soon as the island shows the message instead of closing it about a second later, so its sound plays to the end and it still goes to Notification Center.
 
 ### Fixed

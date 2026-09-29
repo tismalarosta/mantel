@@ -691,7 +691,7 @@ enum NotchTests {
         selection.select(.downloads, available: [.agents, .music])
         suite.expect(selection.preferred == .music, "a late click on a removed choice is ignored")
         let all: [NotchCompactActivity] = [.timer, .downloads, .agents, .calendar, .music]
-        let pairs: [NotchCompactActivity] = [.downloads, .agents, .music]
+        let pairs: [NotchCompactActivity] = [.downloads, .agents, .calendar, .music]
         for companion in pairs {
             selection.select(.timer, companion: companion, available: all, companions: pairs)
             selection.reconcile(available: all)
@@ -717,8 +717,27 @@ enum NotchTests {
                          "an empty island clears the entire combination")
         }
         selection.select(.music, available: all)
-        selection.select(.timer, companion: .calendar, available: all, companions: pairs)
-        suite.expect(selection.preferred == .music, "unsupported pairs cannot displace the current choice")
+        selection.select(.agents, companion: .music, available: all, companions: [])
+        suite.expect(selection.preferred == .music && selection.companion(available: pairs) == nil,
+                     "unsupported pairs cannot displace the current choice")
+        let eventPairs: [NotchCompactActivity] = [.downloads, .agents, .music]
+        for companion in eventPairs {
+            selection.select(.calendar, companion: companion, available: all, companions: eventPairs)
+            selection.reconcile(available: all)
+            suite.expect(selection.current(available: all) == .calendar
+                         && selection.companion(available: eventPairs) == companion,
+                         "an event leads a pair of its own, keeping its clock beside the camera")
+            suite.expect(selection.preferred == .calendar
+                         && selection.companion(available: eventPairs.filter { $0 != companion }) == nil
+                         && selection.companion(available: eventPairs) == companion,
+                         "a companion that pauses leaves the event alone until it returns")
+            selection.reconcile(available: all.filter { $0 != .calendar })
+            suite.expect(selection.current(available: all.filter { $0 != .calendar }) == .timer,
+                         "the event's countdown ending leaves the island to the automatic order")
+            selection.reconcile(available: [])
+            suite.expect(selection.preferred == nil && selection.companion(available: eventPairs) == nil,
+                         "an empty island clears the event's pair")
+        }
         for height: CGFloat in [16, 22, 32, 40, 64] {
             for width: CGFloat in [200, 320, 560] {
                 for combinations in [false, true] {
@@ -2131,6 +2150,8 @@ enum NotchTests {
         suite.expect(NotchCalendarSupport.isEnabled(in: defaults), "calendar can be enabled independently")
         suite.expect(!NotchCalendarSupport.showsCountdown(in: defaults) && !NotchCalendarSupport.showsTimeLeft(in: defaults),
                      "calendar titles stay out of the closed island until explicitly enabled")
+        suite.expect(NotchCalendarSupport.showsCountdown(chosen: true, in: defaults),
+                     "an event chosen from its menu counts down while the countdown for every event is off")
         defaults.set(true, forKey: DefaultsKey.notchCalendarCountdown)
         suite.expect(NotchCalendarSupport.showsCountdown(in: defaults) && !NotchCalendarSupport.showsTimeLeft(in: defaults),
                      "the compact countdown follows its own opt-in")
@@ -2141,8 +2162,9 @@ enum NotchTests {
         defaults.set(true, forKey: DefaultsKey.notchCalendarCountdown)
         defaults.set("calendar", forKey: DefaultsKey.notchHiddenModules)
         suite.expect(!NotchCalendarSupport.isEnabled(in: defaults), "hiding the calendar releases its resources")
-        suite.expect(!NotchCalendarSupport.showsCountdown(in: defaults) && !NotchCalendarSupport.showsTimeLeft(in: defaults),
-                     "a hidden calendar cannot leave event titles in the island")
+        suite.expect(!NotchCalendarSupport.showsCountdown(in: defaults) && !NotchCalendarSupport.showsTimeLeft(in: defaults)
+                     && !NotchCalendarSupport.showsCountdown(chosen: true, in: defaults),
+                     "a hidden calendar cannot leave event titles in the island, even a chosen event's")
         defaults.set("", forKey: DefaultsKey.notchHiddenModules)
         defaults.set(false, forKey: AppFeature.notchCalendar.availabilityKey)
         suite.expect(!NotchCalendarSupport.isEnabled(in: defaults), "removing the calendar from the hub stops its reader")
@@ -2258,6 +2280,7 @@ enum NotchTests {
         suite.expect(transition([meeting], starts: false, ends: true) == meeting.end
                      && transition([meeting], starts: false) == nil,
                      "a refresh is scheduled when the current event ends, and none when nothing is followed")
+        chosenCountdownContracts(suite, defaults: defaults, now: now)
         let posix = Locale(identifier: "en_US_POSIX")
         let endText = NotchCalendarSupport.timeText(NotchCalendarCountdown(event: meeting, ongoing: true), locale: posix)
         suite.expect(NotchCalendarSupport.timeText(NotchCalendarCountdown(event: afterGap, ongoing: false), locale: posix)
@@ -2299,6 +2322,71 @@ enum NotchTests {
                                                            locale: british, calendar: calendar) == "Tue 09:00",
                      "the tile reads a start today as its time and adds the weekday for a later day, in the calendar's zone")
         calendarMonthContracts(suite)
+    }
+
+    /// Events chosen from their menu in the island, with the countdown for
+    /// every event off.
+    private static func chosenCountdownContracts(_ suite: TestSuite, defaults: UserDefaults, now: Date) {
+        let hour = NotchCalendarSupport.countdownLeadTime
+        func event(_ key: String, _ start: Double, _ end: Double) -> NotchCalendarEvent {
+            NotchCalendarEvent(id: key + ":" + String(start), title: key, calendar: "Personal",
+                               start: now.addingTimeInterval(start), end: now.addingTimeInterval(end),
+                               allDay: false, location: "", countdownKey: key)
+        }
+        let series = NotchCalendarSupport.countdownKey(identifier: "series", occurrence: now)
+        suite.expect(NotchCalendarSupport.countdownKey(identifier: "single", occurrence: nil) == "single"
+                     && series.hasPrefix("series@")
+                     && series != NotchCalendarSupport.countdownKey(identifier: "series",
+                                                                    occurrence: now.addingTimeInterval(86_400))
+                     && NotchCalendarSupport.countdownKey(
+                        identifier: "series", occurrence: Date(timeIntervalSinceReferenceDate: .greatestFiniteMagnitude))
+                        .hasPrefix("series@"),
+                     "a single event is chosen by its identifier and each occurrence of a series by the date it fell on")
+        let chosen = event("chosen", 1200, 2400)
+        let other = event("other", 600, 900)
+        let unkeyed = event("", 300, 600)
+        func countdown(_ events: [NotchCalendarEvent], at offset: Double = 0, starts: Bool = false,
+                       ends: Bool = false, choices: Set<String> = ["chosen"]) -> NotchCalendarCountdown? {
+            NotchCalendarSupport.countdown(events, now: now.addingTimeInterval(offset), starts: starts, ends: ends,
+                                           chosen: choices)
+        }
+        suite.expect(countdown([other, chosen]) == NotchCalendarCountdown(event: chosen, ongoing: false)
+                     && countdown([other, chosen], choices: []) == nil,
+                     "with the countdown for every event off, only an event chosen from its menu counts down")
+        suite.expect(countdown([other, chosen], starts: true)?.event == other,
+                     "with the countdown for every event on, the nearest start still leads")
+        suite.expect(countdown([unkeyed], choices: [""]) == nil,
+                     "an event read without a key is never taken for a chosen one")
+        suite.expect(countdown([chosen], at: 1200) == nil
+                     && countdown([chosen], at: 1200, ends: true) == NotchCalendarCountdown(event: chosen, ongoing: true),
+                     "a chosen event counts down to its start; time left in it follows its own option")
+        let ahead = event("ahead", hour + 1800, hour + 3600)
+        suite.expect(NotchCalendarSupport.countdownTransition([ahead], now: now, starts: false, ends: false,
+                                                              chosen: ["ahead"]) == now.addingTimeInterval(1800)
+                     && NotchCalendarSupport.countdownTransition([ahead], now: now, starts: false, ends: false,
+                                                                 chosen: []) == nil,
+                     "a refresh is scheduled when a chosen event's hour opens, and none for an event not chosen")
+        suite.expect(NotchCalendarSupport.chosenCountdowns(in: defaults).isEmpty, "no event starts chosen")
+        NotchCalendarSupport.setCountdown(true, for: chosen, in: defaults)
+        NotchCalendarSupport.setCountdown(true, for: unkeyed, in: defaults)
+        suite.expect(NotchCalendarSupport.chosenCountdowns(in: defaults) == ["chosen": chosen.end],
+                     "a chosen event is kept by its key with its end, and an event without a key cannot be chosen")
+        suite.expect(!SettingsBackupSupport.exportKeys().contains(DefaultsKey.notchCalendarChosenCountdowns),
+                     "events chosen on this Mac stay out of settings backups")
+        let moved = event("chosen", 1200 + hour, 2400 + hour)
+        suite.expect(NotchCalendarSupport.refreshedChoices(["chosen": chosen.end], events: [moved], now: now)
+                        == ["chosen": moved.end],
+                     "a chosen event moved to another time stays chosen with its new end")
+        suite.expect(NotchCalendarSupport.refreshedChoices(["chosen": chosen.end], events: [chosen, other], now: now) == nil,
+                     "an unchanged read writes no preference")
+        let nextWeek = now.addingTimeInterval(8 * 86_400)
+        suite.expect(NotchCalendarSupport.refreshedChoices(["chosen": chosen.end, "ended": now,
+                                                            "next week": nextWeek], events: [chosen], now: now)
+                        == ["chosen": chosen.end, "next week": nextWeek],
+                     "a choice is forgotten once its event ends, and one beyond the week read waits for its week")
+        NotchCalendarSupport.setCountdown(false, for: chosen, in: defaults)
+        suite.expect(defaults.object(forKey: DefaultsKey.notchCalendarChosenCountdowns) == nil,
+                     "removing the last choice leaves no preference behind")
     }
 
     private static func calendarMonthContracts(_ suite: TestSuite) {

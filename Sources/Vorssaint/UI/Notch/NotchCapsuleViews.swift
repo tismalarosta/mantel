@@ -254,21 +254,15 @@ struct NotchCapsuleTimerStrip: View {
     /// Another display's capsule, when the island shows on every display.
     var displayGeometry: NotchGeometry? = nil
     @ObservedObject private var timer = NotchTimerService.shared
-    @ObservedObject private var downloads = NotchDownloadService.shared
-    @ObservedObject private var music = NotchMusicService.shared
-    @ObservedObject private var usage = AgentUsageService.shared
     @ObservedObject private var l10n = L10n.shared
 
     private var geometry: NotchGeometry { displayGeometry ?? service.geometry }
     private var companion: NotchCompactActivity? { service.compactCompanion }
-    private var working: [AgentProvider] {
-        AgentProvider.allCases.filter { provider in usage.snapshot.live.contains { $0.provider == provider } }
-    }
 
     var body: some View {
         NotchCapsuleRow(size: size, geometry: geometry,
                         leading: companion == .music ? CapsuleLayout.artworkInset(geometry) : CapsuleLayout.endPadding) {
-            HStack(spacing: CapsuleLayout.spacing) {
+            HStack(spacing: CapsuleLayout.markGap(companion)) {
                 mark
                 if timer.session.isRunning {
                     TimelineView(.periodic(from: Date(timeIntervalSinceNow: NotchTimerSupport.tickScheduleOffset(
@@ -285,22 +279,9 @@ struct NotchCapsuleTimerStrip: View {
     }
 
     @ViewBuilder private var mark: some View {
-        switch companion {
-        case .downloads:
-            HStack(spacing: CapsuleLayout.markSpacing) {
-                NotchCapsuleSymbol(name: "arrow.down.circle.fill")
-                if let fraction = downloads.items.first(where: { $0.active && !$0.completed })?.fraction {
-                    Text(fraction, format: NotchDownloadSupport.percentFormat(l10n.language))
-                        .font(Font(CapsuleLayout.smallFont as CTFont)).lineLimit(1)
-                        .frame(width: CapsuleLayout.downloadPercentWidth(l10n.language), alignment: .trailing)
-                }
-            }
-        case .agents:
-            NotchCapsuleAgentMarks(providers: working)
-        case .music:
-            let side = CapsuleLayout.artworkSide(geometry)
-            NotchMusicCover(artwork: music.artwork, side: side, radius: side / 2)
-        default:
+        if let companion {
+            NotchCapsuleCompanionMark(companion: companion, geometry: geometry)
+        } else {
             NotchCapsuleSymbol(name: timer.session.completed ? "checkmark.circle" : timer.session.isPaused ? "pause.circle"
                                : timer.session.countsUp ? "stopwatch" : "timer", tint: .orange)
         }
@@ -313,6 +294,7 @@ struct NotchCapsuleTimerStrip: View {
             .font(Font(CapsuleLayout.readingFont as CTFont))
             .foregroundStyle(.orange)
             .lineLimit(1).fixedSize()
+            .modifier(NotchRollingDigits(value: text, countsDown: !timer.session.countsUp, everySecond: false))
             // A reading that gains or loses a character, like 10m becoming
             // 9m, resizes the capsule; the service measures the same reading.
             .onChange(of: NotchAgentSupport.readingShape(text)) { _, _ in
@@ -328,6 +310,48 @@ private struct NotchCapsuleAgentMarks: View {
     var body: some View {
         HStack(spacing: 1) {
             ForEach(providers) { NotchAgentGlyph(provider: $0, size: CapsuleLayout.agentMarkSize(working: providers.count)) }
+        }
+    }
+}
+
+/// What shares the capsule with a timer or an event: a download's arrow and
+/// percentage, the working agents, the playing track's cover, or the next
+/// event's dot and countdown.
+private struct NotchCapsuleCompanionMark: View {
+    let companion: NotchCompactActivity
+    let geometry: NotchGeometry
+    @ObservedObject private var downloads = NotchDownloadService.shared
+    @ObservedObject private var music = NotchMusicService.shared
+    @ObservedObject private var usage = AgentUsageService.shared
+    @ObservedObject private var calendar = NotchCalendarService.shared
+    @ObservedObject private var l10n = L10n.shared
+
+    var body: some View {
+        switch companion {
+        case .downloads:
+            HStack(spacing: CapsuleLayout.markSpacing) {
+                NotchCapsuleSymbol(name: "arrow.down.circle.fill")
+                if let fraction = downloads.items.first(where: { $0.active && !$0.completed })?.fraction {
+                    Text(fraction, format: NotchDownloadSupport.percentFormat(l10n.language))
+                        .font(Font(CapsuleLayout.smallFont as CTFont)).lineLimit(1)
+                        .frame(width: CapsuleLayout.downloadPercentWidth(l10n.language), alignment: .trailing)
+                }
+            }
+        case .agents:
+            NotchCapsuleAgentMarks(providers: AgentProvider.allCases.filter { provider in
+                usage.snapshot.live.contains { $0.provider == provider }
+            })
+        case .music:
+            let side = CapsuleLayout.artworkSide(geometry)
+            NotchMusicCover(artwork: music.artwork, side: side, radius: side / 2)
+        case .calendar:
+            if let countdown = calendar.countdown {
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    NotchCapsuleCalendarStrip.clockMark(countdown, now: context.date)
+                }
+            }
+        case .timer:
+            EmptyView()
         }
     }
 }
@@ -425,32 +449,42 @@ struct NotchCapsuleCalendarStrip: View {
     @ObservedObject private var l10n = L10n.shared
 
     private var text: NotchCalendarStrings { FeatureStrings.notchCalendar(l10n.language) }
+    private var geometry: NotchGeometry { displayGeometry ?? service.geometry }
 
     var body: some View {
         if let countdown = calendar.countdown {
+            let companion = service.compactCompanion
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 let title = CapsuleLayout.calendarTitle(countdown, language: l10n.language)
                 let remaining = NotchCalendarSupport.countdownText(until: countdown.target, now: context.date)
-                NotchCapsuleRow(size: size, geometry: displayGeometry ?? service.geometry) {
-                    HStack(spacing: CapsuleLayout.spacing) {
-                        Circle().fill(countdown.event.color.color)
-                            .frame(width: CapsuleLayout.calendarDotSide, height: CapsuleLayout.calendarDotSide)
-                            .overlay { Circle().strokeBorder(.white.opacity(0.5), lineWidth: 0.5) }
-                        Text(title).capsuleTitle().truncationMode(.tail)
-                        // The time left keeps its place; the start or end time
-                        // beside it gives way first when the bar is short.
-                        ViewThatFits(in: .horizontal) {
-                            HStack(spacing: CapsuleLayout.markSpacing) {
-                                clock(remaining, ongoing: countdown.ongoing)
-                                Text(NotchCalendarSupport.timeText(countdown, locale: l10n.language.formattingLocale()))
-                                    .font(Font(CapsuleLayout.smallFont as CTFont))
-                                    .foregroundStyle(.white.opacity(0.55))
-                                    .lineLimit(1).fixedSize()
-                            }
-                            clock(remaining, ongoing: countdown.ongoing)
+                NotchCapsuleRow(size: size, geometry: geometry,
+                                leading: companion == .music ? CapsuleLayout.artworkInset(geometry) : CapsuleLayout.endPadding) {
+                    if let companion {
+                        // Paired, what shares the capsule takes the title's place,
+                        // and the title moves to the tooltip and VoiceOver.
+                        HStack(spacing: CapsuleLayout.markGap(.calendar)) {
+                            NotchCapsuleCompanionMark(companion: companion, geometry: geometry)
+                            Self.clockMark(countdown, now: context.date)
                         }
-                        .padding(.leading, CapsuleLayout.groupSpacing - CapsuleLayout.spacing)
-                        .layoutPriority(1)
+                    } else {
+                        HStack(spacing: CapsuleLayout.spacing) {
+                            Self.dot(countdown.event)
+                            Text(title).capsuleTitle().truncationMode(.tail)
+                            // The time left keeps its place; the start or end time
+                            // beside it gives way first when the bar is short.
+                            ViewThatFits(in: .horizontal) {
+                                HStack(spacing: CapsuleLayout.markSpacing) {
+                                    Self.clock(remaining, ongoing: countdown.ongoing)
+                                    Text(NotchCalendarSupport.timeText(countdown, locale: l10n.language.formattingLocale()))
+                                        .font(Font(CapsuleLayout.smallFont as CTFont))
+                                        .foregroundStyle(.white.opacity(0.55))
+                                        .lineLimit(1).fixedSize()
+                                }
+                                Self.clock(remaining, ongoing: countdown.ongoing)
+                            }
+                            .padding(.leading, CapsuleLayout.groupSpacing - CapsuleLayout.spacing)
+                            .layoutPriority(1)
+                        }
                     }
                 }
                 .accessibilityElement(children: .ignore)
@@ -464,13 +498,28 @@ struct NotchCapsuleCalendarStrip: View {
         }
     }
 
+    /// The event's dot and its countdown, as a pair shows the event.
+    static func clockMark(_ countdown: NotchCalendarCountdown, now: Date) -> some View {
+        HStack(spacing: CapsuleLayout.markSpacing) {
+            dot(countdown.event)
+            clock(NotchCalendarSupport.countdownText(until: countdown.target, now: now), ongoing: countdown.ongoing)
+        }
+    }
+
+    private static func dot(_ event: NotchCalendarEvent) -> some View {
+        Circle().fill(event.color.color)
+            .frame(width: CapsuleLayout.calendarDotSide, height: CapsuleLayout.calendarDotSide)
+            .overlay { Circle().strokeBorder(.white.opacity(0.5), lineWidth: 0.5) }
+    }
+
     /// Time left in an event under way takes the agenda's "happening now"
     /// color, so it never reads as a wait for the next one.
-    private func clock(_ remaining: String, ongoing: Bool) -> some View {
+    private static func clock(_ remaining: String, ongoing: Bool) -> some View {
         Text(remaining)
             .font(Font(CapsuleLayout.readingFont as CTFont))
             .lineLimit(1).fixedSize()
             .foregroundStyle(ongoing ? Color.mint : Color.white)
+            .modifier(NotchRollingDigits(value: remaining, countsDown: true, everySecond: false))
     }
 }
 

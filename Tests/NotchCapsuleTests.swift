@@ -54,6 +54,14 @@ enum NotchCapsuleTests {
                                                      downloadPercent: false, geometry: geometry, language: language)),
             ("timer and music", Layout.timerSurface(reading: "9m", companion: .music, workingAgents: 0,
                                                     downloadPercent: false, geometry: geometry, language: language)),
+            ("timer and event", Layout.timerSurface(reading: "1h02", companion: .calendar, workingAgents: 0,
+                                                    downloadPercent: false, geometry: geometry, language: language)),
+            ("event and download", Layout.calendarPairSurface(companion: .downloads, workingAgents: 0, downloadPercent: true,
+                                                              geometry: geometry, language: language)),
+            ("event and agents", Layout.calendarPairSurface(companion: .agents, workingAgents: 2, downloadPercent: false,
+                                                            geometry: geometry, language: language)),
+            ("event and music", Layout.calendarPairSurface(companion: .music, workingAgents: 0, downloadPercent: false,
+                                                           geometry: geometry, language: language)),
             ("agents", Layout.agentSurface(reading: "1:02:33", working: 2, geometry: geometry)),
             ("download", Layout.downloadSurface(name: "Installer.dmg", hasProgress: true, geometry: geometry, language: language)),
             ("long download", Layout.downloadSurface(name: long, hasProgress: false, geometry: geometry, language: language)),
@@ -227,6 +235,13 @@ enum NotchCapsuleTests {
         let cover = Layout.artworkSide(geometry)
         suite.expect(abs(Layout.artworkInset(geometry) + cover / 2 - geometry.stripBodyHeight / 2) < 0.001 && cover >= 12,
                      "the cover is a circle concentric with the capsule's round end, an even gap inside it")
+        let eventAndMusic = Layout.calendarPairSurface(companion: .music, workingAgents: 0, downloadPercent: false,
+                                                       geometry: geometry, language: .enUS)
+        let eventAndMusicContent = Layout.artworkInset(geometry) + cover + Layout.groupSpacing + Layout.calendarClockWidth
+            + Layout.endPadding
+        suite.expect(abs(visible(eventAndMusic) - max(visible(geometry.restingSize(showsContent: false)),
+                                                      eventAndMusicContent)) < 1,
+                     "an event paired with music hugs the cover and the event's countdown, its title left out")
         for font in [Layout.titleFont, Layout.detailFont, Layout.levelFont, Layout.readingFont, Layout.smallFont] {
             suite.expect((geometry.stripBodyHeight - font.capHeight) / 2 >= 4,
                          "the capsule's text keeps clear of its top and bottom: \(font.pointSize) pt")

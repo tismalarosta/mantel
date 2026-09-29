@@ -49,7 +49,10 @@ enum NotchMusicVisibilityTests {
 
     class State {
         var activitySelection = NotchActivitySelection()
-        var compactActivityCompanions: [NotchCompactActivity] = []
+        var timerCompanions: [NotchCompactActivity] = []
+        func compactCompanions(of primary: NotchCompactActivity) -> [NotchCompactActivity] {
+            primary == .timer ? timerCompanions : []
+        }
         var showsCompactActivityPicker = false
         var compactActivityPickerLayout = NotchActivityPickerLayout(
             count: 2, labelWidth: 80, stripSize: CGSize(width: 300, height: 32), screenWidth: 1440)
@@ -82,7 +85,7 @@ enum NotchMusicVisibilityTests {
         var agentStripWing: CGFloat = 58
         func agentStripWing(in geometry: NotchGeometry) -> CGFloat { agentStripWing }
         var calendarStripWing: CGFloat = 120
-        func calendarStripWing(in geometry: NotchGeometry) -> CGFloat { calendarStripWing }
+        func calendarStripWing(for companion: NotchCompactActivity?, in geometry: NotchGeometry) -> CGFloat { calendarStripWing }
         var notchNeedsMonitor = false
         var heldDrag = false
         var pinned = false
@@ -280,7 +283,7 @@ enum NotchMusicVisibilityTests {
         service.hasTimerActivity = true
         service.hasDownloadActivity = true
         suite.expect(service.compactActivity == .timer, "Nothing for resting music preserves a running timer")
-        service.compactActivityCompanions = [.downloads]
+        service.timerCompanions = [.downloads]
         service.activitySelection.select(.timer, available: service.compactActivities)
         suite.expect(service.compactCompanion == nil,
                      "the production Timer selection does not borrow the active download wing")
