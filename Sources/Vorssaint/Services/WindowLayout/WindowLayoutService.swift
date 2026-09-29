@@ -993,7 +993,7 @@ final class WindowLayoutService: ObservableObject {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             directionalModifierHold?.cancel()
             WindowDirectionalModifierTapSupport.afterCallback { [weak self] in
-                self?.cancelDirectionalGesture()
+                self?.cancelDirectionalGesture(preservingModifierState: true)
                 if SessionActivity.shared.isActive, AXIsProcessTrusted(), !ShortcutCapture.isCapturing,
                    let directionalModifierTap = self?.directionalModifierTap {
                     CGEvent.tapEnable(tap: directionalModifierTap, enable: true)
@@ -1011,7 +1011,7 @@ final class WindowLayoutService: ObservableObject {
             directionalModifierHold = hold
             WindowDirectionalModifierTapSupport.afterCallback { [weak self] in
                 guard let self, self.directionalModifierHold?.generation == generation else { return }
-                self.cancelDirectionalGesture()
+                self.cancelDirectionalGesture(preservingModifierState: true)
             }
             return Unmanaged.passUnretained(event)
         }
@@ -1033,7 +1033,7 @@ final class WindowLayoutService: ObservableObject {
             case .finish:
                 self.updateDirectionalGesture()
                 self.finishDirectionalGesture()
-            case .cancel: self.cancelDirectionalGesture()
+            case .cancel: self.cancelDirectionalGesture(preservingModifierState: true)
             case .none: break
             }
         }
@@ -1218,8 +1218,8 @@ final class WindowLayoutService: ObservableObject {
         }
     }
 
-    private func cancelDirectionalGesture() {
-        directionalModifierHold?.cancel()
+    private func cancelDirectionalGesture(preservingModifierState: Bool = false) {
+        if !preservingModifierState { directionalModifierHold?.cancel() }
         stopDirectionalTap()
         directionalTimer?.invalidate()
         directionalTimer = nil
