@@ -53,6 +53,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Radial menu profiles refuse a shortcut that another profile or feature already uses, and other shortcut settings now warn when a combination belongs to a radial menu profile.
 - The Keyboard Shortcuts page lists the shortcuts radial menu profiles use and links to the Radial menu page to change them, instead of showing an outdated shortcut whose changes had no effect.
 - Closing the menu bar panel returns focus to the previous app without switching desktops.
+- Opening or using Siri AI on macOS 27 no longer opens Vorssaint's Settings or menu bar panel.
 - Esc in Settings no longer closes the menu bar panel open beside it, so it clears a search or closes a sheet there; a confirmation or popover opened from the panel now closes before the panel does.
 - Expanding a weekly Automatic cleanup in the Cleaner no longer cuts off the edges of the menu bar panel or Quick Launcher; the weekday moves to its own row when it does not fit beside the time.
 - The menu bar panel opens centered under its icon again, without a gray band along its top and right edges on macOS 14 and 15, and tall tabs no longer open it beside the icon.
