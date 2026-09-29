@@ -1891,6 +1891,9 @@ enum SwitcherModelFeatureTests {
         suite.expect(registeredDefaults[DefaultsKey.shelfClearOnClose] as? Bool == false
                 && SettingsBackupSupport.exportKeys().contains(DefaultsKey.shelfClearOnClose),
                "clearing the shelf on close is opt-in and travels with settings backups")
+        suite.expect(registeredDefaults[DefaultsKey.shelfShortcutAddsFinderSelection] as? Bool == false
+                && SettingsBackupSupport.exportKeys().contains(DefaultsKey.shelfShortcutAddsFinderSelection),
+               "adding the Finder selection with the shelf shortcut is opt-in and travels with settings backups")
         suite.expect((registeredDefaults[DefaultsKey.shelfAutomaticExclusions] as? [String])?.isEmpty == true,
                "shelf automatic exclusions start empty")
         suite.expect(registeredDefaults[DefaultsKey.mouseNavigationEnabled] as? Bool == false,
