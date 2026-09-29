@@ -47,6 +47,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Esc in Settings no longer closes the menu bar panel open beside it, so it clears a search or closes a sheet there; a confirmation or popover opened from the panel now closes before the panel does.
 - Expanding a weekly Automatic cleanup in the Cleaner no longer cuts off the edges of the menu bar panel or Quick Launcher; the weekday moves to its own row when it does not fit beside the time.
 - The menu bar panel opens centered under its icon again, without a gray band along its top and right edges on macOS 14 and 15, and tall tabs no longer open it beside the icon.
+- The menu bar panel shows the Controls tab when Focus follows mouse is the only installed control, so its switch is no longer out of reach.
 - Scrolling the Features page in Settings no longer stutters or freezes the app.
 - Clipboard History search reuses prepared text while typing in long histories, reducing repeated processing.
 - Scratchpad warns in both views when notes cannot be saved and shows a warning if the final save fails while closing.
