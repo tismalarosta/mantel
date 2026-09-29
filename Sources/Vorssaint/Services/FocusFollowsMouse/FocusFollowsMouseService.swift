@@ -172,10 +172,11 @@ final class FocusFollowsMouseService {
                       !SpaceWindowBridge.isParkedOnHiddenSpace(target.windowID)
                 else { return }
                 guard UserDefaults.standard.bool(forKey: DefaultsKey.focusFollowsMouseRaise) else {
+                    let activation = WindowActivator.supersedePendingActivations(for: target.processID)
                     SpaceWindowBridge.focusWithoutRaise(
                         target.windowID, ownerPID: target.processID,
                         replacing: targetAppIsFrontmost ? target.focusedWindowID : nil,
-                        while: isCurrent)
+                        while: { isCurrent() && WindowActivator.isCurrentActivation(activation) })
                     return
                 }
                 WindowActivator.activate(pid: target.processID,

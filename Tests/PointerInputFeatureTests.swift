@@ -1058,6 +1058,9 @@ enum PointerInputFeatureTests {
         suite.expect(focusFollowsMouseServiceSource.contains(
                 "!SpaceWindowBridge.isParkedOnHiddenSpace(target.windowID)"),
                "focus follows mouse never hands a window on a hidden Space to the activator, which would travel")
+        suite.expect(focusFollowsMouseServiceSource.contains(
+                "WindowActivator.supersedePendingActivations(for: target.processID)"),
+               "focus without raise stops the passes a switcher jump left pending, as the raising path does")
 
         // A wheel that reports continuously already measures in points, and
         // that field is the one to trust; the line field only fills in for a
