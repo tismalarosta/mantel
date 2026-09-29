@@ -64,6 +64,8 @@ struct NotchSettings: View {
     @AppStorage(DefaultsKey.notchCapsuleFitHeight) private var capsuleFitHeight = 0.0
     @AppStorage(DefaultsKey.notchCapsuleFitDrop) private var capsuleFitDrop = 0.0
     @AppStorage(DefaultsKey.notchHapticFeedback) private var hapticFeedback = true
+    @AppStorage(DefaultsKey.notchTranslucentBackground) private var translucentBackground = false
+    @AppStorage(DefaultsKey.notchLiquidGlassEnabled) private var liquidGlass = false
     @AppStorage(DefaultsKey.notchShelf) private var shelfWindow = true
     @AppStorage(DefaultsKey.notchDragReveal) private var dragReveal = true
     @AppStorage(DefaultsKey.notchCaptureControls) private var captureControls = true
@@ -180,6 +182,12 @@ struct NotchSettings: View {
                     }
                     Text(text.sizeHint).font(.caption).foregroundStyle(.secondary)
                 }
+                // Liquid Glass takes the open island's background when it is
+                // on, so the switch would change nothing then.
+                switchRow("drop.halffull", text.translucentBackground,
+                          caption: liquidGlassIsOn ? text.translucentBackgroundGlassHint : text.translucentBackgroundHint,
+                          isOn: $translucentBackground)
+                    .disabled(liquidGlassIsOn)
             }
             // Only a display without a camera can float the island.
             if NotchSupport.hasDisplayWithoutNotch {
@@ -221,6 +229,13 @@ struct NotchSettings: View {
                 }
             }
         }
+    }
+
+    private var liquidGlassIsOn: Bool {
+#if compiler(>=6.2)
+        if #available(macOS 26, *) { return liquidGlass }
+#endif
+        return false
     }
 
     /// The sections in a list of their own, the chosen one's options beside
