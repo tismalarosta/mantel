@@ -204,7 +204,7 @@ final class RecorderButton: NSButton {
                 return
             }
             if let captured {
-                guard captured.hasPrimaryModifier else {
+                guard captured.isValidWindowDirectionalTrigger else {
                     invalidAction?()
                     return
                 }

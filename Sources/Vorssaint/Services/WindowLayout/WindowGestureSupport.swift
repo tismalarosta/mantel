@@ -688,7 +688,7 @@ enum WindowDirectionalTrigger: Equatable {
                 default: return nil
                 }
             }
-            guard modifiers.hasPrimaryModifier else { return nil }
+            guard modifiers.isValidWindowDirectionalTrigger else { return nil }
             self = .modifiers(modifiers)
         } else {
             guard let shortcut = GlobalShortcut(storageValue: storageValue) else { return nil }
@@ -708,6 +708,15 @@ enum WindowDirectionalTrigger: Equatable {
         case .key(let shortcut): return shortcut.displayString
         case .modifiers(let modifiers): return modifiers.keyCaps.joined()
         }
+    }
+}
+
+extension GlobalShortcutModifiers {
+    /// A bare Command, Option or Control chord collides with ordinary app
+    /// shortcuts and modifier-clicks. Shift may join a trigger, but it does
+    /// not make a single primary modifier safe on its own.
+    var isValidWindowDirectionalTrigger: Bool {
+        intersection([.control, .option, .command]).rawValue.nonzeroBitCount >= 2
     }
 }
 
@@ -732,10 +741,12 @@ struct WindowDirectionalModifierHold {
     private(set) var generation: UInt64 = 0
     private var active = false
     private var waitingForRelease: Bool
+    private var held: GlobalShortcutModifiers
 
     init(expected: GlobalShortcutModifiers, initiallyHeld: GlobalShortcutModifiers = []) {
         self.expected = expected
-        waitingForRelease = !initiallyHeld.intersection(expected).isEmpty
+        held = initiallyHeld
+        waitingForRelease = !initiallyHeld.isEmpty
     }
 
     mutating func cancel() {
@@ -745,21 +756,28 @@ struct WindowDirectionalModifierHold {
     }
 
     mutating func cancelForKeyPress() -> Bool {
-        guard active else { return false }
+        guard active || !held.isEmpty else { return false }
         cancel()
         return true
     }
 
     mutating func update(_ held: GlobalShortcutModifiers) -> Decision {
+        self.held = held
         if active {
             guard held == expected else {
                 let released = !held.isSuperset(of: expected)
                 cancel()
-                waitingForRelease = !held.intersection(expected).isEmpty
+                waitingForRelease = !held.isEmpty
                 return released ? .finish : .cancel
             }
         } else if waitingForRelease {
-            waitingForRelease = !held.intersection(expected).isEmpty
+            waitingForRelease = !held.isEmpty
+        } else if !held.subtracting(expected).isEmpty {
+            // Once an unrelated modifier joins this physical hold, releasing
+            // it must not turn the remainder into a fresh trigger chord.
+            cancel()
+            waitingForRelease = !held.isEmpty
+            return .cancel
         } else if held == expected {
             generation &+= 1
             active = true
