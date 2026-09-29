@@ -36,6 +36,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Dynamic Island keeps the current song on screen while a player loads the next one, instead of briefly showing an empty music page and changing size. With the New track indicator on, the compact island keeps the previous song until the indicator shows the next one.
 - Clicking the Now Playing cover in Dynamic Island, or the radial menu's Now Playing card, brings the playing app to the front instead of doing nothing, and shows its window again when it was closed.
 - Dynamic Island accessory alerts no longer show a connection notice when a phone, tablet or computer connects to the Mac over Bluetooth.
+- Dynamic Island's Tools page no longer scrolls by itself while the pointer rests on a tool away from the center, so tools stay put and are easy to click.
 - On Macs without a battery, Dynamic Island settings no longer offer Battery at rest or among its indicators, and an island already set to show the battery at rest stays empty instead of showing a battery icon with no charge.
 - Setting the volume from Command Bar no longer adds a floating confirmation under the volume notice in Dynamic Island.
 - Dynamic Island's Fan Control page is as tall as its card, instead of opening a tall, mostly empty page even with the Compact size.
@@ -60,7 +61,7 @@ Dynamic Island can follow the pointer between displays, fit the notch, step back
 - Homebrew commands and app update checks use proxy and mirror settings exported by the user's shell, allowing package operations on networks where direct access is blocked.
 
 ### Contributors
-Thanks to @0miicr0n, @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @bweh, @cedigang, @daniel-dosiper, @Goonwb, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1, @Yahddyyp and @zxedacus. Feedback: Brain and Pinea.
+Thanks to @0miicr0n, @abdulshahid1, @ahfornitani, @arsarsars1, @Aryan-Saini, @bweh, @cedigang, @daniel-dosiper, @Goonwb, @gorillasuti, @I-Have-No-Idea-What-Im-Doing-Right-Now, @IanHollow, @ilim-cell, @iva-zhu, @Kernel-Hunter, @muskecan, @npcmail010, @PathGao, @renan-tiberio, @sarat03, @scream1ng, @shlok1806, @trac3r00, @tyteachestech, @veged, @Void1-1, @Yahddyyp and @zxedacus. Feedback: Brain, DeWalt Brushless and Pinea.
 
 ## [3.4.0] - 2026-09-27
 
