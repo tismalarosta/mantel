@@ -711,11 +711,13 @@ enum WindowDirectionalTrigger: Equatable {
     }
 }
 
-/// Passive policy for the modifier chord that arms pointer layout. The event
-/// itself is never held while the main queue looks up or places a window.
+/// Passive policy for the modifier chord that arms pointer layout. Modifier
+/// changes and shortcut-cancelling keys are observed without holding the event
+/// while the main queue looks up or places a window.
 enum WindowDirectionalModifierTapSupport {
     static let options: CGEventTapOptions = .listenOnly
     static let eventMask = CGEventMask(1 << CGEventType.flagsChanged.rawValue)
+        | CGEventMask(1 << CGEventType.keyDown.rawValue)
 
     static func afterCallback(_ work: @escaping () -> Void) {
         DispatchQueue.main.async { work() }
@@ -727,6 +729,7 @@ enum WindowDirectionalModifierTapSupport {
 struct WindowDirectionalModifierHold {
     enum Decision { case none, begin, finish, cancel }
     let expected: GlobalShortcutModifiers
+    private(set) var generation: UInt64 = 0
     private var active = false
     private var waitingForRelease: Bool
 
@@ -736,8 +739,15 @@ struct WindowDirectionalModifierHold {
     }
 
     mutating func cancel() {
+        generation &+= 1
         active = false
         waitingForRelease = true
+    }
+
+    mutating func cancelForKeyPress() -> Bool {
+        guard active else { return false }
+        cancel()
+        return true
     }
 
     mutating func update(_ held: GlobalShortcutModifiers) -> Decision {
@@ -751,6 +761,7 @@ struct WindowDirectionalModifierHold {
         } else if waitingForRelease {
             waitingForRelease = !held.intersection(expected).isEmpty
         } else if held == expected {
+            generation &+= 1
             active = true
             return .begin
         }
