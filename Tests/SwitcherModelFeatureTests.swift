@@ -485,6 +485,13 @@ enum SwitcherModelFeatureTests {
                && SwitcherSupport.usesAppGroupsForMainShortcut(iconRowLayout: true,
                                                                 windowRow: false),
                "App Switcher main shortcut steps through simple window rows without app grouping")
+        let previewProviderCode = (try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Switcher/WindowPreviewProvider.swift",
+            encoding: .utf8)) ?? ""
+        suite.expect(previewProviderCode.contains("Self.warmEnumerationQueue.async {")
+               && previewProviderCode.contains("continuation.resume(returning: WindowEnumerator.listWindows(for: pid, snapshot: snapshot))")
+               && !previewProviderCode.contains("Task.detached"),
+               "preview warming enumerates windows on a queue of its own, never on a shared task thread")
         suite.expect(SwitcherSupport.preservesGroupedWindowsDuringEnumeration(allApps: true,
                                                                         mergeWindowsByApp: true,
                                                                         simpleMode: true)
