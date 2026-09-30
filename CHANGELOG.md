@@ -13,6 +13,7 @@ The recording editor can copy a recording as an animated GIF. Volume keys routed
 - In the open capsule, the header's buttons now sit as far from the top edge as the page does from the bottom, so the title no longer crowds the top.
 - The capsule grows around what it shows when the pointer reaches it, so a song's cover and sound bars no longer jump outward first.
 - An event countdown paired with music or AI agents is only as wide as its clock and the other activity's mark need, like a timer's pair, so it leaves no extra black beside the camera. With Show over the menus off, the pair also stays beside the camera on a crowded menu bar whenever it fits.
+- The camera mirror fills the island's page instead of showing a small preview in the middle, and Stop camera sits over the image beside the camera picker.
 
 ### Added
 - The recording editor's Copy button has a menu with Copy as GIF, which copies the edited recording as an animated GIF ready to paste. Copy and ⌘C still copy the video.
