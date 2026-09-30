@@ -538,16 +538,28 @@ final class NotchService: ObservableObject {
     /// The island around a previewed section, whose title sits beside the
     /// camera only where the island's would.
     func previewGeometry(for module: NotchModule) -> NotchGeometry {
+        previewGeometry(for: module, sectionsButton: previewShowsSectionsButton)
+    }
+
+    private func previewGeometry(for module: NotchModule, sectionsButton: Bool) -> NotchGeometry {
         var result = geometry
-        result.headerTitleWidth = NotchLayout.headerTitleWidth(module.title(L10n.shared.language), button: headerShowsSectionsButton)
+        result.headerTitleWidth = NotchLayout.headerTitleWidth(module.title(L10n.shared.language), button: sectionsButton)
         return result
+    }
+
+    /// Settings previews the island while it is off too, when the floating
+    /// buttons are not read for it, so a preview reads them as it draws.
+    private var previewShowsSectionsButton: Bool {
+        !NotchQuickAccessConfiguration.current().actions.contains(.explore)
     }
 
     /// The tallest island a preview can show: a page that fills the budget,
     /// below the row the widest title may need.
     var previewLargestSize: CGSize {
+        let sectionsButton = previewShowsSectionsButton
         var tallest = geometry
-        tallest.headerTitleWidth = NotchModule.allCases.map { previewGeometry(for: $0).headerTitleWidth }.max() ?? 0
+        tallest.headerTitleWidth = NotchModule.allCases
+            .map { previewGeometry(for: $0, sectionsButton: sectionsButton).headerTitleWidth }.max() ?? 0
         return tallest.expandedSize(module: .calendar)
     }
 

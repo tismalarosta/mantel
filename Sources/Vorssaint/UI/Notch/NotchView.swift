@@ -116,7 +116,10 @@ struct NotchView: View {
                     }
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(NotchButtonStyle(cornerRadius: 14, lifts: false))
+                // A floating capsule lights up under the pointer. Beside a
+                // camera the wash would outline the housing, so the notch keeps
+                // its notices plain, as its other strips are.
+                .buttonStyle(NotchButtonStyle(cornerRadius: 14, lifts: false, highlights: floats))
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(notice.accessibilityText)
                 .accessibilityAddTraits(.isButton)

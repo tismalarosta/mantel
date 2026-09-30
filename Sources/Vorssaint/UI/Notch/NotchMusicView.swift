@@ -289,7 +289,7 @@ private struct NotchMusicTransport: View {
                 // Only a player the island writes to directly answers fast enough
                 // to show its word early; a slower path waits for the player.
                 let direct = playback.canSendCommandsDirectly
-                if service.send(.toggle, context: playback.commandContext), direct { requestedPlaying = !playback.isPlaying }
+                if service.send(.toggle, context: playback.commandContext), direct { requestedPlaying = !showsPlaying }
             } else { service.requestAutomationAccess() }
         } label: {
             Image(systemName: showsPlaying ? "pause.fill" : "play.fill")
@@ -302,7 +302,9 @@ private struct NotchMusicTransport: View {
                 .contentShape(Circle())
         }
         .buttonStyle(NotchButtonStyle(cornerRadius: height / 2))
-        .onChange(of: playback.isPlaying) { requestedPlaying = nil }
+        // A second tap before the player answers asks for the state after it,
+        // so only the player reaching what was asked ends the early word.
+        .onChange(of: playback.isPlaying) { if playback.isPlaying == requestedPlaying { requestedPlaying = nil } }
         .onChange(of: playback.track) { requestedPlaying = nil }
         // A player that never answers leaves the button as it was.
         .task(id: requestedPlaying) {

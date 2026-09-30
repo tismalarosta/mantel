@@ -142,12 +142,13 @@ struct NotchIslandPreview: View {
             if geometry.headerCameraGap > 0 {
                 Color.clear.frame(width: geometry.headerCameraGap)
             }
+            // In a row of its own the title takes the width the actions leave.
             Image(systemName: "ellipsis")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.35))
                 .frame(width: 28, height: 28)
                 .frame(width: half, alignment: .trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                .frame(maxWidth: half == nil ? nil : .infinity, alignment: .trailing)
         }
         .frame(height: geometry.headerRowHeight)
     }
