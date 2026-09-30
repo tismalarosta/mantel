@@ -25,6 +25,7 @@ The recording editor can copy a recording as an animated GIF. Volume keys routed
 - Dynamic Island's Combine menu names each pair in the order the island shows it, left to right, such as Music + Timer.
 - While Dynamic Island or Show brightness when adjusting shows the brightness, the brightness keys ease the display to each new level as macOS does, instead of jumping to it. Display brightness shortcuts ease the same way.
 - On a Mac with a notch, the outline from Show outline no longer hides behind the camera while Dynamic Island is closed. The closed island reaches slightly past the notch to show it.
+- A Dynamic Island opened by hover now closes when the pointer leaves quickly past one of its floating buttons, such as the music button below it, instead of staying open until the pointer comes back.
 
 ### Contributors
 Thanks to @AlirezaBs, @niukanen1, @Qarru and @ruvelro. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
