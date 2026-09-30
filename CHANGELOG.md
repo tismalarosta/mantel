@@ -23,6 +23,7 @@ The recording editor can copy a recording as an animated GIF. Volume keys routed
 - Cancelling a GIF export from the recording editor no longer leaves a hidden empty file in the folder it was saving to.
 - Dynamic Island's Combine menu names each pair in the order the island shows it, left to right, such as Music + Timer.
 - While Dynamic Island or Show brightness when adjusting shows the brightness, the brightness keys ease the display to each new level as macOS does, instead of jumping to it. Display brightness shortcuts ease the same way.
+- On a Mac with a notch, the outline from Show outline no longer hides behind the camera while Dynamic Island is closed. The closed island reaches slightly past the notch to show it.
 
 ### Contributors
 Thanks to @AlirezaBs, @niukanen1, @Qarru and @ruvelro. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.

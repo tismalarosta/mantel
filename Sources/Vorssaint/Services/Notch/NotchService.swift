@@ -570,7 +570,7 @@ final class NotchService: ObservableObject {
 
     var surfaceSize: CGSize {
         if let capsule = capsuleSurfaceSize { return capsule }
-        if fullscreenCompact { return geometry.restingSize(showsContent: false) }
+        if fullscreenCompact { return geometry.bareCutout }
         if captureControls != nil {
             if captureControlsCollapsed {
                 return CGSize(width: geometry.cameraWidth + 56, height: geometry.stripHeight)
@@ -2533,7 +2533,8 @@ final class NotchService: ObservableObject {
                              customWidth: UserDefaults.standard.double(forKey: DefaultsKey.notchCustomWidth),
                              customHeight: UserDefaults.standard.double(forKey: DefaultsKey.notchCustomHeight),
                              cameraFit: NotchCameraFit.current(), silhouette: NotchSilhouette.current(),
-                             capsuleFit: NotchCapsuleFit.current())
+                             capsuleFit: NotchCapsuleFit.current(),
+                             outline: UserDefaults.standard.bool(forKey: DefaultsKey.notchOutlineEnabled))
     }
 
     private func updateFullscreenVisibility(displayID: CGDirectDisplayID) {
