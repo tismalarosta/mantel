@@ -11,6 +11,7 @@ The recording editor can copy a recording as an animated GIF. Volume keys routed
 
 ### Dynamic Island
 - In the open capsule, the header's buttons now sit as far from the top edge as the page does from the bottom, so the title no longer crowds the top.
+- The capsule grows around what it shows when the pointer reaches it, so a song's cover and sound bars no longer jump outward first.
 
 ### Added
 - The recording editor's Copy button has a menu with Copy as GIF, which copies the edited recording as an animated GIF ready to paste. Copy and ⌘C still copy the video.
@@ -22,7 +23,7 @@ The recording editor can copy a recording as an animated GIF. Volume keys routed
 - Dynamic Island's Combine menu names each pair in the order the island shows it, left to right, such as Music + Timer.
 
 ### Contributors
-Thanks to @niukanen1, @Qarru and @ruvelro. Feedback: Pinea and the/master.
+Thanks to @niukanen1, @Qarru and @ruvelro. Feedback: Barbel Design, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
