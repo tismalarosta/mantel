@@ -226,6 +226,7 @@ struct NotchRail<Item: Identifiable, Content: View>: View {
                     .contentShape(Rectangle())
                 }
                 .scrollIndicators(.never)
+                .notchScrollEdgeFade(.horizontal)
                 .onAppear {
                     if let targetColumn { proxy.scrollTo(targetColumn, anchor: .center) }
                 }
@@ -387,6 +388,14 @@ struct NotchSurfaceBackground: View {
         .accessibilityHidden(true)
     }
 
+    /// How much of the glass the lip lets through at its lowest edge. Content
+    /// sits over that edge too, so it stays dark enough to keep a window's
+    /// text behind it from reading through the island's own.
+    static let lipTransparency = 0.32
+    /// How late the lip starts to open: content sits over most of the surface,
+    /// so the glass shows through only near the bottom edge.
+    static let lipCurve = 4.0
+
     /// The dimming over the glass, from the top of the island to its lip. Near
     /// a black strip the lip closes up, so the last frames of a collapse
     /// already match the resting island.
@@ -394,7 +403,7 @@ struct NotchSurfaceBackground: View {
         (0...64).map { index in
             let t = Double(index) / 64
             return Gradient.Stop(
-                color: .black.opacity(1 - openness * (contrast == .increased ? 0.10 : 0.45) * pow(t, 2.5)),
+                color: .black.opacity(1 - openness * (contrast == .increased ? 0.10 : lipTransparency) * pow(t, lipCurve)),
                 location: t)
         }
     }
@@ -601,6 +610,8 @@ final class NotchMenuAnchor: NSObject {
         actions = items.map(\.action)
         let menu = NSMenu()
         menu.autoenablesItems = false
+        // The island is dark whatever the system is, so its menus are too.
+        menu.appearance = NSAppearance(named: .darkAqua)
         for (index, item) in items.enumerated() {
             guard !item.isSeparator else { menu.addItem(.separator()); continue }
             let entry = NSMenuItem(title: item.title, action: #selector(choose(_:)), keyEquivalent: "")
@@ -613,7 +624,15 @@ final class NotchMenuAnchor: NSObject {
             }
             menu.addItem(entry)
         }
-        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: 0), in: view)
+        // A menu whose top lands on the menu bar's edge opens scrolled past its
+        // first entry, so a button against the bar opens it a little below.
+        var location = NSPoint.zero
+        if let window = view.window, let screen = window.screen {
+            let bottom = window.convertPoint(toScreen: view.convert(location, to: nil)).y
+            let edge = screen.visibleFrame.maxY - 3
+            if bottom > edge { location.y -= bottom - edge }
+        }
+        menu.popUp(positioning: nil, at: location, in: view)
     }
 
     @objc private func choose(_ sender: NSMenuItem) {

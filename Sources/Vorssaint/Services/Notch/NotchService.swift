@@ -312,18 +312,32 @@ final class NotchService: ObservableObject {
     func selectCompactActivity(_ activity: NotchCompactActivity) {
         guard compactActivities.contains(activity) else { return }
         hoverWork?.cancel(); hoverWork = nil
-        mutatePresentation(transitionContent: .replace) {
-            objectWillChange.send()
+        switchCompactSelection {
             activitySelection.select(activity, available: compactActivities)
         }
+    }
+
+    /// The picker keeps its size whatever is chosen, so the choice moves inside
+    /// the surface, the highlight sliding and the strip changing in place,
+    /// instead of the whole content fading through the host.
+    private func switchCompactSelection(_ change: () -> Void) {
+        let animation: Animation? = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            ? nil : .smooth(duration: 0.26)
+        withAnimation(animation) {
+            objectWillChange.send()
+            change()
+        }
+        // A song chosen away is not music disappearing, which the host would
+        // fade out through the whole picker as another activity takes its place.
+        presentedMusic = nil
+        refreshPresentation()
     }
 
     func selectCompactCombination(_ combination: NotchActivityCombination) {
         let companions = compactCompanions(of: combination.primary)
         guard companions.contains(combination.companion) else { return }
         hoverWork?.cancel(); hoverWork = nil
-        mutatePresentation(transitionContent: .replace) {
-            objectWillChange.send()
+        switchCompactSelection {
             activitySelection.select(combination.primary, companion: combination.companion,
                                      available: compactActivities, companions: companions)
         }
