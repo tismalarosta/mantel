@@ -1033,6 +1033,10 @@ final class NotchService: ObservableObject {
         // passing through the gallery keeps that answer.
         if !expanded { detailHasPage = false }
         else if appPanel || metric != nil, !showingAppPanel, selectedMetric == nil { detailHasPage = true }
+        // Following the closed island ends the moment it opens, before a page
+        // or a capture preview under the pointer can be told the pointer left.
+        // An open page is followed again only from an exit report.
+        if !expanded { removeHoverExitMonitors() }
         mutatePresentation(transitionContent: changesPresentation ? (expanded ? .replace : .reveal) : .none) {
             showingAppPanel = appPanel
             showingSections = sections
@@ -1103,7 +1107,6 @@ final class NotchService: ObservableObject {
             && windowHost?.isConcealedForMissionControl == false
             : windowHost?.containsHover(point) == true || pointerOverChildWindow(point)
         hoverState.update(pointerInside: inside)
-        syncHoverExitMonitoring(entered: entered, point: point)
         let emphasize = inside && !hiddenInFullscreen && !hiddenUntilHover && !expanded && !peeking && !dragPlaceholder
             && notice == nil && captureControls == nil
             && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
@@ -1111,6 +1114,7 @@ final class NotchService: ObservableObject {
             hoverEmphasized = emphasize
             refreshPresentation()
         }
+        syncHoverExitMonitoring(entered: entered, point: point)
         captureHover?(entered)
         if captureControls != nil {
             updateCaptureControlsHover(wasInside: wasInside)
@@ -1145,6 +1149,8 @@ final class NotchService: ObservableObject {
                       UserDefaults.standard.bool(forKey: DefaultsKey.notchOpenOnHover),
                       self.windowHost?.blocksHoverReveal() == false,
                       self.geometry.contains(NSEvent.mouseLocation, in: self.hiddenUntilHover ? self.geometry.collapsed : self.surfaceSize) else { return }
+                // Following the closed island ends as it opens or peeks.
+                self.removeHoverExitMonitors()
                 if UserDefaults.standard.bool(forKey: DefaultsKey.notchHoverExpands) {
                     self.open(takeFocus: false)
                 } else {
@@ -1180,10 +1186,17 @@ final class NotchService: ObservableObject {
     /// An exit can then arrive with the pointer still in that margin and be
     /// the last report. From such an exit until AppKit reports the pointer
     /// again, every move is checked here, so leaving still closes the island.
-    /// A pointer at rest costs nothing.
+    /// The closed island's hover emphasis has the same gap, and worse: a fast
+    /// pass up through the top edge to a display above can report its exit
+    /// while the pointer still touches the island, or no exit at all. So while
+    /// the emphasis shows, moves are followed from the entry on. A pointer at
+    /// rest costs nothing.
     private func syncHoverExitMonitoring(entered: Bool, point: CGPoint) {
-        let watching = !entered
-            && NotchSupport.closesOnPointerExit(expanded: expanded, peeking: peeking, openedByHover: openedByHover)
+        // A timed capture stays attached to the closed island until its timer
+        // ends, and each followed move would tell it the pointer left, which
+        // restarts its dismissal under a pointer that came back to reopen it.
+        let watching = (hoverEmphasized && captureHover == nil
+                || !entered && NotchSupport.closesOnPointerExit(expanded: expanded, peeking: peeking, openedByHover: openedByHover))
             && captureControls == nil && !pinned && !heldDrag && !hiddenUntilHover && !keepsWorkingSurface
             // Once watching, a pointer that leaves and slips back unreported is still seen.
             && (!hoverExitMonitors.isEmpty || windowHost?.containsHover(point) == true)
