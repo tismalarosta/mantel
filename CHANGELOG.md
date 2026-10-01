@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-The recording editor can copy a recording as an animated GIF, and the camera mirror in Dynamic Island now fills its page. Dynamic Island keeps the playing song while a web player loads the next one, and the brightness keys it handles ease the display as macOS does. Volume keys step from the level the output really plays after the Mac wakes, and brightness and volume keys pressed with Option, Command or Control reach macOS again.
+The recording editor can copy a recording as an animated GIF, and screenshots can skip their confirmation preview, keep it until dismissed, or go up as a temporary link with a shortcut. Dynamic Island keeps the playing song while a web player loads the next one, its camera mirror fills its page, and the brightness keys it handles ease the display as macOS does. Volume keys step from the level the output really plays after the Mac wakes, and brightness and volume keys pressed with Option, Command or Control reach macOS again.
 
 ### Dynamic Island
 - The camera mirror fills the island's page instead of showing a small preview in the middle, and Stop camera sits over the image beside the camera picker.
@@ -21,6 +21,8 @@ The recording editor can copy a recording as an animated GIF, and the camera mir
 
 ### Added
 - The recording editor's Copy button has a menu with Copy as GIF, which copies the edited recording as an animated GIF ready to paste. Copy and ⌘C still copy the video.
+- After a screenshot is saved or copied automatically, the confirmation preview can be turned off, or kept for 1, 2, 3, 5 or 10 seconds or until dismissed. A failed or partial action still shows it, and a preview kept until dismissed has a close button and leaves the keyboard with the app in front. Settings → Screen capture → Screenshot → More options → Show confirmation preview and Confirmation duration, shown when the default action saves or copies.
+- A new shortcut, off by default (⌃⌥⌘U), uploads the latest screenshot as a temporary link and copies the link. The floating preview's link button uploads with that default expiry on a click and its arrow picks another one, and a copied link closes the preview. A capture that went through the editor or was discarded is never uploaded by the shortcut. Settings → Screen capture → Temporary links → Upload latest screenshot and Default link expiry.
 
 ### Fixed
 - Dynamic Island keeps the current song on screen while a web player loads the next one, instead of briefly showing another player's paused song. With the New track indicator on, a new song appears in the indicator before the compact island, even when it takes a while to load.
@@ -33,9 +35,10 @@ The recording editor can copy a recording as an animated GIF, and the camera mir
 - Brightness and volume keys pressed with Option, Command or Control reach macOS again while Vorssaint handles those keys, so Option opens Displays or Sound settings. Option-Shift brightness keys take quarter steps and still follow the pointer to the right display.
 - Cancelling a GIF export from the recording editor no longer leaves a hidden empty file in the folder it was saving to.
 - Uninstalling with `Tools/uninstall.sh` now removes the password-free closed-lid rule, which the script used to leave behind.
+- The Uninstaller's app pickers and the Command Bar's Uninstall Application list offer only apps it can remove, so Apple's App Store apps, iPhone and iPad apps and linked apps no longer lead back to an empty drop zone. A refused app or a link dragged from a browser springs back from the drop zone instead.
 
 ### Contributors
-Thanks to @AlirezaBs, @gorillasuti, @niukanen1, @Qarru and @ruvelro. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @69grcv8vfm-sys, @AlirezaBs, @emreertunc, @EugeneCarldotme, @gorillasuti, @iltonandrew, @niukanen1, @Qarru, @ruvelro and @samanyudas. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
