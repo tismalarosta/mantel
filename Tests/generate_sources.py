@@ -367,7 +367,8 @@ def main():
           + "func readSnapshot(volume: Double?, muted: Bool?) { applyOutputControls(volume: volume, muted: muted) }\n"
           + "".join(declaration(mixer, prefix) for prefix in [
               "    func requestOutputAdjustment(", "    private func removeOutputControlListeners(",
-              "    func requestOutputStep(", "    private func settleQueuedOutputSteps(",
+              "    func requestOutputStep(", "    func requestOutputMuteToggle(",
+              "    private func enqueueOutputKey(", "    private func settleQueuedOutputSteps(",
               "    private func applyQueuedOutputSteps(",
               "    private func isCurrentOutputAdjustment(", "    private var hasCurrentOutputAdjustment:",
               "    private func applyOutputControls(", "    private func drainOutputAdjustment("])
