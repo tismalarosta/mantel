@@ -2464,17 +2464,24 @@ final class NotchService: ObservableObject {
             // The menu bar a capsule leaves above itself takes its clicks too.
             guard !isNotchWindow, !keepsWorkingSurface,
                   CGRect(x: 0, y: 0, width: area.width, height: 1 + (geometry.floatingGap ?? 0)).contains(local),
-                  windowHost?.contains(point) == true else { return }
+                  windowHost?.containsDestination(point) == true else { return }
             screenEdgePressArea = area
             hoverWork?.cancel(); hoverWork = nil
             hoverState.close(pointerInside: true)
         case .leftMouseUp:
             let pressedArea = screenEdgePressArea
             screenEdgePressArea = nil
-            guard pressedArea == area, CGRect(origin: .zero, size: area.size).contains(local),
-                  windowHost?.contains(point) == true else { return }
+            // The hover pulse can settle between press and release; the click
+            // stays on the island in either size.
+            guard let pressed = pressedArea,
+                  NotchSupport.screenEdgeArea(pressed, contains: point) || NotchSupport.screenEdgeArea(area, contains: point),
+                  windowHost?.containsDestination(point) == true else { return }
             open()
         case .leftMouseDragged:
+            // A press at the screen's edge reports a drag at once, often without
+            // moving. Only a drag that leaves the island cancels the click.
+            guard !NotchSupport.screenEdgeArea(area, contains: point),
+                  !(screenEdgePressArea.map { NotchSupport.screenEdgeArea($0, contains: point) } ?? false) else { return }
             screenEdgePressArea = nil
         default:
             break
