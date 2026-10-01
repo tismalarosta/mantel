@@ -927,20 +927,40 @@ def main():
         "    private func loadLiveLoupeImages()",
         "    private func markCapturePending()",
         "    private func captureFullDisplayUnderMouse()",
+        "    fileprivate func captureFullScreenFromControl(",
+        "    private func captureFullDisplay(",
         "    private func repeatLastRegion()",
         "    fileprivate func confirmWindow(",
         "    fileprivate func confirmRegion(",
         "    fileprivate func confirmColor(",
     ]
-    write("ScreenshotSelectionRefresh.swift", "import Foundation\nimport AppKit\n"
+    write("ScreenshotSelectionRefresh.swift", "import Foundation\nimport AppKit\nimport SwiftUI\n"
           + "extension ScreenshotSelectionRefreshContract.Chooser {\n"
+          + declaration(selection, "    fileprivate func setSelectionInProgress(").replace("fileprivate func", "func", 1)
           + declaration(selection, "    fileprivate var acceptsCaptureInput:").replace("fileprivate var", "var", 1)
+          + declaration(selection, "    fileprivate var offersFullScreenCapture:").replace("fileprivate var", "var", 1)
+          + declaration(selection, "    fileprivate var acceptsWindowClick:").replace("fileprivate var", "var", 1)
+          + declaration(selection, "    func placeFullScreenControlBelowNotch(")
           + declaration(selection, "    private var repeatTargetPanel:").replace("private var", "var", 1)
           + declaration(selection, "    fileprivate var offersRepeatLastRegion:").replace("fileprivate var", "var", 1)
           + "".join(declaration(selection, prefix).replace("fileprivate func", "func", 1)
                     .replace("private func", "func", 1).replace("UserDefaults.standard", "ReviewDefaults.current")
                     for prefix in refresh_methods)
-          + "}\n")
+          + "}\nextension ScreenshotSelectionRefreshContract.View {\n"
+          + declaration(selection, "    func captureToolDidChange()")
+          + declaration(selection, "    func setNotchCaptureControlsHeight(")
+          + declaration(selection, "    func refreshFullScreenControlVisibility()")
+          + declaration(selection, "    private func pointerIsOverFullScreenControl(").replace("private func", "func", 1)
+          + declaration(selection, "    private func updatePointerHover(").replace("private func", "func", 1)
+          + declaration(selection, "    private func fullScreenControlHoverChanged(").replace("private func", "func", 1)
+          + declaration(selection, "    private func resetFullScreenControlHover(").replace("private func", "func", 1)
+          + declaration(selection, "    private func applyDeferredNotchCaptureControlsHeight(").replace("private func", "func", 1)
+          + "}\nextension ScreenshotSelectionRefreshContract.SurfaceService {\n"
+          + declaration("Sources/Vorssaint/Services/QuickTools/ScreenCaptureService.swift",
+                        "    private func connectCaptureControlsSurface(").replace("private func", "func", 1)
+          + "}\n"
+          + declaration(selection, "private final class PassThroughHostingView<")
+              .replace("private final class", "final class", 1))
     write("NotchCaptureKeyboard.swift", "import Foundation\nimport Carbon.HIToolbox\n\nextension NotchCaptureKeyboardContract {\n"
           + "final class NotchService {\nstatic var shared = NotchService()\n"
           + "var presentationWindow: NSPanel? = NSPanel()\nvar acceptsSystemFeedback = true\n"
