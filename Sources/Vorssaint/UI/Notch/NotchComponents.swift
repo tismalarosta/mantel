@@ -10,6 +10,8 @@ import SwiftUI
 struct NotchButtonStyle: ButtonStyle {
     var cornerRadius: CGFloat = 10
     var lifts = true
+    /// A light wash under the pointer.
+    var highlights = true
     @State private var hovered = false
     @Environment(\.isEnabled) private var enabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -19,7 +21,7 @@ struct NotchButtonStyle: ButtonStyle {
         configuration.label
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.white.opacity(active ? 0.09 : 0))
+                    .fill(.white.opacity(active && highlights ? 0.09 : 0))
                     .allowsHitTesting(false)
             }
             .opacity(enabled ? (configuration.isPressed ? 0.8 : 1) : 0.4)
@@ -371,7 +373,8 @@ struct NotchSurfaceBackground: View {
                     .environment(\.appearsActive, true)
                     .materialActiveAppearance(.active)
                     .overlay {
-                        LinearGradient(stops: Self.shade(openness: presentation.openness, contrast: contrast),
+                        LinearGradient(stops: Self.shade(openness: presentation.openness, contrast: contrast,
+                                                             height: presentation.contourBottom),
                                        startPoint: .top, endPoint: .bottom)
                             .frame(height: presentation.contourBottom)
                             .frame(maxHeight: .infinity, alignment: .top)
@@ -388,24 +391,14 @@ struct NotchSurfaceBackground: View {
         .accessibilityHidden(true)
     }
 
-    /// How much of the glass the lip lets through at its lowest edge. Content
-    /// sits over that edge too, so it stays dark enough to keep a window's
-    /// text behind it from reading through the island's own.
-    static let lipTransparency = 0.32
-    /// How late the lip starts to open: content sits over most of the surface,
-    /// so the glass shows through only near the bottom edge.
-    static let lipCurve = 4.0
-
     /// The dimming over the glass, from the top of the island to its lip. Near
     /// a black strip the lip closes up, so the last frames of a collapse
     /// already match the resting island.
-    static func shade(openness: Double, contrast: ColorSchemeContrast) -> [Gradient.Stop] {
-        (0...64).map { index in
-            let t = Double(index) / 64
-            return Gradient.Stop(
-                color: .black.opacity(1 - openness * (contrast == .increased ? 0.10 : lipTransparency) * pow(t, lipCurve)),
-                location: t)
-        }
+    /// The black holds over the whole page, and the lip opens in the margin
+    /// below it (NotchGlassLip), measured in points over an island `height` tall.
+    static func shade(openness: Double, contrast: ColorSchemeContrast, height: CGFloat) -> [Gradient.Stop] {
+        NotchGlassLip.stops(height: height, openness: openness, increasedContrast: contrast == .increased)
+            .map { Gradient.Stop(color: .black.opacity($0.opacity), location: $0.location) }
     }
 }
 

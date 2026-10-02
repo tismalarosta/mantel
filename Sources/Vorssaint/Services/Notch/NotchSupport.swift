@@ -1295,6 +1295,12 @@ enum NotchSupport {
     static let defaultHoverDelay = 0.25
     static let hoverDelayRange = 0.10...1.0
 
+    /// Whether a screen point lies in a top-edge click area, whose top edge
+    /// belongs to it as in the flipped native view.
+    static func screenEdgeArea(_ area: CGRect, contains point: CGPoint) -> Bool {
+        CGRect(origin: .zero, size: area.size).contains(CGPoint(x: point.x - area.minX, y: area.maxY - point.y))
+    }
+
     static func sanitizedHoverDelay(_ value: TimeInterval) -> TimeInterval {
         value.isFinite ? min(hoverDelayRange.upperBound, max(hoverDelayRange.lowerBound, value)) : defaultHoverDelay
     }
@@ -1326,6 +1332,13 @@ enum NotchSupport {
         guard !ids.isEmpty else { return nil }
         guard let current, let index = ids.firstIndex(of: current) else { return ids.first }
         return ids[min(max(index + (backwards ? -1 : 1), 0), ids.count - 1)]
+    }
+
+    /// Return can paste before an arrow is pressed. A stale highlight falls
+    /// back to the first visible entry, never to a filtered-out row.
+    static func clipboardPasteTarget<ID: Equatable>(highlighted: ID?, in ids: [ID]) -> ID? {
+        if let highlighted, ids.contains(highlighted) { return highlighted }
+        return ids.first
     }
 
     /// The row a search leaves highlighted: the current one while it is still
@@ -2313,6 +2326,40 @@ enum NotchMenuBarLayout {
             if rect.minX >= camera.maxX { right = min(right, rect.minX - 8) }
         }
         return max(0, min(camera.minX - left, right - camera.maxX))
+    }
+}
+
+/// The dimming over the island's Liquid Glass, top to bottom. The glass is
+/// clear, not blurred, so wherever the black thins a window's text behind it
+/// reads through the island's own. The page and its cards stay over black,
+/// and only the margin below the page opens into the glass lip.
+enum NotchGlassLip {
+    /// The margin below the page, which holds no content.
+    static let depth = NotchLayout.bottomInset
+    /// How much of the glass the lip lets through at its lowest edge.
+    static let transparency = 0.45
+    static let increasedContrastTransparency = 0.10
+
+    static func opacity(atDepth depth: CGFloat, height: CGFloat,
+                        openness: Double, increasedContrast: Bool) -> Double {
+        let lipTop = height - Self.depth
+        guard depth > lipTop else { return 1 }
+        let ramp = Double(min(1, (depth - lipTop) / Self.depth))
+        let eased = ramp * ramp * (3 - 2 * ramp)
+        return 1 - min(1, max(0, openness))
+            * (increasedContrast ? increasedContrastTransparency : transparency) * eased
+    }
+
+    /// Gradient stops over an island `height` points tall, top to bottom.
+    static func stops(height: CGFloat, openness: Double,
+                      increasedContrast: Bool) -> [(location: Double, opacity: Double)] {
+        guard height > 0 else { return [(0, 1), (1, 1)] }
+        let lipTop = max(0, height - Self.depth)
+        let depths = [0, lipTop] + (1...8).map { lipTop + (height - lipTop) * CGFloat($0) / 8 }
+        return depths.map {
+            (Double($0 / height), opacity(atDepth: $0, height: height,
+                                          openness: openness, increasedContrast: increasedContrast))
+        }
     }
 }
 
