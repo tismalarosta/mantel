@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island gains an optional companion, a Command Bar that opens from it and notices that fit their content. Watch can follow changes in any part of a window, while AI Agents adds OpenCode and resumes log reading where the last launch stopped. The Volume mixer can send one app to an AirPlay speaker on macOS 27, clipboard searches highlight matches, and screenshots gain faster capture and sharing through temporary links. Smaller fixes improve Space switching, capture and trackpad controls, clipboard history, settings backups and monitor readings.
+Dynamic Island gains an optional companion, a Command Bar that opens from it and notices that fit their content. Watch can follow changes in any part of a window, while AI Agents adds OpenCode and GitHub Copilot and resumes log reading where the last launch stopped. The Volume mixer can send one app to an AirPlay speaker on macOS 27, clipboard searches highlight matches, and screenshots gain faster capture and sharing through temporary links. Smaller fixes improve Space switching, capture and trackpad controls, clipboard history, settings backups and monitor readings.
 
 ### Dynamic Island
 - A companion can live in the island. Installed on the Features page, and already installed in betas for people who use the Command Bar, it hops out from behind the camera and rests beside it when nothing else is there, passes through now and then, and comes out over music, the timer and other activities to react to music starting, an event beginning, an AI agent getting to work or finishing, its limit renewing, a finished download, what Watch waited for, the charger, Keep Awake, the microphone, a screenshot or the Mac unlocking. It stays beside the camera while the island opens and closes, steps into the notices it reacts to and hops back after, watches the last five seconds of a timer and cheers a finished focus session, follows the pointer, can be petted, and grows sleepy after a long rest and stretches when you come back. Its own tab shows it live in a slice of the island, acts out every moment it reacts to under See how it reacts, and has Say Hi to see it in the island. Choose its Style, Shape, Color and Side of the camera, how often it appears and whether it reacts. Settings → Dynamic Island → Companion.
@@ -27,8 +27,9 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - Up next shows each song's cover when the player shares one, and the list no longer blanks out for a moment on next or previous.
 - On the Clipboard page, Return or Enter pastes the first entry before any arrow is pressed, as the history window does. Without Accessibility it copies the entry.
 - The AI Agents page follows OpenCode too, next to Claude Code and Codex. Its tokens, costs, models and working tasks come from OpenCode's own database on this Mac, which is read again at each launch. Settings → Dynamic Island → Content → AI Agents → OpenCode.
+- AI Agents follows GitHub Copilot sessions from local logs, with activity, models, API value and live work. Token totals arrive with shutdown metrics, and history resumes across app launches without duplicating usage or losing turn state. Settings → Dynamic Island → Content → AI Agents → GitHub Copilot.
 - The closed island can show the limit you pick instead of the one closest to running out. Choose Session, Week or Most used, which stays the default. The resting wings, the capsule and the Lock Screen follow the same choice. Settings → Dynamic Island → Content → AI Agents → Limit to show.
-- The AI Agents page picks up where the last launch stopped and reads only what Claude Code and Codex wrote since, instead of every log of the last 13 weeks. What it keeps for that is in the app's cache folder and is deleted when the section is turned off.
+- The AI Agents page picks up where the last launch stopped and reads only what Claude Code, Codex and GitHub Copilot wrote since, instead of every log of the last 13 weeks. What it keeps for that is in the app's cache folder and is deleted when the section is turned off.
 
 ### Added
 - The recording editor's Copy button has a menu with Copy as GIF, which copies the edited recording as an animated GIF ready to paste. Copy and ⌘C still copy the video.
@@ -45,6 +46,9 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - Removed unused private code.
 
 ### Fixed
+- With macOS three-finger drag enabled, a four-finger trackpad press now works as a middle click.
+- Confirming Quit Protection for Steam now exits the app instead of only closing its window.
+- Maximize windows no longer restores the old size when a window moved from another display stays wider than the space beside the Dock.
 - Support thank-you messages use a white heart in dark mode so it stays visible.
 - Settings backups leave recording and screenshot folders and the replacement music app path on their own Mac, preserving the receiving Mac's choices when restored.
 - The system monitor moves byte sizes and rates to the next unit when rounding reaches its boundary. Out-of-range SMART usage values no longer crash the app during a disk refresh.
@@ -77,7 +81,7 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - App Switcher keeps showing apps that are too busy to describe their windows to Accessibility in time.
 
 ### Contributors
-Thanks to @69grcv8vfm-sys, @AlirezaBs, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @dc0dr, @dreammissnot, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @gorillasuti, @ilim-cell, @iltonandrew, @itsalexcoman, @LeChaEgg, @mikeknight85, @niukanen1, @PathGao, @Qarru, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @shlok1806, @thitiwats, @trac3r00 and @yuzu-octopus. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @69grcv8vfm-sys, @AlirezaBs, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @dc0dr, @dreammissnot, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @gorillasuti, @hartra344, @ilim-cell, @iltonandrew, @itsalexcoman, @LeChaEgg, @mikeknight85, @nickciava98, @niukanen1, @oecer, @PathGao, @Qarru, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @shlok1806, @thitiwats, @trac3r00 and @yuzu-octopus. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
@@ -168,7 +172,6 @@ This beta takes Dynamic Island beyond the notch. It floats as a capsule on displ
 - Radial menu profiles refuse a shortcut that another profile or feature already uses, and other shortcut settings now warn when a combination belongs to a radial menu profile.
 - The Keyboard Shortcuts page lists the shortcuts radial menu profiles use and links to the Radial menu page to change them, instead of showing an outdated shortcut whose changes had no effect.
 - Extra Brightness no longer hides purchase confirmations in the system app store or administrator password prompts.
-- Maximize windows no longer snaps a window moved in from another display back to its old size when the Dock is on the right, as happened with Google Chrome.
 - Clipboard History search reuses prepared text while typing in long histories, reducing repeated processing.
 - Scratchpad warns in both views when notes cannot be saved and shows a warning if the final save fails while closing.
 - Homebrew commands and app update checks use proxy and mirror settings exported by the user's shell, allowing package operations on networks where direct access is blocked.
