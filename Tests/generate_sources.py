@@ -992,6 +992,7 @@ def main():
         "    private func applySource(",
         "    private func loadLiveLoupeImages()",
         "    private func markCapturePending()",
+        "    private func confirmSelectionWithKeyboard()",
         "    private func captureFullDisplayUnderMouse()",
         "    fileprivate func captureFullScreenFromControl(",
         "    private func captureFullDisplay(",
@@ -1046,8 +1047,11 @@ def main():
           + "var keyMonitor: Any?\nvar globalKeyMonitor: Any?\nvar spaceIsDown = false\n"
           + "var acceptsWindowClick = true\nvar loupeAcceptsKeyboardActions = false\n"
           + "var actions: [String] = []\nvar draggingPanel: ScreenshotOverlayPanel?\n"
+          + "var isPickingColor = false\nvar acceptsCaptureInput = true\n"
+          + "var panels: [ScreenshotOverlayPanel] = []\nvar currentPointerLocation: CGPoint?\n"
           + 'func finish(_ outcome: Outcome) { actions.append("cancel") }\n'
           + 'func captureFullDisplayUnderMouse() { actions.append("fullDisplay") }\n'
+          + 'func confirmColor(at point: CGPoint, on panel: ScreenshotOverlayPanel) { actions.append("color") }\n'
           + "func panelUnderMouse() -> ScreenshotOverlayPanel? { draggingPanel }\n"
           + 'func repeatLastRegion() { actions.append("repeat") }\n'
           + "func selectCaptureTool(for event: NSEvent) -> Bool { false }\n"
@@ -1059,6 +1063,7 @@ def main():
           + "func nudgePointer(keyCode: Int, fast: Bool) {}\nfunc attach() { installKeyMonitor() }\n"
           + declaration(selection, "    private static func isRepeatRegionKey(")
           + declaration(selection, "    private static func matchesShortcutKey(")
+          + declaration(selection, "    private func confirmSelectionWithKeyboard()")
           + declaration(selection, "    private func installKeyMonitor()")
           + "}\n}\n")
     hop = "Sources/Vorssaint/Services/Switcher/SpaceHop.swift"
