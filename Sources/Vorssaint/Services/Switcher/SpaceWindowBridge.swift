@@ -296,9 +296,14 @@ enum SpaceWindowBridge {
     /// verifiably holds it.
     static func focusWithoutRaise(_ windowID: CGWindowID, ownerPID: pid_t,
                                   replacing focusedWindowID: CGWindowID?,
-                                  while isCurrent: @escaping () -> Bool) {
+                                  while isCurrent: @escaping () -> Bool,
+                                  completion: @escaping (Bool) -> Void) {
+        guard isCurrent() else {
+            completion(false)
+            return
+        }
         guard let focusedWindowID else {
-            frontWindow(windowID, ownerPID: ownerPID)
+            completion(frontWindow(windowID, ownerPID: ownerPID))
             return
         }
         postFocusRecord(focusedWindowID, ownerPID: ownerPID, gained: false)
@@ -310,10 +315,11 @@ enum SpaceWindowBridge {
                     appIsFrontmost: NSWorkspace.shared.frontmostApplication?.processIdentifier == ownerPID) {
                     postFocusRecord(focusedWindowID, ownerPID: ownerPID, gained: true)
                 }
+                completion(false)
                 return
             }
             postFocusRecord(windowID, ownerPID: ownerPID, gained: true)
-            frontWindow(windowID, ownerPID: ownerPID)
+            completion(frontWindow(windowID, ownerPID: ownerPID))
         }
     }
 
