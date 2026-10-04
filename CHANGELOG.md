@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Summary
-Dynamic Island gains an optional companion, a Command Bar that opens from it and notices that fit their content. Watch can follow changes in any part of a window, while AI Agents adds OpenCode and GitHub Copilot and resumes log reading where the last launch stopped. The Volume mixer can send one app to an AirPlay speaker on macOS 27, clipboard searches highlight matches, and screenshots gain faster capture and sharing through temporary links. Smaller fixes improve Space switching, capture and trackpad controls, clipboard history, settings backups and monitor readings.
+Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI Agents supports more providers. App audio can play through AirPlay, and screenshots gain faster capture and sharing through temporary links. Monitor settings are easier to scan, while keyboard shortcuts and hover focus gain more flexibility.
 
 ### Dynamic Island
 - A companion can live in the island. Installed on the Features page, and already installed in betas for people who use the Command Bar, it hops out from behind the camera and rests beside it when nothing else is there, passes through now and then, and comes out over music, the timer and other activities to react to music starting, an event beginning, an AI agent getting to work or finishing, its limit renewing, a finished download, what Watch waited for, the charger, Keep Awake, the microphone, a screenshot or the Mac unlocking. It stays beside the camera while the island opens and closes, steps into the notices it reacts to and hops back after, watches the last five seconds of a timer and cheers a finished focus session, follows the pointer, can be petted, and grows sleepy after a long rest and stretches when you come back. Its own tab shows it live in a slice of the island, acts out every moment it reacts to under See how it reacts, and has Say Hi to see it in the island. Choose its Style, Shape, Color and Side of the camera, how often it appears and whether it reacts. Settings → Dynamic Island → Companion.
@@ -37,18 +37,23 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - A new shortcut, off by default (⌃⌥⌘U), uploads the latest screenshot as a temporary link and copies the link. The floating preview's link button uploads with that default expiry on a click and its arrow picks another one, and a copied link closes the preview. A capture that went through the editor or was discarded is never uploaded by the shortcut. Settings → Screen capture → Temporary links → Upload latest screenshot and Default link expiry.
 
 - On macOS 27 and later, the Volume mixer can send one app to an AirPlay speaker while everything else keeps playing where it was. Choose AirPlay in the app's output menu, and Choose AirPlay speaker… in the same menu to pick or change the speaker, in the menu bar panel, Settings and the island's mixer page.
-- Clipboard searches highlight the words they matched in the history window, the menu bar panel's Clipboard tab and Dynamic Island's Clipboard page.
+- Clipboard searches highlight the words they matched in the history window, the menu bar panel's Clipboard tab and Dynamic Island's Clipboard page. Control-N and Control-P move through clipboard history while searching or browsing.
 - The screenshot selection shows a Full screen button near the top of the display under the pointer, which captures that whole display in one click.
 
+- Option-Up and Option-Down move the current line or selected lines in Scratchpad, including inside Dynamic Island, and in the snippet editor.
+- Focus follows mouse can give a window keyboard focus without bringing it to the front. With raising turned off, it can also focus while the pointer moves instead of waiting for it to stop.
+
 ### Changed
+- Monitor settings put each reading's display options beside its compact label, with separate groups for the menu bar, panel and shared settings.
+- With Group dependencies on, Homebrew lists dependencies that no installed package needs in a separate No longer needed group. Those with pending updates stay beside the other updates.
 - Deleting a Radial Menu profile now asks for confirmation and names the profile and what will be removed.
 - Trackpad middle click is named explicitly, and cleanup, microphone, quit-protection and Command Bar privacy messages more accurately describe what happens.
-- Removed unused private code.
 
 ### Fixed
 - With macOS three-finger drag enabled, a four-finger trackpad press now works as a middle click.
 - Confirming Quit Protection for Steam now exits the app instead of only closing its window.
 - Maximize windows no longer restores the old size when a window moved from another display stays wider than the space beside the Dock.
+- Dock Preview no longer enlarges the gaps with Large and Extra large cards. Small stays compact.
 - Support thank-you messages use a white heart in dark mode so it stays visible.
 - Settings backups leave recording and screenshot folders and the replacement music app path on their own Mac, preserving the receiving Mac's choices when restored.
 - The system monitor moves byte sizes and rates to the next unit when rounding reaches its boundary. Out-of-range SMART usage values no longer crash the app during a disk refresh.
@@ -58,6 +63,7 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - Fast magnifier zoom crosses the range in a few mouse-wheel notches, while stepped zoom and trackpads keep their pace.
 - Clipboard settings has one Clear unpinned button. Pinned entries stay, and the Command Bar still finds the action by its former names.
 - The Command Bar's Kill Process rows follow the sort order selected on the Kill Process page.
+- App shortcuts in the Command Bar now offer to take over a macOS shortcut while Vorssaint runs, just like other shortcut settings.
 - Trackpad middle click explains when no readable trackpad is available and updates the warning as devices disconnect and reconnect.
 - Searching a feature in the Command Bar, such as Keep awake or Shelf, lists its switch or main command first, then its presets, then its Settings page, instead of the Settings page first and the switch last.
 - Dynamic Island keeps the current song on screen while a web player loads the next one, instead of briefly showing another player's paused song. With the New track indicator on, a new song appears in the indicator before the compact island, even when it takes a while to load.
@@ -78,10 +84,11 @@ Dynamic Island gains an optional companion, a Command Bar that opens from it and
 - Cancelling a GIF export from the recording editor no longer leaves a hidden empty file in the folder it was saving to.
 - Uninstalling with `Tools/uninstall.sh` now removes the password-free closed-lid rule, which the script used to leave behind.
 - The Uninstaller's app pickers and the Command Bar's Uninstall Application list offer only apps it can remove, so Apple's App Store apps, iPhone and iPad apps and linked apps no longer lead back to an empty drop zone. A refused app or a link dragged from a browser springs back from the drop zone instead.
+- Cleaner no longer treats common screenshot renames, such as adding copy or an emoji after the capture time, as untouched captures.
 - App Switcher keeps showing apps that are too busy to describe their windows to Accessibility in time.
 
 ### Contributors
-Thanks to @69grcv8vfm-sys, @AlirezaBs, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @dc0dr, @dreammissnot, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @gorillasuti, @hartra344, @ilim-cell, @iltonandrew, @itsalexcoman, @LeChaEgg, @mikeknight85, @nickciava98, @niukanen1, @oecer, @PathGao, @Qarru, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @shlok1806, @thitiwats, @trac3r00 and @yuzu-octopus. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @69grcv8vfm-sys, @adhvikrayaprolu, @AlirezaBs, @ashwanthbalakrishnan5, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @claude, @dc0dr, @dreammissnot, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @LeChaEgg, @mikeknight85, @nickciava98, @niukanen1, @oecer, @PathGao, @Qarru, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @shlok1806, @sim-pez, @theafox, @thitiwats, @trac3r00 and @yuzu-octopus. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
