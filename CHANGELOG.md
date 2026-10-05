@@ -14,6 +14,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - With Command Bar in the island on, the Command Bar shortcut drops the bar out of the island with the companion as its face. It reads along as you type, reacts to the results and goes back into the island when the bar closes, smiling when you ran something. Choose Open island under Opens as to show the bar inside the island instead. Settings → Dynamic Island → Companion → Command Bar in the island.
 - The notice for a finished timer keeps the orange of the timer's strip and page.
 - The timer countdown can be hidden from the closed island while the session keeps running, with controls and completion alerts available. Settings → Dynamic Island → Content → Timer → Hide timer countdown.
+- The timer remembers the last duration set on its ruler instead of going back to 15 minutes each time it opens.
 - The Notifications page can clear its inbox from the island's header after confirmation. Notification Center keeps its own messages.
 - Notices beside the camera take only the room they need on each side. A short reply next to a long sender, a microphone or clipboard notice, or a brightness, volume or keyboard light level no longer leaves a band of empty black at one end: the island reaches further toward its wider side while the camera's gap stays in place, and a message that wraps onto two lines is only as wide as its lines.
 - When a level needs another width, such as brightness reaching 100% or volume dropping below 10%, the island eases to it, and its icon, reading and meter move with the edge instead of jumping ahead of it.
@@ -31,6 +32,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - The AI Agents page follows OpenCode too, next to Claude Code and Codex. Its tokens, costs, models and working tasks come from OpenCode's own database on this Mac, which is read again at each launch. Settings → Dynamic Island → Content → AI Agents → OpenCode.
 - AI Agents follows GitHub Copilot sessions from local logs, with activity, models, API value and live work. Token totals arrive with shutdown metrics, and history resumes across app launches without duplicating usage or losing turn state. Settings → Dynamic Island → Content → AI Agents → GitHub Copilot.
 - The closed island can show the limit you pick instead of the one closest to running out. Choose Session, Week or Most used, which stays the default. The resting wings, the capsule and the Lock Screen follow the same choice. Settings → Dynamic Island → Content → AI Agents → Limit to show.
+- Pointing at a bar in the AI Agents trend shows its tokens beside its cost.
 - The AI Agents page picks up where the last launch stopped and reads only what Claude Code, Codex and GitHub Copilot wrote since, instead of every log of the last 13 weeks. What it keeps for that is in the app's cache folder and is deleted when the section is turned off.
 
 ### Added
@@ -58,6 +60,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - With Group dependencies on, Homebrew keeps dependency updates under the packages that need them. Those packages move up with other updates and show how many dependency updates are waiting. Dependencies that no installed package needs stay in No longer needed, including those with updates.
 - Deleting a Radial Menu profile now asks for confirmation and names the profile and what will be removed.
 - Trackpad middle click is named explicitly, and cleanup, microphone, quit-protection and Command Bar privacy messages more accurately describe what happens.
+- Pasting or copying an entry from Clipboard history moves it to the top of the recent entries, as copying the same content again elsewhere already did. Pinned entries keep their place and their ⌘1 to ⌘9 shortcuts, and the island and menu bar panel lists follow the copied entry.
 
 ### Fixed
 - Clipboard history reopens at the top and searches large histories more efficiently.
@@ -67,6 +70,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - App Updates no longer offers the installed release again when its version differs only in letter case.
 - The Shelf no longer retracts its screen edge peek immediately after a drop while waiting for the source app to deliver the file.
 - Keep Awake can select helper apps bundled inside another app as running-app triggers and notices when they start or quit.
+- With Hide the app icon while metrics are shown on, a running Keep Awake brings the icon back, like an available update or a muted microphone. Settings → Monitor.
 - With macOS three-finger drag enabled, a four-finger trackpad press now works as a middle click.
 - Confirming Quit Protection for Steam now exits the app instead of only closing its window.
 - Maximize windows no longer restores the old size when a window moved from another display stays wider than the space beside the Dock.
@@ -103,9 +107,11 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - The Uninstaller's app pickers and the Command Bar's Uninstall Application list offer only apps it can remove, so Apple's App Store apps, iPhone and iPad apps and linked apps no longer lead back to an empty drop zone. A refused app or a link dragged from a browser springs back from the drop zone instead.
 - Cleaner no longer treats common screenshot renames, such as adding copy or an emoji after the capture time, as untouched captures.
 - Window switcher stays responsive while preparing window previews and keeps showing apps that are too busy to describe their windows in time.
+- When macOS still needs approval for Launch at login, General settings says so with a button to System Settings, and the switch updates once it is allowed there.
+- Radial Menu settings say when the profile being edited has nothing that opens it. A mouse button now belongs to one wheel, so giving it to another wheel moves it there instead of leaving that wheel unable to open.
 
 ### Contributors
-Thanks to @0mgABear, @69grcv8vfm-sys, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @claude, @dc0dr, @dreammissnot, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @Qarru, @renan-tiberio, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @shlok1806, @sim-pez, @tenbux, @theafox, @thitiwats, @trac3r00, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @jd4386, @kushalvora, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @Qarru, @renan-tiberio, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @shlok1806, @sim-pez, @tenbux, @theafox, @thitiwats, @tobyadams87, @trac3r00, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
