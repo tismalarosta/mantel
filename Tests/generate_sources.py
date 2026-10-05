@@ -129,11 +129,17 @@ def main():
           + "extension DisplayRestorationTests {\nfinal class BrightnessService: Fixture {\n"
           + declaration(brightness, "    enum DisplayControlFailure:")
           + "".join(declaration(brightness, prefix).replace("private ", "", 1) for prefix in [
+              "    private static func restorationDisplayFingerprint(",
+              "    private static func rememberDisplaySwitchedOff(",
+              "    private static func forgetDisplaySwitchedOff(",
               "    private static func configureDisplay(", "    private func restoreDisplay(",
+              "    private func canRestoreDisplay(",
               "    private func syncLidObserver(", "    private func restoreDeferredDisplays(",
               "    private func restoreManagedDisplays(", "    func restoreDisplaysLeftOff(",
               "    private func commitDisplayToggle(", "    private func finishDisplayToggle(",
-              "    private func restoreManagedDisplayIfHeadless("])
+              "    private func restoreManagedDisplayIfHeadless(",
+              "    private func recordDiscoveredTopology(", "    private func discardReplacedDisplay(",
+              "    private func displaysWokeUp("])
           + "}\n}\n")
     write("BrightnessStep.swift", "import CoreGraphics\nimport Foundation\nimport os\n"
           + "extension BrightnessStepTests {\n"
