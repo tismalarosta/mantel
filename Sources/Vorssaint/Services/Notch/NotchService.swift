@@ -404,7 +404,7 @@ final class NotchService: ObservableObject {
     private var mascotWantsRoom: Bool { NotchMascotSupport.isEnabled() }
 
     var hasTimerActivity: Bool {
-        NotchTimerSupport.isEnabled() && NotchTimerService.shared.session.hasSession
+        NotchTimerSupport.showsActivity(hasSession: NotchTimerService.shared.session.hasSession)
     }
 
     var hasWatchActivity: Bool {
