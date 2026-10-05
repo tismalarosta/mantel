@@ -21,13 +21,16 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - Watch is a new page that turns any part of any window into a live activity. Choose Area lets you drag over a progress bar, a build status or a score, or click a window to take all of it, and the closed island shows what the area reads. Tell me picks when it speaks up, such as when the area changes, stops changing, shows a text you type or reaches a number you type. The area is read on the Mac with Screen Recording, and nothing leaves it. Settings → Dynamic Island → Content → Watch.
 - The camera mirror fills the island's page instead of showing a small preview in the middle, and Stop camera sits over the image beside the camera picker.
 - An event countdown paired with music or AI agents is only as wide as its clock and the other activity's mark need, like a timer's pair, so it leaves no extra black beside the camera. With Show over the menus off, the pair also stays beside the camera on a crowded menu bar whenever it fits.
+- Clicking an event's countdown in the closed island opens the Calendar page scrolled to that event, also from its side of a timer pair, the top edge of the screen above it or its copy on another display.
 - The capsule grows around what it shows when the pointer reaches it, so a song's cover and sound bars no longer jump outward first.
 - In the open capsule, the header's buttons now sit as far from the top edge as the page does from the bottom, so the title no longer crowds the top.
 - With Liquid Glass on, the open island keeps its page over black, so text from a window behind it no longer reads through, and the glass shows along its lower edge. Menus opened from the island's buttons, such as ··· and the output device chooser, use the island's dark look.
 - On macOS 15 and later, a page taller than the island fades at the top and bottom where more follows, and rows that run past the side, such as recent captures and notifications, fade at that edge instead of ending in a hard line.
 - Choosing another activity in the closed island slides the highlight to it and changes the strip in place instead of fading the whole island. Play and pause change at once for players the island controls directly, on the Lock Screen too.
+- As the Mac unlocks, the Lock Screen's player and activities leave with the lock screen instead of staying over the desktop for about a second.
 - The Downloads page without a folder explains what it does and offers a Choose Folder… button, or a Downloads switch while Downloads is off, instead of a bare checkbox.
 - Up next shows each song's cover when the player shares one, and the list no longer blanks out for a moment on next or previous.
+- The Now Playing page is calmer. Play, pause and skip are plain symbols as on the Lock Screen, the times sit beside the position bar so the artist stays visible with lyrics or Up next open, and a song without lyrics or a player without a queue says so with buttons for the next step, such as Import lyrics… or Find lyrics online.
 - On the Clipboard page, Return or Enter pastes the first entry before any arrow is pressed, as the history window does. Without Accessibility it copies the entry.
 - The AI Agents page follows OpenCode too, next to Claude Code and Codex. Its tokens, costs, models and working tasks come from OpenCode's own database on this Mac, which is read again at each launch. Settings → Dynamic Island → Content → AI Agents → OpenCode.
 - AI Agents follows GitHub Copilot sessions from local logs, with activity, models, API value and live work. Token totals arrive with shutdown metrics, and history resumes across app launches without duplicating usage or losing turn state. Settings → Dynamic Island → Content → AI Agents → GitHub Copilot.
@@ -72,10 +75,12 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - The Shelf no longer retracts its screen edge peek immediately after a drop while waiting for the source app to deliver the file.
 - Keep Awake can select helper apps bundled inside another app as running-app triggers and notices when they start or quit.
 - With Hide the app icon while metrics are shown on, a running Keep Awake brings the icon back, like an available update or a muted microphone. Settings → Monitor.
+- When a second click on a menu bar metric closes its panel while the panel is moving to that item, the icon keeps following the microphone and Keep Awake instead of staying as it was until the panel opens again.
 - With macOS three-finger drag enabled, a four-finger trackpad press now works as a middle click.
 - Confirming Quit Protection for Steam now exits the app instead of only closing its window.
 - Maximize windows no longer restores the old size when a window moved from another display stays wider than the space beside the Dock.
 - Dock Preview no longer enlarges the gaps with Large and Extra large cards. Small stays compact.
+- With the Dock hiding automatically, Dock previews stay where they opened when the Dock slides away instead of moving toward the edge of the screen.
 - Support thank-you messages use a white heart in dark mode so it stays visible.
 - Settings backups leave recording and screenshot folders and the replacement music app path on their own Mac, preserving the receiving Mac's choices when restored.
 - The system monitor moves byte sizes and rates to the next unit when rounding reaches its boundary. Out-of-range SMART usage values no longer crash the app during a disk refresh.
@@ -85,6 +90,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - Fast magnifier zoom crosses the range in a few mouse-wheel notches, while stepped zoom and trackpads keep their pace.
 - Clipboard settings has one Clear unpinned button. Pinned entries stay, and the Command Bar still finds the action by its former names.
 - The Command Bar's Kill Process rows follow the sort order selected on the Kill Process page.
+- The Command Bar's Actions list includes Uninstall Application, uninstalling the app selected in Finder, Emoji and Kill Process, which only the empty bar and search offered before, and leaves them out while their source is switched off.
 - App shortcuts in the Command Bar now offer to take over a macOS shortcut while Vorssaint runs, just like other shortcut settings.
 - Trackpad middle click explains when no readable trackpad is available and updates the warning as devices disconnect and reconnect.
 - Searching a feature in the Command Bar, such as Keep awake or Shelf, lists its switch or main command first, then its presets, then its Settings page, instead of the Settings page first and the switch last.
@@ -96,7 +102,6 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - The closed Dynamic Island no longer stays enlarged after the pointer passes over it quickly, such as on the way to a display above it.
 - With Expand on hover selected, Dynamic Island stays at its resting size while the pointer waits over it and then opens directly, without growing first. Leaving and coming back starts the activation time again, even after a quick pass up to a display above.
 - The buttons in the open Dynamic Island's header, such as Pin and Settings, hide again when the pointer leaves the header quickly, instead of staying in view until it comes back.
-- As the Mac unlocks, the Lock Screen's player and activities leave with the lock screen instead of staying over the desktop for about a second.
 - When Dynamic Island opens on a click, a click at the top edge of the screen while the island grows under the pointer now opens it instead of doing nothing.
 - With Keyboard navigation on in System Settings, clicking Dynamic Island no longer leaves a focus ring around the camera.
 - The AI Agents page shows the 5-hour session renewing five hours after its first request, as the provider's usage page does, instead of up to an hour later.
@@ -116,7 +121,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - Radial Menu settings say when the profile being edited has nothing that opens it. A mouse button now belongs to one wheel, so giving it to another wheel moves it there instead of leaving that wheel unable to open.
 
 ### Contributors
-Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @jd4386, @kushalvora, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @Qarru, @renan-tiberio, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sim-pez, @tenbux, @theafox, @thitiwats, @tobyadams87, @trac3r00, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @jd4386, @kushalvora, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @PeshangALO, @Qarru, @renan-tiberio, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sim-pez, @soguy, @tenbux, @theafox, @thitiwats, @tobyadams87, @trac3r00, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
