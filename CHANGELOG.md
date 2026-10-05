@@ -28,6 +28,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - On macOS 15 and later, a page taller than the island fades at the top and bottom where more follows, and rows that run past the side, such as recent captures and notifications, fade at that edge instead of ending in a hard line.
 - Choosing another activity in the closed island slides the highlight to it and changes the strip in place instead of fading the whole island. Play and pause change at once for players the island controls directly, on the Lock Screen too.
 - As the Mac unlocks, the Lock Screen's player and activities leave with the lock screen instead of staying over the desktop for about a second.
+- On the Lock Screen, the padlock island takes the music strip's size and sound bars, with the padlock where the cover sits, so the island no longer grows when the Mac locks during a song. With a half-point Notch fit it also stays flush with the top of the display.
 - The Downloads page without a folder explains what it does and offers a Choose Folder… button, or a Downloads switch while Downloads is off, instead of a bare checkbox.
 - Up next shows each song's cover when the player shares one, and the list no longer blanks out for a moment on next or previous.
 - The Now Playing page is calmer. Play, pause and skip are plain symbols as on the Lock Screen, the times sit beside the position bar so the artist stays visible with lyrics or Up next open, and a song without lyrics or a player without a queue says so with buttons for the next step, such as Import lyrics… or Find lyrics online.
@@ -83,7 +84,8 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - With the Dock hiding automatically, Dock previews stay where they opened when the Dock slides away instead of moving toward the edge of the screen.
 - Support thank-you messages use a white heart in dark mode so it stays visible.
 - Settings backups leave recording and screenshot folders and the replacement music app path on their own Mac, preserving the receiving Mac's choices when restored.
-- The system monitor moves byte sizes and rates to the next unit when rounding reaches its boundary. Out-of-range SMART usage values no longer crash the app during a disk refresh.
+- The system monitor moves byte sizes and rates to the next unit when rounding reaches its boundary. Out-of-range SMART usage values no longer crash the app during a disk refresh, and neither does an accessory that reports an impossible battery level.
+- With the adapter connected but charging paused, such as at full charge or at a charge limit, the menu bar's battery shows the bolt, and the menu bar panel and Command Bar describe the Mac as plugged in instead of on battery.
 - Checking or using a banked Codex reset no longer refreshes plugin marketplaces.
 - Window switcher stops raising a window again after a Space switch has already focused it.
 - Window captures keep attached sheets and dialogs when the window spans two displays, including displays with different scales.
@@ -122,7 +124,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - Radial Menu settings say when the profile being edited has nothing that opens it. A mouse button now belongs to one wheel, so giving it to another wheel moves it there instead of leaving that wheel unable to open.
 
 ### Contributors
-Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @jd4386, @JoaoPedroSedrez, @kushalvora, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @PeshangALO, @Qarru, @renan-tiberio, @Retr0MrWave, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sim-pez, @soguy, @tenbux, @theafox, @thitiwats, @tobyadams87, @trac3r00, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @JamesOBrien2, @jd4386, @JoaoPedroSedrez, @kushalvora, @LeChaEgg, @liambennett1223-jpg, @mikeknight85, @nickciava98, @niukanen1, @NRanjan-17, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @PeshangALO, @Qarru, @renan-tiberio, @Retr0MrWave, @rodalpho, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sim-pez, @soguy, @tenbux, @theafox, @thitiwats, @tobyadams87, @trac3r00, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
