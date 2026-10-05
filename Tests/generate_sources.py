@@ -1003,7 +1003,7 @@ def main():
                                    "    func openEditor(with", "    func editorDidClose(",
                                    "    private func invalidateLatestCaptureUploads()",
                                    "    private func beginLatestCapture(", "    private func discardLatestCapture(",
-                                   "    private func syncLatestCapture("])
+                                   "    private func withholdLatestCapture()", "    private func syncLatestCapture("])
           + "}\n}\n")
     write("ScreenshotPreviewHover.swift", "import Foundation\n"
           + "extension ScreenshotPreviewHoverTests {\nfinal class Controller: State {\n"
