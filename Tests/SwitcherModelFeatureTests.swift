@@ -2515,6 +2515,27 @@ enum SwitcherModelFeatureTests {
                      && keepAwakeHoldCode.contains("refresh()")
                      && statusControllerSource.contains("heldKeepAwakeSignal ?? currentKeepAwakeSignal"),
                "starting or stopping Keep Awake from an open panel does not bring the glyph back under it")
+        // popoverDidClose keeps the hold while the panel switches anchors, so
+        // a switch that ends with the panel closed has to release it itself.
+        // Otherwise the glyph ignores Keep Awake until the next panel closes.
+        // Each failure branch is sliced at its own closing brace.
+        for (header, guardEnd, branchEnd, condition, label) in [
+            ("private func reanchorMetricPopover(", "activeMetric == detailKind else {",
+             "\n            }", "if !self.popover.isShown {", "closes while moving between metric items"),
+            ("private func useStablePopoverPositioningViewIfNeeded(", "view.window else {",
+             "\n        }", "if !popover.isShown {", "does not come back on its stable anchor"),
+        ] {
+            let switchCode = stripCommentLines((statusAnchorAppDelegateSource
+                .components(separatedBy: header).last ?? "")
+                .components(separatedBy: "\n    }").first ?? "")
+            let releaseCode = ((switchCode.components(separatedBy: guardEnd).dropFirst().first ?? "")
+                .components(separatedBy: branchEnd).first ?? "")
+                .components(separatedBy: condition).dropFirst().first ?? ""
+            suite.expect(releaseCode.contains("statusController.setMicBadgeHeld(false)")
+                         && releaseCode.contains("releasePanelResources()")
+                         && releaseCode.contains("endPanelActivationTracking()"),
+                   "a panel that \(label) releases the held glyph, its resources and activation tracking")
+        }
         suite.expect(MenuBarSpacingSupport.shouldHideStatusIcon(optionEnabled: true, separateMetrics: false,
                                                           metricsEnabled: true, renderedTitleLength: 12,
                                                           mustShowForSignal: false),
