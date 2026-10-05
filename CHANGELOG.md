@@ -24,7 +24,7 @@ Dynamic Island adds a companion, an integrated Command Bar and Watch, while AI A
 - Clicking an event's countdown in the closed island opens the Calendar page scrolled to that event, also from its side of a timer pair, the top edge of the screen above it or its copy on another display.
 - The capsule grows around what it shows when the pointer reaches it, so a song's cover and sound bars no longer jump outward first.
 - In the open capsule, the header's buttons now sit as far from the top edge as the page does from the bottom, so the title no longer crowds the top.
-- With Liquid Glass on, the open island keeps its page over black, so text from a window behind it no longer reads through, and the glass shows along its lower edge. Menus opened from the island's buttons, such as ··· and the output device chooser, use the island's dark look.
+- Menus opened from the island's buttons, such as ··· and the output device chooser, use the island's dark look.
 - On macOS 15 and later, a page taller than the island fades at the top and bottom where more follows, and rows that run past the side, such as recent captures and notifications, fade at that edge instead of ending in a hard line.
 - Choosing another activity in the closed island slides the highlight to it and changes the strip in place instead of fading the whole island. Play and pause change at once for players the island controls directly, on the Lock Screen too.
 - As the Mac unlocks, the Lock Screen's player and activities leave with the lock screen instead of staying over the desktop for about a second.
