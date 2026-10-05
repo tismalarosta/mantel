@@ -1168,6 +1168,44 @@ enum ClipboardPreviewContract {
         service.togglePin(service.entries.first { $0.id == current.id }!)
         suite.expect(service.latestPasteboardEntry == nil,
                      "pinning after a delayed copy cannot replace its preview with an uncopied edit")
+        let a = ClipboardHistoryEntry(text: "A"), b = ClipboardHistoryEntry(text: "B")
+        let c = ClipboardHistoryEntry(text: "C"), d = ClipboardHistoryEntry(text: "D")
+        var orderSeenByCompletion: [String] = []
+        func reuse(_ entries: [ClipboardHistoryEntry], copied: Bool) {
+            let done: (Bool) -> Void = { _ in orderSeenByCompletion = service.entries.map(\.text) }
+            if entries.count == 1 { service.copy(entries[0], completion: done) } else { service.copy(entries, completion: done) }
+            service.pendingWrite?(copied)
+            service.pendingWrite = nil
+        }
+        service.setEntries([a, b, c, d])
+        reuse([c], copied: true)
+        suite.expect(service.entries.map(\.text) == ["C", "A", "B", "D"],
+                     "an entry pasted from the history moves to the top, as copying it again elsewhere does")
+        suite.expect(orderSeenByCompletion == ["C", "A", "B", "D"],
+                     "the copy's completion already sees the new order, so an open list can scroll to the entry")
+        service.setEntries([a, b, c, d])
+        reuse([c], copied: false)
+        suite.expect(service.entries.map(\.text) == ["A", "B", "C", "D"], "a write that failed leaves the order alone")
+        service.setEntries([a, b, c, d])
+        let stampBeforeBatch = service.entriesStamp
+        reuse([d, b], copied: true)
+        suite.expect(service.entries.map(\.text) == ["D", "B", "A", "C"],
+                     "a pasted selection moves to the top in the order it was pasted")
+        suite.expect(service.entriesStamp == stampBeforeBatch + 1,
+                     "a pasted selection reorders the history in one update")
+        var p = ClipboardHistoryEntry(text: "P")
+        p.pinnedAt = Date()
+        service.setEntries([p, a, b])
+        reuse([b], copied: true)
+        suite.expect(service.entries.map(\.text) == ["P", "B", "A"],
+                     "a pasted recent entry tops the recent ones and stays below the pinned")
+        let q = ClipboardHistoryEntry(text: "Q", copiedAt: Date(timeIntervalSinceNow: -60), pinnedAt: Date())
+        let r = ClipboardHistoryEntry(text: "R", pinnedAt: Date())
+        service.setEntries([p, q, r, a, b])
+        reuse([q, b], copied: true)
+        suite.expect(service.entries.map(\.text) == ["P", "Q", "R", "B", "A"]
+                     && service.entries[1].copiedAt > Date(timeIntervalSinceNow: -30),
+                     "a pasted pinned entry keeps its place and its shortcut, and only its time changes")
         let image = ClipboardHistoryEntry(text: "", kind: .image, imageFile: "saved.png")
         service.setEntries([image])
         service.latestPasteboardEntry = image
