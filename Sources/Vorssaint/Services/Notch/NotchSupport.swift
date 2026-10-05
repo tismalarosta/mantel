@@ -1821,6 +1821,13 @@ struct NotchGeometry: Equatable {
         compact.minimumWing = wing
         return compact
     }
+    /// The Lock Screen keeps no menus beside the camera, so its island always
+    /// takes the wings the music strip fits to the cover and the bars.
+    var lockScreenMusicGeometry: NotchGeometry {
+        var unobstructed = self
+        unobstructed.compactSideRoom = screen.width
+        return unobstructed.compactMusicGeometry
+    }
     /// The cover takes the strip's height less an even gap above and below.
     var compactMusicArtworkSide: CGFloat {
         max(0, min(26, compactActivityContentHeight - NotchLayout.compactEdgeGap * 2))
