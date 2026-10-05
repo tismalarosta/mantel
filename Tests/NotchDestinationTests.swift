@@ -56,6 +56,11 @@ enum NotchDestinationContract {
         func playSound(locking: Bool) { sounds.append(locking) }
     }
     enum NotchLockScreenService { static var shared = LockScreen() }
+    final class CountdownCalendar {
+        var countdown: NotchCalendarCountdown?
+        var revealing: String?
+    }
+    enum NotchCalendarService { static var shared = CountdownCalendar() }
 
     class State {
         var acceptsUserInteraction = true
@@ -127,6 +132,7 @@ enum NotchDestinationContract {
         defaults.set(true, forKey: DefaultsKey.notchEnabled)
         scratchpadContracts(defaults: defaults, suite: suite)
         reopeningContracts(defaults: defaults, suite: suite)
+        countdownContracts(defaults: defaults, suite: suite)
         stepBackContracts(suite)
         // A page opened while the Command Bar is in the island takes its place.
         let barHost = Service()
@@ -455,6 +461,55 @@ enum NotchDestinationContract {
         defaults.set(NotchModule.controls.rawValue, forKey: DefaultsKey.notchHomeModule)
         defaults.set(false, forKey: DefaultsKey.notchReturnHome)
         activityContracts(defaults: defaults) { suite.expect($0, $1) }
+    }
+
+    /// A click on the event countdown leaves its event for the Calendar page
+    /// only when that page is what opens.
+    private static func countdownContracts(defaults: UserDefaults, suite: TestSuite) {
+        let keys = [DefaultsKey.notchOpensActivity, DefaultsKey.notchReturnHome, DefaultsKey.notchHomeModule,
+                    DefaultsKey.notchHiddenModules, DefaultsKey.notchModuleOrder]
+        let saved = keys.map { defaults.object(forKey: $0) }
+        defer {
+            for (key, value) in zip(keys, saved) { defaults.set(value, forKey: key) }
+            NotchCalendarService.shared = CountdownCalendar()
+        }
+        let start = Date(timeIntervalSinceNow: 600)
+        let event = NotchCalendarEvent(id: "event", title: "Review", calendar: "Work", start: start,
+                                       end: start.addingTimeInterval(1800), allDay: false, location: "")
+        NotchCalendarService.shared.countdown = NotchCalendarCountdown(event: event, ongoing: false)
+        let service = Service()
+        service.openCountdownEvent()
+        suite.expect(service.expanded && service.selected == .calendar && NotchCalendarService.shared.revealing == event.id,
+                     "a click on the event countdown opens Calendar on its event")
+        defaults.set(false, forKey: DefaultsKey.notchOpensActivity)
+        defaults.set(true, forKey: DefaultsKey.notchReturnHome)
+        // Controls hidden and Calendar first: the app panel opens with Calendar still selected.
+        defaults.set("controls", forKey: DefaultsKey.notchHiddenModules)
+        defaults.set("calendar", forKey: DefaultsKey.notchModuleOrder)
+        for destination in NotchReopeningDestination.allCases {
+            defaults.set(destination.rawValue, forKey: DefaultsKey.notchHomeModule)
+            service.expanded = false
+            service.selected = .calendar
+            NotchCalendarService.shared.revealing = nil
+            service.openCountdownEvent()
+            suite.expect(service.expanded && service.selected == .calendar
+                         && (service.showingSections || service.showingAppPanel)
+                         && NotchCalendarService.shared.revealing == nil,
+                         "with activities turned off, \(destination.rawValue) opened in Calendar's place keeps no event for later")
+        }
+        defaults.set("", forKey: DefaultsKey.notchHiddenModules)
+        defaults.set("", forKey: DefaultsKey.notchModuleOrder)
+        defaults.set(NotchModule.calendar.rawValue, forKey: DefaultsKey.notchHomeModule)
+        for returnHome in [false, true] {
+            defaults.set(returnHome, forKey: DefaultsKey.notchReturnHome)
+            service.expanded = false
+            service.selected = returnHome ? .controls : .calendar
+            NotchCalendarService.shared.revealing = nil
+            service.openCountdownEvent()
+            suite.expect(service.selected == .calendar && !service.showingSections && !service.showingAppPanel
+                         && NotchCalendarService.shared.revealing == event.id,
+                         "with activities turned off, Calendar reopened as the last or saved page keeps its event")
+        }
     }
 
     /// What the closed island is already showing is what opening it shows,

@@ -1236,6 +1236,16 @@ final class NotchService: ObservableObject {
         if opensActivity { open(module) } else { open() }
     }
 
+    /// Opens the Calendar page scrolled to the countdown's event.
+    func openCountdownEvent() {
+        let calendar = NotchCalendarService.shared
+        calendar.revealing = calendar.countdown?.event.id
+        openActivity(.calendar)
+        // Explore or an app panel opened in the page's place keeps no event
+        // for a later visit to Calendar.
+        if !expanded || selected != .calendar || showingSections || showingAppPanel { calendar.revealing = nil }
+    }
+
     func open(_ module: NotchModule? = nil, pinned: Bool = false, takeFocus: Bool = true,
               appPanel: Bool = false, metric: MetricDetailKind? = nil, feedback: Bool = true, sections: Bool = false) {
         guard NotchSupport.isEnabled(), !suspended else { return }
@@ -2447,7 +2457,9 @@ final class NotchService: ObservableObject {
             }, activate: { [weak self] in
                 guard let self else { return }
                 if self.captureControls != nil { self.expandCaptureControls() }
-                else { self.toggle() }
+                else if !self.expanded, self.compactActivity == .calendar {
+                    self.openCountdownEvent()
+                } else { self.toggle() }
             })
         if panel?.isVisible != true { panel?.orderFrontRegardless() }
         let music = NotchMusicService.shared
@@ -2701,7 +2713,7 @@ final class NotchService: ObservableObject {
             guard let self, self.running, !self.suspended, self.canFollowPointer,
                   let screen = NSScreen.screens.first(where: { $0.notchDisplayID == id }) else { return }
             self.move(to: screen)
-            self.open()
+            if self.compactActivity == .calendar { self.openCountdownEvent() } else { self.open() }
         }
     }
 
@@ -2761,7 +2773,7 @@ final class NotchService: ObservableObject {
             guard let pressed = pressedArea,
                   NotchSupport.screenEdgeArea(pressed, contains: point) || NotchSupport.screenEdgeArea(area, contains: point),
                   windowHost?.containsDestination(point) == true else { return }
-            open()
+            if compactActivity == .calendar { openCountdownEvent() } else { open() }
         case .leftMouseDragged:
             // A press at the screen's edge reports a drag at once, often without
             // moving. Only a drag that leaves the island cancels the click.
