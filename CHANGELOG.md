@@ -81,6 +81,7 @@ This beta gives Dynamic Island a companion that rests beside the camera, reacts 
 - Window switcher stays responsive while preparing previews, keeps showing busy apps and no longer raises a window twice after a Space switch.
 - Window captures keep sheets and dialogs when the window spans two displays.
 - Maximize no longer restores the old size of a window moved from another display.
+- With Snap windows at screen edges on, dragging inside apps such as Logic Pro no longer stutters, and Move and resize by dragging no longer stalls other input.
 - Dock Preview keeps its gaps with Large and Extra large cards and stays in place when the Dock hides automatically.
 - With three-finger drag on, a four-finger press works as a middle click, and the setting says when no readable trackpad is available.
 - Confirming Quit Protection for Steam quits it instead of only closing its window.
@@ -98,7 +99,7 @@ This beta gives Dynamic Island a companion that rests beside the camera, reacts 
 - Radial Menu settings say when a profile has nothing that opens it, and a mouse button opens only one wheel.
 
 ### Contributors
-Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @akune, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @fakepooh, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @iva-zhu, @JamesOBrien2, @jd4386, @JoaoPedroSedrez, @kushalvora, @LeChaEgg, @leekunwu, @liambennett1223-jpg, @marjue12255, @MehmetHuseyinDelipalta, @mikeknight85, @nickciava98, @niukanen1, @NRanjan-17, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @PeshangALO, @Qarru, @raulpop8, @renan-tiberio, @Retr0MrWave, @rodalpho, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sigwrench, @sim-pez, @soguy, @tenbux, @theafox, @theguru789, @thitiwats, @tobyadams87, @trac3r00, @wenujacodes, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
+Thanks to @0mgABear, @69grcv8vfm-sys, @acicovic, @adhvikrayaprolu, @adnn-alc, @akune, @AlirezaBs, @ashwanthbalakrishnan5, @asim-sde, @Bald-M, @bebricoOOOOOOf, @benjaminbelloeil, @benjaminbrtrd, @bmrtfm, @Borisserz, @bravest-cat, @claude, @dc0dr, @dreammissnot, @elliotnev27, @emreertunc, @EugeneCarldotme, @fakepooh, @Ffinnis, @frieddeli, @Frozen0wl, @fuck713, @georgebnov, @gorillasuti, @hartra344, @IanHollow, @ilim-cell, @iltonandrew, @itsalexcoman, @iva-zhu, @JamesOBrien2, @jd4386, @JoaoPedroSedrez, @kushalvora, @LeChaEgg, @leekunwu, @liambennett1223-jpg, @marjue12255, @MehmetHuseyinDelipalta, @mikeknight85, @nickciava98, @niukanen1, @NRanjan-17, @nzc0der, @oecer, @oskarsss, @ozanuslan, @PathGao, @PeshangALO, @Qarru, @raulpop8, @renan-tiberio, @Retr0MrWave, @rodalpho, @ruvelro, @sagnikonly, @samanyudas, @sarat03, @schnyders, @Shlok-gupta08, @shlok1806, @sigwrench, @sim-pez, @soguy, @tbills08, @tenbux, @theafox, @theguru789, @thitiwats, @tobyadams87, @trac3r00, @wenujacodes, @Yahddyyp, @yuzu-octopus and @ywu73. Feedback: Barbel Design, Emanuele Frasca, Pinea and the/master.
 
 ## [3.4.1-beta.1] - 2026-09-29
 
