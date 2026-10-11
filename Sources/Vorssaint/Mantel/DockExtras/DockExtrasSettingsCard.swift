@@ -26,11 +26,12 @@ struct DockExtrasSettingsCard: View {
     @AppStorage(DefaultsKey.dockActiveIndicatorStyle) private var indicatorStyle = "line"
     @AppStorage(DefaultsKey.dockLockEnabled) private var dockLock = true
     @AppStorage(DefaultsKey.dockLockScreen) private var dockLockScreen = ""
+    @AppStorage(DefaultsKey.dockAppCardsEnabled) private var appCards = true
 
     static var hasInstalledExtra: Bool {
         [AppFeature.dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
          .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-         .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock]
+         .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards]
             .contains { $0.isAvailable }
     }
 
@@ -125,6 +126,11 @@ struct DockExtrasSettingsCard: View {
                     }
                 }
             }
+            if AppFeature.dockAppCards.isAvailable {
+                SettingsRow(symbol: "music.note.list", title: text.appCardsTitle, caption: text.appCardsCaption) {
+                    Toggle(text.appCardsTitle, isOn: $appCards).labelsHidden()
+                }
+            }
             if AppFeature.dockLock.isAvailable {
                 SettingsRow(symbol: "lock.display", title: text.dockLockTitle, caption: text.dockLockCaption) {
                     Toggle(text.dockLockTitle, isOn: $dockLock).labelsHidden()
@@ -152,6 +158,7 @@ struct DockExtrasSettingsCard: View {
         .onChange(of: switcherSwipe) { _, _ in TrackpadSwitcherSwipe.shared.syncWithPreferences() }
         .onChange(of: indicator) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
         .onChange(of: indicatorStyle) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
+        .onChange(of: appCards) { _, on in if !on { DockAppCard.shared.hide() } }
         .onChange(of: dockLock) { _, _ in
             DockLock.shared.syncWithPreferences()
             DockClickService.shared.syncWithPreferences()

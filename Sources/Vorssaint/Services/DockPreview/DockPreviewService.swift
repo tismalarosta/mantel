@@ -744,6 +744,13 @@ final class DockPreviewService: ObservableObject {
         cancelPendingHover()
         cancelPendingHide()
 
+        // Mantel: music and calendar apps can show their card instead (DockDoor).
+        if DockAppCard.shared.show(for: hit.app, iconFrame: hit.iconFrame,
+                                   orientation: hit.preferences.orientation) {
+            if isVisible { endSession() }
+            return
+        }
+
         let list = prefetched ?? Self.previewableWindows(for: hit.app.processIdentifier)
         // An app with no real windows shows nothing; if a panel is already up
         // (the user moved here from another app), close it cleanly.

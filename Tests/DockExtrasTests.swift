@@ -81,6 +81,7 @@ enum DockExtrasTests {
             (.trackpadSwitcherSwipe, DefaultsKey.trackpadSwitcherSwipeEnabled),
             (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
             (.dockLock, DefaultsKey.dockLockEnabled),
+            (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
         ]
         for (feature, key) in extras {
             suite.expect(!feature.installedByDefault && feature.group == .windowsDock
@@ -115,7 +116,8 @@ enum DockExtrasTests {
                            text.switcherNeeded, text.indicatorTitle, text.indicatorHub, text.indicatorCaption,
                            text.styleLine, text.styleDots, text.dockLockTitle, text.dockLockHub,
                            text.dockLockCaption, text.menuBarScreen, text.titleBarDesktop,
-                           text.titleBarDesktopCaption]
+                           text.titleBarDesktopCaption, text.appCardsTitle, text.appCardsHub,
+                           text.appCardsCaption, text.nothingToday, text.allDay]
                             .contains(where: \.isEmpty),
                          "the Dock extras have complete strings in \(language.rawValue)")
         }
@@ -142,6 +144,7 @@ enum DockExtrasTests {
             (.trackpadSwitcherSwipe, DefaultsKey.trackpadSwitcherSwipeEnabled),
             (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
             (.dockLock, DefaultsKey.dockLockEnabled),
+            (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
         ]
         suite.expect(features.allSatisfy { !DockExtrasSupport.isOn($0.0, key: $0.1, in: defaults) },
                      "an update installs none of the extras")
@@ -165,6 +168,16 @@ enum DockExtrasTests {
         let switcherSwipe = source("Sources/Vorssaint/Mantel/DockExtras/TrackpadSwitcherSwipe.swift")
         let indicator = source("Sources/Vorssaint/Mantel/DockExtras/DockActiveIndicator.swift")
         let lock = source("Sources/Vorssaint/Mantel/DockExtras/DockLock.swift")
+        let card = source("Sources/Vorssaint/Mantel/DockExtras/DockAppCard.swift")
+        suite.expect(!card.isEmpty && card.contains("NotchMusicService.shared") && card.contains("NotchCalendarService.shared")
+                        && !card.contains("tapCreate") && !card.contains("mediaremote"),
+                     "the Dock cards read Vorssaint's music and calendar services, no second source")
+        suite.expect(source("Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift")
+                        .contains("DockAppCard.shared.show(for: hit.app"),
+                     "the card is offered where the Dock preview opens")
+        suite.expect(AppFeature.dockAppCards.energyProfile == .idle
+                        && DockExtrasSupport.mediaBundleIDs.contains("com.github.th-ch.youtube-music"),
+                     "the cards cost nothing at rest; YouTube Music counts as a music app")
         suite.expect(![tap, buttons, titleBar, swipe, shake, switcherSwipe, indicator, lock].contains(where: \.isEmpty),
                      "the Dock extras sources are readable")
         let mantel = tap + buttons + titleBar + swipe + shake + indicator + lock

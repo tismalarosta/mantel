@@ -15,8 +15,10 @@ import Foundation
 /// decisions their hooks make. Each extra is its own Features hub switch
 /// (SPEC §3C) and changes nothing while it is off.
 enum DockExtrasSupport {
-    /// Spotify and Apple Music: scrolling on their icon can set the volume.
-    static let mediaBundleIDs: Set<String> = ["com.spotify.client", "com.apple.Music"]
+    /// Spotify, Apple Music and YouTube Music (the Pear desktop app):
+    /// scrolling on their icon can set the volume, hovering shows the player.
+    static let mediaBundleIDs: Set<String> = ["com.spotify.client", "com.apple.Music",
+                                              "com.github.th-ch.youtube-music"]
     /// Never quit from the Dock: Finder relaunches itself, and quitting
     /// Mantel from its own Dock tap would end the tap mid-event.
     static let protectedBundleIDs: Set<String> = ["com.apple.finder"]
@@ -44,6 +46,7 @@ enum DockExtrasSupport {
     static var switcherSwipeOn: Bool { isOn(.trackpadSwitcherSwipe, key: DefaultsKey.trackpadSwitcherSwipeEnabled) }
     static var activeIndicatorOn: Bool { isOn(.dockActiveIndicator, key: DefaultsKey.dockActiveIndicatorEnabled) }
     static var dockLockOn: Bool { isOn(.dockLock, key: DefaultsKey.dockLockEnabled) }
+    static var appCardsOn: Bool { isOn(.dockAppCards, key: DefaultsKey.dockAppCardsEnabled) }
 
     /// Whether the Dock tap should run for the extras alone.
     static var wantsDockTap: Bool { quitClickOn || scrollOn || titleBarScrollOn || dockLockOn }

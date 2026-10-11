@@ -53,6 +53,11 @@ struct DockExtrasFeatureStrings {
     let menuBarScreen: String
     let titleBarDesktop: String
     let titleBarDesktopCaption: String
+    let appCardsTitle: String
+    let appCardsHub: String
+    let appCardsCaption: String
+    let nothingToday: String
+    let allDay: String
     let closeAll: String
     let minimizeAll: String
     let fullScreen: String
@@ -116,6 +121,11 @@ extension DockExtrasFeatureStrings {
         menuBarScreen: "Screen with the menu bar",
         titleBarDesktop: "Sideways switches desktop",
         titleBarDesktopCaption: "Scrolling sideways on a title bar moves to the next or previous desktop.",
+        appCardsTitle: "Music and calendar cards",
+        appCardsHub: "Hover Music, Spotify or Calendar in the Dock for a small card",
+        appCardsCaption: "Hovering a music app that is playing shows its song with play controls; hovering Calendar shows today’s events (needs the island’s calendar). Click the card to open the app.",
+        nothingToday: "Nothing else today",
+        allDay: "All day",
         closeAll: "Close All",
         minimizeAll: "Minimize All",
         fullScreen: "Full screen",
@@ -169,6 +179,11 @@ extension DockExtrasFeatureStrings {
         menuBarScreen: "Écran avec la barre des menus",
         titleBarDesktop: "Sur le côté change de bureau",
         titleBarDesktopCaption: "Défiler sur le côté sur une barre de titre passe au bureau suivant ou précédent.",
+        appCardsTitle: "Cartes musique et calendrier",
+        appCardsHub: "Survolez Musique, Spotify ou Calendrier dans le Dock pour une petite carte",
+        appCardsCaption: "Survoler une app de musique en lecture montre son morceau avec les commandes ; survoler Calendrier montre les événements du jour (nécessite le calendrier de l’île). Cliquez sur la carte pour ouvrir l’app.",
+        nothingToday: "Rien d’autre aujourd’hui",
+        allDay: "Toute la journée",
         closeAll: "Tout fermer",
         minimizeAll: "Tout réduire",
         fullScreen: "Plein écran",

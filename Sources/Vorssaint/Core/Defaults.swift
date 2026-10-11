@@ -616,6 +616,7 @@ enum DefaultsKey {
     static let dockActiveIndicatorEnabled = "dockActiveIndicatorEnabled"
     static let dockActiveIndicatorStyle = "dockActiveIndicatorStyle"           // line | dots
     static let dockLockEnabled = "dockLockEnabled"
+    static let dockAppCardsEnabled = "dockAppCardsEnabled"
     static let dockLockScreen = "dockLockScreen"                               // display UUID, "" = menu bar screen
     // Mantel: Boring Notch design
     static let notchDesign = "notchDesign"
@@ -1855,6 +1856,7 @@ enum Defaults {
         DefaultsKey.dockActiveIndicatorStyle: "line",
         DefaultsKey.dockLockEnabled: true,
         DefaultsKey.dockLockScreen: "",
+        DefaultsKey.dockAppCardsEnabled: true,
         DefaultsKey.notchDesign: "boringNotch",
         DefaultsKey.notchBoringTab: "home",
         DefaultsKey.notchBoringMusicSlots: "none,previous,playPause,next,none",

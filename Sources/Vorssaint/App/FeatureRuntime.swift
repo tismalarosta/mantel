@@ -254,6 +254,7 @@ final class FeatureRuntime: ObservableObject {
         .titleBarScroll: { DockClickService.shared.syncWithPreferences() },
         .trackpadSwitcherSwipe: { TrackpadSwitcherSwipe.shared.syncWithPreferences() },
         .dockActiveIndicator: { DockActiveIndicator.shared.syncWithPreferences() },
+        .dockAppCards: { if !DockExtrasSupport.appCardsOn { DockAppCard.shared.hide() } },
         .dockLock: {
             DockLock.shared.syncWithPreferences()
             DockClickService.shared.syncWithPreferences()

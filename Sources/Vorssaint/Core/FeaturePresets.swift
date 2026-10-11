@@ -154,7 +154,7 @@ extension AppFeature {
                     defaults.string(forKey: DefaultsKey.brightnessKeyStep)) != .standard
                 ? .keyboard : .idle
         case .mouseAcceleration, .spacesOrder, .pastePlain, .typeClipboard, .soundOutputSwitcher,
-             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake,
+             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake, .dockAppCards,
              .audioPriority, .micMute,
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,

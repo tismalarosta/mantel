@@ -291,7 +291,7 @@ extension AppFeature {
         case .dockClick: return FeatureSettingsDestination(.dock, sectionAnchor: .dockClick)
         case .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock:
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards:
             return FeatureSettingsDestination(.dock, sectionAnchor: .dockExtras)
         case .spacesOrder: return FeatureSettingsDestination(.dock, sectionAnchor: .spacesOrder)
         case .windowMaximizer:
@@ -420,7 +420,7 @@ enum FeatureVisibilitySupport {
         case .dock: return [.dockPreview, .dockClick, .spacesOrder,
                             .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
                             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-                            .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock]
+                            .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards]
         case .windowLayout: return [.windowLayout, .windowMaximizer]
         case .autoQuit: return [.autoQuit]
         case .quitProtection: return [.quitWindowProtection]
