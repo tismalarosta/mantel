@@ -609,6 +609,14 @@ enum DefaultsKey {
     static let dockPreviewSwipeEnabled = "dockPreviewSwipeEnabled"
     static let dockPreviewShakeEnabled = "dockPreviewShakeEnabled"
     static let titleBarScrollEnabled = "titleBarScrollEnabled"
+    static let titleBarScrollSwitchesDesktop = "titleBarScrollSwitchesDesktop"
+    static let trackpadSwitcherSwipeEnabled = "trackpadSwitcherSwipeEnabled"
+    static let trackpadSwitcherSwipeFingers = "trackpadSwitcherSwipeFingers"
+    static let trackpadSwitcherSwipeDirection = "trackpadSwitcherSwipeDirection" // horizontal | vertical
+    static let dockActiveIndicatorEnabled = "dockActiveIndicatorEnabled"
+    static let dockActiveIndicatorStyle = "dockActiveIndicatorStyle"           // line | dots
+    static let dockLockEnabled = "dockLockEnabled"
+    static let dockLockScreen = "dockLockScreen"                               // display UUID, "" = menu bar screen
     // Mantel: Boring Notch design
     static let notchDesign = "notchDesign"
     static let notchBoringTab = "notchBoringTab"
@@ -1839,6 +1847,14 @@ enum Defaults {
         DefaultsKey.dockPreviewSwipeEnabled: true,
         DefaultsKey.dockPreviewShakeEnabled: true,
         DefaultsKey.titleBarScrollEnabled: true,
+        DefaultsKey.titleBarScrollSwitchesDesktop: false,
+        DefaultsKey.trackpadSwitcherSwipeEnabled: true,
+        DefaultsKey.trackpadSwitcherSwipeFingers: 3,
+        DefaultsKey.trackpadSwitcherSwipeDirection: "horizontal",
+        DefaultsKey.dockActiveIndicatorEnabled: true,
+        DefaultsKey.dockActiveIndicatorStyle: "line",
+        DefaultsKey.dockLockEnabled: true,
+        DefaultsKey.dockLockScreen: "",
         DefaultsKey.notchDesign: "boringNotch",
         DefaultsKey.notchBoringTab: "home",
         DefaultsKey.notchBoringMusicSlots: "none,previous,playPause,next,none",

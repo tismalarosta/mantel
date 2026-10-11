@@ -252,6 +252,12 @@ final class FeatureRuntime: ObservableObject {
         .dockPreviewSwipe: { DockPreviewSwipe.shared.syncWithPreferences() },
         .dockPreviewShake: {},
         .titleBarScroll: { DockClickService.shared.syncWithPreferences() },
+        .trackpadSwitcherSwipe: { TrackpadSwitcherSwipe.shared.syncWithPreferences() },
+        .dockActiveIndicator: { DockActiveIndicator.shared.syncWithPreferences() },
+        .dockLock: {
+            DockLock.shared.syncWithPreferences()
+            DockClickService.shared.syncWithPreferences()
+        },
         .windowMaximizer: { WindowMaximizer.shared.syncWithPreferences() },
         .windowLayout: {
             WindowUseTracker.shared.syncWithFeatures()

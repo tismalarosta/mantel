@@ -7,7 +7,8 @@
 import AppKit
 
 /// C8: scroll up on the front window's title bar to maximize it, down to
-/// centre it. A guest of Vorssaint's Dock Click tap like C7 (one scroll tap,
+/// centre it; sideways switches desktop when that option is on (off by
+/// default). A guest of Vorssaint's Dock Click tap like C7 (one scroll tap,
 /// SPEC rule 4), and the window moves through Vorssaint's Window Layout
 /// actions, so the frame settling and Restore history are Vorssaint's.
 ///
@@ -51,10 +52,21 @@ final class DockExtrasTitleBarScroll {
             deltaY: event.getDoubleValueField(.scrollWheelEventDeltaAxis1),
             natural: NSEvent(cgEvent: event)?.isDirectionInvertedFromDevice ?? false,
             isMomentum: event.getIntegerValueField(.scrollWheelEventMomentumPhase) != 0,
-            sinceLastAction: now - lastAction)
+            sinceLastAction: now - lastAction,
+            sidewaysSwitchesDesktop: UserDefaults.standard.bool(forKey: DefaultsKey.titleBarScrollSwitchesDesktop))
         switch decision {
         case .pass: return false
         case .swallow: return true
+        case .previousDesktop, .nextDesktop:
+            lastAction = now
+            // The way Vorssaint's mouse gestures change desktop: the system's
+            // own registered shortcut, silent when the user switched it off.
+            DispatchQueue.main.async {
+                guard let shortcut = SpaceWindowBridge.spaceShortcut(decision == .nextDesktop ? .right : .left)
+                else { return }
+                SpaceWindowBridge.pressSpaceShortcut(shortcut)
+            }
+            return true
         case .maximize, .centre:
             lastAction = now
             DispatchQueue.main.async { [weak self] in self?.perform(decision, on: cached) }

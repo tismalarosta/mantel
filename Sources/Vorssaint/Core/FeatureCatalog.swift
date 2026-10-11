@@ -27,6 +27,8 @@ enum AppFeature: String, CaseIterable {
     case dockQuitClick, dockScroll, dockPreviewMassActions, dockPreviewWindowButtons
     // Mantel: DockDoor extras, batch 2 (SPEC §3C: C3, C4, C8)
     case dockPreviewSwipe, dockPreviewShake, titleBarScroll
+    // Mantel: DockDoor extras, batch A for friends (C9, C11, C12)
+    case trackpadSwitcherSwipe, dockActiveIndicator, dockLock
     // Sound
     case mixer, soundOutputSwitcher, audioPriority, micMute, musicBlock
     // Energy and display
@@ -109,7 +111,8 @@ extension AppFeature {
         switch self {
         case .switcher, .dockPreview, .dockClick, .windowMaximizer, .windowLayout, .autoQuit, .spacesOrder,
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
-             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll:
+             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock:
             return .windowsDock
         case .scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts, .middleClick,
              .keyboardDebounce, .textSnippets, .superKey, .quitWindowProtection, .mouseClickDebounce:
@@ -174,6 +177,9 @@ extension AppFeature {
         case .dockPreviewSwipe: return "hand.draw"
         case .dockPreviewShake: return "wind"
         case .titleBarScroll: return "macwindow"
+        case .trackpadSwitcherSwipe: return "hand.draw.fill"
+        case .dockActiveIndicator: return "smallcircle.filled.circle"
+        case .dockLock: return "lock.display"
         case .finderCutPaste: return "scissors"
         case .finderRename: return "pencil"
         case .shelf: return "tray.full"
@@ -302,6 +308,9 @@ extension AppFeature {
         case .dockPreviewSwipe: return [DefaultsKey.dockPreviewSwipeEnabled]
         case .dockPreviewShake: return [DefaultsKey.dockPreviewShakeEnabled]
         case .titleBarScroll: return [DefaultsKey.titleBarScrollEnabled]
+        case .trackpadSwitcherSwipe: return [DefaultsKey.trackpadSwitcherSwipeEnabled]
+        case .dockActiveIndicator: return [DefaultsKey.dockActiveIndicatorEnabled]
+        case .dockLock: return [DefaultsKey.dockLockEnabled]
         case .finderCutPaste: return [DefaultsKey.finderCutPasteEnabled,
                                       DefaultsKey.finderPasteImageAsFile]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
@@ -388,6 +397,7 @@ extension AppFeature {
              // act on windows through Accessibility.
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock,
              // The bar reads other apps' menus and windows and types at the
              // caret, all of it through Accessibility.
              .commandBar:
@@ -525,7 +535,8 @@ extension AppFeature {
              .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder,
              .lidAnimation, .menuBarHider,
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
-             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll:
+             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock:
             return false
         }
     }

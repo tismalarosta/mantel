@@ -4,7 +4,9 @@
 // Behaviour follows DockDoor by Ethan Bills (github.com/ejbills/DockDoor, GPL-3.0),
 // DockDoor/Utilities/DockObserver.swift (handleCmdRightClickQuit, handleDockScroll,
 // handleTitleBarScroll), TrackpadGestureModifier.swift (preview swipes) and
-// WindowPreviewHoverContainer.swift (checkForShakeGesture).
+// WindowPreviewHoverContainer.swift (checkForShakeGesture), TrackpadSwipeTrigger.swift
+// (TrackpadSwipeDetector), DockLocker.swift (DockLockerGeometry) and
+// ActiveAppIndicator/ActiveAppIndicatorPositioning.swift.
 
 import CoreGraphics
 import Foundation
@@ -39,9 +41,12 @@ enum DockExtrasSupport {
     static var swipeOn: Bool { isOn(.dockPreviewSwipe, key: DefaultsKey.dockPreviewSwipeEnabled) }
     static var shakeOn: Bool { isOn(.dockPreviewShake, key: DefaultsKey.dockPreviewShakeEnabled) }
     static var titleBarScrollOn: Bool { isOn(.titleBarScroll, key: DefaultsKey.titleBarScrollEnabled) }
+    static var switcherSwipeOn: Bool { isOn(.trackpadSwitcherSwipe, key: DefaultsKey.trackpadSwitcherSwipeEnabled) }
+    static var activeIndicatorOn: Bool { isOn(.dockActiveIndicator, key: DefaultsKey.dockActiveIndicatorEnabled) }
+    static var dockLockOn: Bool { isOn(.dockLock, key: DefaultsKey.dockLockEnabled) }
 
     /// Whether the Dock tap should run for the extras alone.
-    static var wantsDockTap: Bool { quitClickOn || scrollOn || titleBarScrollOn }
+    static var wantsDockTap: Bool { quitClickOn || scrollOn || titleBarScrollOn || dockLockOn }
     /// Whether the Dock tap should listen to scrolls: on Dock icons (C7) or
     /// on title bars (C8), both through the one tap.
     static var wantsScrollEvents: Bool { scrollOn || titleBarScrollOn }
@@ -153,6 +158,8 @@ enum DockExtrasSupport {
         /// Inside the debounce: kept from the app, nothing done.
         case swallow
         case maximize, centre
+        /// Sideways, with "switch desktops" on: DockDoor's original C8.
+        case previousDesktop, nextDesktop
     }
 
     /// DockDoor's debounce between two title bar actions and its noise floor.
@@ -167,11 +174,18 @@ enum DockExtrasSupport {
     /// lift) never acts, and a sideways scroll goes on to the app: the
     /// desktop switching DockDoor did there was dropped (SPEC §3C, C8).
     static func titleBarDecision(deltaX: Double, deltaY: Double, natural: Bool, isMomentum: Bool,
-                                 sinceLastAction: TimeInterval) -> TitleBarDecision {
+                                 sinceLastAction: TimeInterval,
+                                 sidewaysSwitchesDesktop: Bool = false) -> TitleBarDecision {
         guard deltaX.isFinite, deltaY.isFinite, !isMomentum,
-              abs(deltaX) > titleBarNoise || abs(deltaY) > titleBarNoise,
-              abs(deltaY) >= abs(deltaX) else { return .pass }
+              abs(deltaX) > titleBarNoise || abs(deltaY) > titleBarNoise else { return .pass }
+        let sideways = abs(deltaX) > abs(deltaY)
+        if sideways, !sidewaysSwitchesDesktop { return .pass }
         guard sinceLastAction >= titleBarDebounce else { return .swallow }
+        if sideways {
+            // DockDoor's normalization: the desktop on the side the fingers go toward.
+            let right = natural ? -deltaX : deltaX
+            return right > 0 ? .nextDesktop : .previousDesktop
+        }
         let up = natural ? -deltaY : deltaY
         return up > 0 ? .maximize : .centre
     }
@@ -195,5 +209,238 @@ enum DockExtrasSupport {
     /// An AppKit screen rect (bottom-left origin) in top-left coordinates.
     static func topLeftRect(fromAppKit rect: CGRect, primaryScreenHeight: CGFloat) -> CGRect {
         CGRect(x: rect.minX, y: primaryScreenHeight - rect.maxY, width: rect.width, height: rect.height)
+    }
+
+    // MARK: - C9: trackpad swipe opens the switcher
+
+    struct SwipeTouch: Equatable {
+        let id: Int
+        /// Normalized trackpad position, 0...1 on both axes.
+        let position: CGPoint
+    }
+
+    enum SwitcherSwipeEvent: Equatable { case open, forward, backward, release }
+
+    /// DockDoor's TrackpadSwipeDetector, as is: a swipe with exactly the
+    /// chosen number of fingers, all moving the same way along the axis,
+    /// opens the switcher; while it stays down, further travel steps the
+    /// selection; lifting a finger releases (commits).
+    struct SwitcherSwipeDetector {
+        static let openDistance: CGFloat = 0.03
+        static let firstStepDistance: CGFloat = 0.15
+        static let stepDistance: CGFloat = 0.04
+        static let maxOffAxisDistance: CGFloat = 0.1
+        static let axisDominanceRatio: CGFloat = 1.5
+
+        private var starts: [Int: CGPoint] = [:]
+        private var isSpent = false
+        private var hasStepped = false
+        private(set) var isSwitching = false
+
+        init() {}
+
+        mutating func handle(_ touches: [SwipeTouch], fingers: Int, horizontal: Bool) -> SwitcherSwipeEvent? {
+            if isSwitching {
+                if touches.count < fingers {
+                    isSwitching = false
+                    isSpent = touches.count > 1
+                    starts.removeAll()
+                    return .release
+                }
+                guard let deltas = travel(touches) else { return nil }
+                let along = deltas.map { horizontal ? $0.x : $0.y }.reduce(0, +) / CGFloat(deltas.count)
+                guard abs(along) >= (hasStepped ? Self.stepDistance : Self.firstStepDistance) else { return nil }
+                hasStepped = true
+                rebase(touches)
+                return along > 0 ? .forward : .backward
+            }
+            if touches.count <= 1 {
+                isSpent = false
+                starts.removeAll()
+                return nil
+            }
+            if isSpent { return nil }
+            if touches.count > fingers {
+                isSpent = true
+                return nil
+            }
+            guard touches.count == fingers else {
+                starts.removeAll()
+                return nil
+            }
+            guard let deltas = travel(touches) else { return nil }
+            let along = deltas.map { horizontal ? $0.x : $0.y }
+            let across = deltas.map { horizontal ? abs($0.y) : abs($0.x) }
+            if across.contains(where: { $0 >= Self.maxOffAxisDistance }) {
+                isSpent = true
+                return nil
+            }
+            guard along.allSatisfy({ $0 >= Self.openDistance }) || along.allSatisfy({ $0 <= -Self.openDistance }),
+                  zip(along.map(abs), across).allSatisfy({ $0 > $1 * Self.axisDominanceRatio })
+            else { return nil }
+            isSwitching = true
+            hasStepped = false
+            rebase(touches)
+            return .open
+        }
+
+        private mutating func travel(_ touches: [SwipeTouch]) -> [CGPoint]? {
+            let deltas = touches.compactMap { touch -> CGPoint? in
+                guard let start = starts[touch.id] else { return nil }
+                return CGPoint(x: touch.position.x - start.x, y: touch.position.y - start.y)
+            }
+            guard !deltas.isEmpty, deltas.count == touches.count else {
+                rebase(touches)
+                return nil
+            }
+            return deltas
+        }
+
+        private mutating func rebase(_ touches: [SwipeTouch]) {
+            starts = Dictionary(touches.map { ($0.id, $0.position) }, uniquingKeysWith: { first, _ in first })
+        }
+    }
+
+    static func sanitizedSwipeFingers(_ raw: Int) -> Int { raw == 4 ? 4 : 3 }
+
+    // MARK: - C11: active app indicator under Dock icons
+
+    enum IndicatorStyle: String, CaseIterable { case line, dots }
+
+    static func indicatorStyle(_ raw: String?) -> IndicatorStyle { IndicatorStyle(rawValue: raw ?? "") ?? .line }
+
+    /// Where the mark for one Dock icon goes, in top-left coordinates: a
+    /// line or dot centred under the icon (bottom Dock) or beside it (side
+    /// Docks), 2 pt from its edge, as DockDoor places its bar.
+    static func indicatorRect(icon: CGRect, dock: DockPreviewOrientation, style: IndicatorStyle) -> CGRect {
+        let thickness: CGFloat = style == .line ? 3 : 5
+        let length: CGFloat = style == .line ? max(8, (dock == .bottom ? icon.width : icon.height) * 0.45) : 5
+        switch dock {
+        case .bottom:
+            return CGRect(x: icon.midX - length / 2, y: icon.maxY + 2, width: length, height: thickness)
+        case .left:
+            return CGRect(x: icon.minX - 2 - thickness, y: icon.midY - length / 2, width: thickness, height: length)
+        case .right:
+            return CGRect(x: icon.maxX + 2, y: icon.midY - length / 2, width: thickness, height: length)
+        }
+    }
+
+    // MARK: - C12: keep the Dock on one screen
+
+    struct LockZone: Equatable {
+        let rect: CGRect
+        let nudge: CGVector
+    }
+
+    /// DockDoor's trigger depth: the strip along a screen's Dock edge where
+    /// pushing the pointer would call the Dock over.
+    static let lockZoneDepth: CGFloat = 7
+
+    /// The stretches of a screen's Dock edge that touch no other screen
+    /// (only there can the pointer push against it), top-left coordinates.
+    static func exposedEdge(of frame: CGRect, dock: DockPreviewOrientation,
+                            screens: [CGRect]) -> [ClosedRange<CGFloat>] {
+        let edge: CGFloat
+        var free: [ClosedRange<CGFloat>]
+        switch dock {
+        case .bottom: (edge, free) = (frame.maxY, [frame.minX...frame.maxX])
+        case .left: (edge, free) = (frame.minX, [frame.minY...frame.maxY])
+        case .right: (edge, free) = (frame.maxX, [frame.minY...frame.maxY])
+        }
+        for other in screens where other != frame {
+            let touches: Bool
+            let span: ClosedRange<CGFloat>
+            switch dock {
+            case .bottom: (touches, span) = (abs(other.minY - edge) <= 2, other.minX...other.maxX)
+            case .left: (touches, span) = (abs(other.maxX - edge) <= 2, other.minY...other.maxY)
+            case .right: (touches, span) = (abs(other.minX - edge) <= 2, other.minY...other.maxY)
+            }
+            guard touches else { continue }
+            free = free.flatMap { piece -> [ClosedRange<CGFloat>] in
+                var pieces: [ClosedRange<CGFloat>] = []
+                if span.lowerBound - piece.lowerBound > 0.5 {
+                    pieces.append(piece.lowerBound...min(piece.upperBound, span.lowerBound))
+                }
+                if piece.upperBound - span.upperBound > 0.5 {
+                    pieces.append(max(piece.lowerBound, span.upperBound)...piece.upperBound)
+                }
+                return span.upperBound <= piece.lowerBound || span.lowerBound >= piece.upperBound ? [piece] : pieces
+            }
+        }
+        return free.filter { $0.upperBound - $0.lowerBound > 0.5 }
+    }
+
+    /// The strips on every other screen where the pointer is held back by a
+    /// few points, so the Dock never follows it there. None with one screen,
+    /// or when the chosen screen's own Dock edge is fully covered (macOS
+    /// could not put the Dock there, DockDoor's guard).
+    static func lockZones(screens: [CGRect], locked: Int, dock: DockPreviewOrientation) -> [LockZone] {
+        guard screens.count > 1, screens.indices.contains(locked),
+              !exposedEdge(of: screens[locked], dock: dock, screens: screens).isEmpty else { return [] }
+        let depth = lockZoneDepth
+        var zones: [LockZone] = []
+        for (index, frame) in screens.enumerated() where index != locked {
+            for span in exposedEdge(of: frame, dock: dock, screens: screens) {
+                let length = span.upperBound - span.lowerBound
+                switch dock {
+                case .bottom:
+                    zones.append(LockZone(rect: CGRect(x: span.lowerBound, y: frame.maxY - depth, width: length, height: depth),
+                                          nudge: CGVector(dx: 0, dy: -depth)))
+                case .left:
+                    zones.append(LockZone(rect: CGRect(x: frame.minX, y: span.lowerBound, width: depth, height: length),
+                                          nudge: CGVector(dx: depth, dy: 0)))
+                case .right:
+                    zones.append(LockZone(rect: CGRect(x: frame.maxX - depth, y: span.lowerBound, width: depth, height: length),
+                                          nudge: CGVector(dx: -depth, dy: 0)))
+                }
+            }
+        }
+        return zones
+    }
+
+    /// Where a pointer inside a lock zone is held instead; nil leaves it be.
+    static func heldPointer(_ point: CGPoint, zones: [LockZone]) -> CGPoint? {
+        guard let zone = zones.first(where: { $0.rect.contains(point) }) else { return nil }
+        return CGPoint(x: point.x + zone.nudge.dx, y: point.y + zone.nudge.dy)
+    }
+
+    /// The pointer path that calls the Dock back onto the chosen screen:
+    /// macOS only moves it when the pointer pushes on a free stretch of that
+    /// screen's Dock edge (DockDoor's relocation).
+    static func callBackPath(locked: CGRect, dock: DockPreviewOrientation,
+                             screens: [CGRect]) -> (start: CGPoint, end: CGPoint, push: CGVector)? {
+        guard let span = exposedEdge(of: locked, dock: dock, screens: screens)
+            .max(by: { ($0.upperBound - $0.lowerBound) < ($1.upperBound - $1.lowerBound) }) else { return nil }
+        let along = span.lowerBound + min(60, (span.upperBound - span.lowerBound) / 2)
+        switch dock {
+        case .bottom:
+            return (CGPoint(x: along, y: locked.maxY - 80), CGPoint(x: along, y: locked.maxY - 1), CGVector(dx: 0, dy: 8))
+        case .left:
+            return (CGPoint(x: locked.minX + 80, y: along), CGPoint(x: locked.minX, y: along), CGVector(dx: -8, dy: 0))
+        case .right:
+            return (CGPoint(x: locked.maxX - 80, y: along), CGPoint(x: locked.maxX - 1, y: along), CGVector(dx: 8, dy: 0))
+        }
+    }
+
+    /// Which screen holds the Dock, from the Dock list's frame: the screen
+    /// spanning its middle along the long axis, nearest on the short one.
+    static func screenHoldingDock(_ dock: CGRect, screens: [CGRect], orientation: DockPreviewOrientation) -> Int? {
+        var best: (index: Int, distance: CGFloat)?
+        for (index, frame) in screens.enumerated() {
+            let distance: CGFloat
+            switch orientation {
+            case .bottom:
+                guard dock.midX >= frame.minX, dock.midX <= frame.maxX else { continue }
+                distance = min(abs(frame.maxY - dock.minY), abs(frame.maxY - dock.maxY))
+            case .left:
+                guard dock.midY >= frame.minY, dock.midY <= frame.maxY else { continue }
+                distance = min(abs(frame.minX - dock.maxX), abs(frame.minX - dock.minX))
+            case .right:
+                guard dock.midY >= frame.minY, dock.midY <= frame.maxY else { continue }
+                distance = min(abs(frame.maxX - dock.minX), abs(frame.maxX - dock.maxX))
+            }
+            if best == nil || distance < best!.distance { best = (index, distance) }
+        }
+        return best?.index
     }
 }

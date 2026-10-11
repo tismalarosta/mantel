@@ -146,7 +146,12 @@ final class DockClickService {
         if event.getIntegerValueField(.eventSourceUserData) == Self.syntheticEventMarker {
             return Unmanaged.passUnretained(event)
         }
-        // Mantel: right clicks and scrolls belong to the DockDoor extras.
+        // Mantel: pointer moves feed the Dock lock; right clicks and
+        // scrolls belong to the other DockDoor extras.
+        if type == .mouseMoved {
+            DockLock.shared.filter(event)
+            return Unmanaged.passUnretained(event)
+        }
         if type == .rightMouseDown || type == .rightMouseUp || type == .scrollWheel {
             let consumed = DockExtrasTap.shared.handle(type: type, event: event,
                                                        insideDock: Self.insideDockStrip,
@@ -807,6 +812,7 @@ final class DockClickService {
                 | CGEventMask(1 << CGEventType.rightMouseUp.rawValue)
         }
         if DockExtrasSupport.wantsScrollEvents { mask |= CGEventMask(1 << CGEventType.scrollWheel.rawValue) }
+        if DockLock.shared.wantsPointerMoves { mask |= CGEventMask(1 << CGEventType.mouseMoved.rawValue) }
         return mask
     }
 

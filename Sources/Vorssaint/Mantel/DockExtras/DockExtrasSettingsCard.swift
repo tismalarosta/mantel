@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Matisse Lurie-Giner
 // Part of Mantel, a fork of Vorssaint (github.com/vorssaint/vorssaint-utils).
 
+import AppKit
 import SwiftUI
 
 /// One card on the Dock page for every installed DockDoor extra. Each extra
@@ -17,10 +18,19 @@ struct DockExtrasSettingsCard: View {
     @AppStorage(DefaultsKey.dockPreviewSwipeEnabled) private var swipe = true
     @AppStorage(DefaultsKey.dockPreviewShakeEnabled) private var shake = true
     @AppStorage(DefaultsKey.titleBarScrollEnabled) private var titleBarScroll = true
+    @AppStorage(DefaultsKey.titleBarScrollSwitchesDesktop) private var titleBarDesktop = false
+    @AppStorage(DefaultsKey.trackpadSwitcherSwipeEnabled) private var switcherSwipe = true
+    @AppStorage(DefaultsKey.trackpadSwitcherSwipeFingers) private var swipeFingers = 3
+    @AppStorage(DefaultsKey.trackpadSwitcherSwipeDirection) private var swipeDirection = "horizontal"
+    @AppStorage(DefaultsKey.dockActiveIndicatorEnabled) private var indicator = true
+    @AppStorage(DefaultsKey.dockActiveIndicatorStyle) private var indicatorStyle = "line"
+    @AppStorage(DefaultsKey.dockLockEnabled) private var dockLock = true
+    @AppStorage(DefaultsKey.dockLockScreen) private var dockLockScreen = ""
 
     static var hasInstalledExtra: Bool {
         [AppFeature.dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
-         .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll]
+         .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
+         .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock]
             .contains { $0.isAvailable }
     }
 
@@ -70,6 +80,68 @@ struct DockExtrasSettingsCard: View {
                 SettingsRow(symbol: "macwindow", title: text.titleBarTitle, caption: text.titleBarCaption) {
                     Toggle(text.titleBarTitle, isOn: $titleBarScroll).labelsHidden()
                 }
+                if titleBarScroll {
+                    SettingsRow(symbol: "rectangle.split.3x1", title: text.titleBarDesktop,
+                                caption: text.titleBarDesktopCaption) {
+                        Toggle(text.titleBarDesktop, isOn: $titleBarDesktop).labelsHidden()
+                    }
+                }
+            }
+            if AppFeature.trackpadSwitcherSwipe.isAvailable {
+                SettingsRow(symbol: "hand.draw.fill", title: text.switcherSwipeTitle,
+                            caption: AppFeature.switcher.isAvailable
+                                ? text.switcherSwipeCaption : text.switcherNeeded) {
+                    Toggle(text.switcherSwipeTitle, isOn: $switcherSwipe).labelsHidden()
+                }
+                if switcherSwipe {
+                    SettingsRow(symbol: "hand.raised.fingers.spread", title: text.switcherSwipeFingers) {
+                        Picker(text.switcherSwipeFingers, selection: $swipeFingers) {
+                            Text("3").tag(3)
+                            Text("4").tag(4)
+                        }
+                        .labelsHidden().pickerStyle(.segmented).fixedSize()
+                    }
+                    SettingsRow(symbol: "arrow.left.and.right", title: text.switcherSwipeDirection) {
+                        Picker(text.switcherSwipeDirection, selection: $swipeDirection) {
+                            Text(text.horizontal).tag("horizontal")
+                            Text(text.vertical).tag("vertical")
+                        }
+                        .labelsHidden().pickerStyle(.segmented).fixedSize()
+                    }
+                }
+            }
+            if AppFeature.dockActiveIndicator.isAvailable {
+                SettingsRow(symbol: "smallcircle.filled.circle", title: text.indicatorTitle,
+                            caption: text.indicatorCaption) {
+                    Toggle(text.indicatorTitle, isOn: $indicator).labelsHidden()
+                }
+                if indicator {
+                    SettingsRow(symbol: "paintbrush", title: text.indicatorStyle) {
+                        Picker(text.indicatorStyle, selection: $indicatorStyle) {
+                            Text(text.styleLine).tag("line")
+                            Text(text.styleDots).tag("dots")
+                        }
+                        .labelsHidden().fixedSize()
+                    }
+                }
+            }
+            if AppFeature.dockLock.isAvailable {
+                SettingsRow(symbol: "lock.display", title: text.dockLockTitle, caption: text.dockLockCaption) {
+                    Toggle(text.dockLockTitle, isOn: $dockLock).labelsHidden()
+                }
+                if dockLock {
+                    SettingsRow(symbol: "display.2", title: text.dockLockScreen) {
+                        Picker(text.dockLockScreen, selection: $dockLockScreen) {
+                            Text(text.menuBarScreen).tag("")
+                            ForEach(NSScreen.screens, id: \.self) { screen in
+                                if let id = DockLock.uuid(of: screen) {
+                                    Text(screen.localizedName).tag(id)
+                                }
+                            }
+                        }
+                        .labelsHidden().fixedSize()
+                    }
+                }
             }
         }
         // The Dock tap's mask follows the three input extras.
@@ -77,5 +149,16 @@ struct DockExtrasSettingsCard: View {
         .onChange(of: scroll) { _, _ in DockClickService.shared.syncWithPreferences() }
         .onChange(of: titleBarScroll) { _, _ in DockClickService.shared.syncWithPreferences() }
         .onChange(of: swipe) { _, _ in DockPreviewSwipe.shared.syncWithPreferences() }
+        .onChange(of: switcherSwipe) { _, _ in TrackpadSwitcherSwipe.shared.syncWithPreferences() }
+        .onChange(of: indicator) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
+        .onChange(of: indicatorStyle) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
+        .onChange(of: dockLock) { _, _ in
+            DockLock.shared.syncWithPreferences()
+            DockClickService.shared.syncWithPreferences()
+        }
+        .onChange(of: dockLockScreen) { _, _ in
+            DockLock.shared.syncWithPreferences()
+            DockClickService.shared.syncWithPreferences()
+        }
     }
 }
