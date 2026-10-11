@@ -307,8 +307,20 @@ enum BoringNotchDesignTests {
                         && player.contains("NotchMusicService.shared") && !player.contains("MRMediaRemote"),
                      "the player shows Vorssaint's Up Next and reads Vorssaint's Now Playing bridge only")
         let service = source("Sources/Vorssaint/Services/Notch/NotchService.swift")
-        suite.expect(service.contains("showsContent: !NotchDesign.isBoringNotch"),
-                     "Boring Notch rests as a bare notch, without Vorssaint's resting extras")
+        suite.expect(service.contains("if NotchDesign.isBoringNotch { return .none }")
+                        && service.contains("var mascotAtRest: Bool { mascotOn && idleContent == .none"),
+                     "Boring Notch rests without Vorssaint's resting wings, and the companion can still rest there")
+        let view = source("Sources/Vorssaint/UI/Notch/NotchView.swift")
+        suite.expect(!view.contains("if NotchDesign.isBoringNotch { Color.clear.accessibilityHidden(true) }")
+                        && service.contains("guard !NotchDesign.isBoringNotch else { return false }")
+                        && service.components(separatedBy: "BoringNotchHooks.noticeSize(event: ").count >= 4,
+                     "the companion: drawn in Boring Notch's closed notch, away while its full header is open, "
+                        + "and never sent into Boring Notch's HUD, banner or sneak peek")
+        let settings = source("Sources/Vorssaint/UI/Settings/NotchSettings.swift")
+        suite.expect(settings.contains("NotchDesignStrings.localized(l10n.language).restingNote")
+                        && source("Sources/Vorssaint/Mantel/BoringNotch/NotchDesignCard.swift")
+                            .components(separatedBy: "restingNote: \"").count == 3,
+                     "the resting picker says what Boring Notch's design does with it")
     }
 
     private static func setting(_ suite: TestSuite) {

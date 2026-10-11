@@ -525,6 +525,11 @@ struct NotchSettings: View {
                                    reason: pageReason(.agents, feature: .notchAgents), fix: pageAction(.agents, feature: .notchAgents))
                     }
                 }
+                // Mantel: what Boring Notch's design does with this choice.
+                if NotchDesign.isBoringNotch {
+                    Text(NotchDesignStrings.localized(l10n.language).restingNote)
+                        .font(.caption).foregroundStyle(.secondary)
+                }
                 if restingChoice == .battery { lowBatteryControls }
                 switchRow("menubar.rectangle", text.coverMenus, caption: text.coverMenusHint, isOn: $coversMenus)
             }

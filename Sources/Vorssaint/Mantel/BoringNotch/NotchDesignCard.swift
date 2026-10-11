@@ -19,6 +19,7 @@ struct NotchDesignStrings {
     let lyricsLine: String
     let lyricsPanel: String
     let slotNames: [BoringNotchMusicSlot: String]
+    let restingNote: String
 
     static func localized(_ language: AppLanguage) -> NotchDesignStrings {
         language == .fr ? .fr : .enUS
@@ -37,7 +38,8 @@ struct NotchDesignStrings {
         lyricsLine: "One line",
         lyricsPanel: "Panel",
         slotNames: [.shuffle: "Shuffle", .previous: "Previous", .playPause: "Play / Pause", .next: "Next",
-                    .volume: "Volume", .goBackward: "Back 15 s", .goForward: "Forward 15 s", .none: "Empty"])
+                    .volume: "Volume", .goBackward: "Back 15 s", .goForward: "Forward 15 s", .none: "Empty"],
+        restingNote: "In the Boring Notch design the closed notch stays bare: only the companion shows there, when it is on.")
 
     static let fr = NotchDesignStrings(
         title: "Design",
@@ -52,7 +54,8 @@ struct NotchDesignStrings {
         lyricsLine: "Une ligne",
         lyricsPanel: "Panneau",
         slotNames: [.shuffle: "Aléatoire", .previous: "Précédent", .playPause: "Lecture / Pause", .next: "Suivant",
-                    .volume: "Volume", .goBackward: "Recul 15\u{00A0}s", .goForward: "Avance 15\u{00A0}s", .none: "Vide"])
+                    .volume: "Volume", .goBackward: "Recul 15\u{00A0}s", .goForward: "Avance 15\u{00A0}s", .none: "Vide"],
+        restingNote: "Dans le design Boring Notch, l’encoche fermée reste nue : seul le compagnon s’y montre, s’il est activé.")
 }
 
 /// The choice at the top of the Notch page's Layout tab (SPEC §3D: "Notch

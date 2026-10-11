@@ -279,10 +279,10 @@ struct NotchView: View {
         }
     }
 
-    // Mantel: Boring Notch's resting notch shows nothing beside the camera.
+    // Mantel: in Boring Notch's design the strip has no wings to show
+    // (`idleContent` is none there), only the companion when it is on.
     @ViewBuilder private var compact: some View {
-        if NotchDesign.isBoringNotch { Color.clear.accessibilityHidden(true) }
-        else { NotchRestingStrip(service: service) }
+        NotchRestingStrip(service: service)
     }
 
     /// Open beside a camera, the companion stays where it rested closed, and

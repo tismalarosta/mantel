@@ -410,6 +410,9 @@ final class NotchService: ObservableObject {
     /// A Mac without a battery has no charge to show, so a saved battery
     /// choice rests empty there; playing music still shows as before.
     var idleContent: NotchIdleContent {
+        // Mantel: Boring Notch rests without Vorssaint's resting wings; the
+        // companion, which rests only when they are empty, still comes.
+        if NotchDesign.isBoringNotch { return .none }
         let content = NotchSupport.visibleIdleContent(isPlaying: !awaitsTrackNotice && NotchMusicService.shared.playback?.isPlaying == true)
         return content == .battery && !PowerSampler.hasInternalBattery ? .none : content
     }
@@ -902,9 +905,7 @@ final class NotchService: ObservableObject {
                                           reach: named.map { ($0.leading - $0.trailing) / 2 } ?? 0)
                 : resting
         }
-        // Mantel: Boring Notch rests as a bare notch, without Vorssaint's extras.
-        let resting = geometry.restingSize(showsContent: !NotchDesign.isBoringNotch
-            && (idleContent != .none || mascotShows(on: geometry)))
+        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry))
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
@@ -4411,6 +4412,9 @@ extension NotchService {
     var mascotResidentShows: Bool {
         guard mascotOn, !mascotInBar, expanded, !showingCommandBar, captureControls == nil,
               !dragPlaceholder, !noticeExpanded, geometry.isNotched, !geometry.floats else { return false }
+        // Mantel: Boring Notch's header fills both sides of the camera with its
+        // tabs, so the companion steps away while open, as in a full header.
+        guard !NotchDesign.isBoringNotch else { return false }
         let header = expandedGeometry
         guard header.headerCameraGap > 0 else { return true }
         let side = (contentSize.width - header.headerCameraGap) / 2
@@ -4563,7 +4567,9 @@ extension NotchService {
         guard incoming.mascot != nil, notice == nil, noticeCanPresent, mascotVisit == nil,
               NotchMascotSupport.isEnabled(), geometry.isNotched, !geometry.floats,
               !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
-              mascotRestsInView, canHostMascotVisit() else { return nil }
+              mascotRestsInView, canHostMascotVisit(),
+              // Mantel: Boring Notch's HUD, banner and sneak peek have no place for it.
+              BoringNotchHooks.noticeSize(event: incoming.event, geometry: geometry) == nil else { return nil }
         endMascotBridgeNow()
         let from = mascotClosedOffset
         showMascotBridge(from: from, to: from, duration: 0)
@@ -4594,7 +4600,9 @@ extension NotchService {
     func mascotNoticeBridgeBackStart(from ending: NotchNotice?) -> CGFloat? {
         guard let ending, ending.mascot != nil, NotchMascotSupport.isEnabled(), mascotVisit == nil,
               geometry.isNotched, !geometry.floats, !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
-              mascotRestsInView else { return nil }
+              mascotRestsInView,
+              BoringNotchHooks.noticeSize(event: ending.event, geometry: geometry) == nil  // Mantel
+        else { return nil }
         // Where the notice draws it, before the notice starts to leave.
         endMascotBridgeNow()
         let from = ending.mascotOffset(in: geometry)
