@@ -9,7 +9,7 @@ How to open it
 4. Mantel sits in the menu bar. Open its settings, go to Features and switch on what you want. Each feature asks for the permission it needs (Accessibility, Screen Recording).
 
 Mantel is built on Vorssaint. It doesn't update itself, I'll send new versions.
-The code is free (GPL-3.0). Ask me and I'll send it.
+The code is free (GPL-3.0) and on GitHub: github.com/tismalarosta/mantel
 
 
 FRANÇAIS
@@ -23,4 +23,4 @@ Comment l'ouvrir
 4. Mantel est dans la barre des menus. Ouvre ses réglages, va dans Fonctionnalités et active ce que tu veux. Chaque fonctionnalité demande l'autorisation dont elle a besoin (Accessibilité, Enregistrement de l'écran).
 
 Mantel est construite sur Vorssaint. Elle ne se met pas à jour toute seule, je t'enverrai les nouvelles versions.
-Le code est libre (GPL-3.0). Demande-le moi et je te l'envoie.
+Le code est libre (GPL-3.0) et sur GitHub : github.com/tismalarosta/mantel
