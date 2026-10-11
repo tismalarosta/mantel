@@ -171,6 +171,7 @@ enum SelfUninstall {
         PastePlainService.shared.suspend()
         TypeClipboardService.shared.suspend()
         MainActor.assumeIsolated { LidAnimationService.shared.suspend() }
+        MenuBarHiderService.shared.suspend()
         SnippetLibraryService.shared.suspend()
         TextSnippetService.shared.suspend()
         ScreenCaptureService.shared.suspend()

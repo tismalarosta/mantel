@@ -91,7 +91,9 @@ extension AppFeature {
         switch self {
         case .scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .windowMaximizer, .middleClick,
              .mouseNavigation, .mouseButtonShortcuts, .mouseClickDebounce,
-             .dockPreview, .dockClick, .shelf:
+             .dockPreview, .dockClick, .shelf,
+             // Mantel: click, hover and scroll monitors on the menu bar.
+             .menuBarHider:
             return .mouse
         case .keyboardDebounce, .finderCutPaste, .finderRename, .quitWindowProtection, .musicBlock:
             return .keyboard

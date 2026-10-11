@@ -22,7 +22,7 @@ enum AppFeature: String, CaseIterable {
     case clipboardHistory, pastePlain, finderCutPaste, finderRename, shelf, urlCleaner,
          diskImageInstaller
     // Mantel additions, appended so every Vorssaint id keeps its place
-    case typeClipboard, lidAnimation
+    case typeClipboard, lidAnimation, menuBarHider
     // Sound
     case mixer, soundOutputSwitcher, audioPriority, micMute, musicBlock
     // Energy and display
@@ -117,7 +117,8 @@ extension AppFeature {
             return .energyDisplay
         case .quickLauncher, .quickToggles, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
-             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager:
+             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
+             .menuBarHider:
             return .tools
         case .notch, .notchCalendar, .notchNotifications, .notchGestures, .notchTimer, .notchAccessories,
              .notchLyrics, .notchQueue, .notchLiveEqualizer, .notchDownloads, .notchAgents, .notchWatch,
@@ -159,6 +160,7 @@ extension AppFeature {
         case .pastePlain: return "doc.plaintext"
         case .typeClipboard: return "keyboard.badge.ellipsis"
         case .lidAnimation: return "macbook"
+        case .menuBarHider: return "menubar.rectangle"
         case .finderCutPaste: return "scissors"
         case .finderRename: return "pencil"
         case .shelf: return "tray.full"
@@ -279,6 +281,7 @@ extension AppFeature {
         case .pastePlain: return [DefaultsKey.pastePlainEnabled]
         case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
         case .lidAnimation: return [DefaultsKey.lidAnimationEnabled]
+        case .menuBarHider: return [DefaultsKey.menuBarHiderEnabled]
         case .finderCutPaste: return [DefaultsKey.finderCutPasteEnabled,
                                       DefaultsKey.finderPasteImageAsFile]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
@@ -359,6 +362,8 @@ extension AppFeature {
              .keyboardDebounce, .textSnippets, .superKey, .mouseClickDebounce,
              .dockClick, .windowMaximizer, .windowLayout,
              .autoQuit, .quitWindowProtection, .cleaningMode, .pastePlain, .typeClipboard, .radialMenu,
+             // Tells the app's menus from empty menu bar space.
+             .menuBarHider,
              // The bar reads other apps' menus and windows and types at the
              // caret, all of it through Accessibility.
              .commandBar:
@@ -494,7 +499,7 @@ extension AppFeature {
             return true
         case .focusFollowsMouse, .scrollHorizontal, .linearScroll, .diskImageInstaller, .audioPriority,
              .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder,
-             .lidAnimation:
+             .lidAnimation, .menuBarHider:
             return false
         }
     }

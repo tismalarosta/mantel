@@ -59,11 +59,12 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
     // Mantel
     case typeClipboard
     case lidAnimation
+    case menuBarHider
 
     var page: SettingsPage {
         switch self {
         case .panelConfiguration, .mixer, .audioPriority, .musicBlocking,
-             .soundOutputSwitcher:
+             .soundOutputSwitcher, .menuBarHider:
             return .general
         case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation: return .energy
         case .scrollDirection, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts,
@@ -340,6 +341,8 @@ extension AppFeature {
             return FeatureSettingsDestination(.quickTools, sectionAnchor: .micMute)
         case .musicBlock:
             return FeatureSettingsDestination(.general, sectionAnchor: .musicBlocking)
+        case .menuBarHider:
+            return FeatureSettingsDestination(.general, sectionAnchor: .menuBarHider)
 
         case .keepAwake:
             return FeatureSettingsDestination(.energy, sectionAnchor: .keepAwake)

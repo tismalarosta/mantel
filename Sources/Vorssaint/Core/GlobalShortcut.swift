@@ -204,6 +204,12 @@ struct GlobalShortcut: Equatable, Hashable {
     // Mantel: pauses the lid animation, Mac Duo's own ⌃⌥⌘F.
     static let lidAnimationPauseDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_F),
                                                          modifiers: [.control, .option, .command])
+    // Mantel: menu bar hider, I for icons and O beside it. Ice ships these
+    // unset; here they sit behind their own switch, off by default.
+    static let menuBarHiderToggleHiddenDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_I),
+                                                                modifiers: [.control, .option, .command])
+    static let menuBarHiderToggleAlwaysHiddenDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_O),
+                                                                      modifiers: [.control, .option, .command])
     // Default screenshot shortcut on the available control-option-command layer.
     static let screenshotDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_4),
                                                   modifiers: [.control, .option, .command])
@@ -707,6 +713,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
     case pastePlain
     case typeClipboard
     case lidAnimationPause
+    case menuBarHiderToggleHidden
+    case menuBarHiderToggleAlwaysHidden
     case finderRename
     case colorPicker
     case screenOCR
@@ -743,6 +751,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .pastePlain: return DefaultsKey.pastePlainShortcut
         case .typeClipboard: return DefaultsKey.typeClipboardShortcut
         case .lidAnimationPause: return DefaultsKey.lidAnimationPauseShortcut
+        case .menuBarHiderToggleHidden: return DefaultsKey.menuBarHiderToggleHiddenShortcut
+        case .menuBarHiderToggleAlwaysHidden: return DefaultsKey.menuBarHiderToggleAlwaysHiddenShortcut
         case .finderRename: return DefaultsKey.finderRenameShortcut
         case .colorPicker: return DefaultsKey.colorPickerShortcut
         case .screenOCR: return DefaultsKey.screenOCRShortcut
@@ -779,6 +789,8 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .pastePlain: return .pastePlainDefault
         case .typeClipboard: return .typeClipboardDefault
         case .lidAnimationPause: return .lidAnimationPauseDefault
+        case .menuBarHiderToggleHidden: return .menuBarHiderToggleHiddenDefault
+        case .menuBarHiderToggleAlwaysHidden: return .menuBarHiderToggleAlwaysHiddenDefault
         case .finderRename: return .finderRenameDefault
         case .colorPicker: return .colorPickerDefault
         case .screenOCR: return .screenOCRDefault
@@ -834,6 +846,9 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .pastePlain: return strings.pastePlainName
         case .typeClipboard: return FeatureStrings.typeClipboard(L10n.shared.language).title
         case .lidAnimationPause: return FeatureStrings.lidAnimation(L10n.shared.language).pauseShortcut
+        case .menuBarHiderToggleHidden: return FeatureStrings.menuBarHider(L10n.shared.language).toggleHidden
+        case .menuBarHiderToggleAlwaysHidden:
+            return FeatureStrings.menuBarHider(L10n.shared.language).toggleAlwaysHidden
         case .finderRename: return FeatureStrings.finderRename(L10n.shared.language).hubTitle
         case .colorPicker: return strings.colorPickerName
         case .screenOCR: return strings.ocrName
@@ -903,6 +918,11 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .pastePlain: return [DefaultsKey.pastePlainEnabled]
         case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
         case .lidAnimationPause: return [DefaultsKey.lidAnimationEnabled]
+        case .menuBarHiderToggleHidden:
+            return [DefaultsKey.menuBarHiderEnabled, DefaultsKey.menuBarHiderShortcutsEnabled]
+        case .menuBarHiderToggleAlwaysHidden:
+            return [DefaultsKey.menuBarHiderEnabled, DefaultsKey.menuBarHiderShortcutsEnabled,
+                    DefaultsKey.menuBarHiderAlwaysHiddenEnabled]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
         case .colorPicker: return [DefaultsKey.colorPickerShortcutEnabled]
         case .screenOCR: return [DefaultsKey.screenOCRShortcutEnabled]
@@ -941,6 +961,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .pastePlain: return .pastePlain
         case .typeClipboard: return .typeClipboard
         case .lidAnimationPause: return .lidAnimation
+        case .menuBarHiderToggleHidden, .menuBarHiderToggleAlwaysHidden: return .menuBarHider
         case .finderRename: return .finderRename
         case .colorPicker: return .colorPicker
         case .screenOCR: return .screenOCR

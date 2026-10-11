@@ -418,6 +418,14 @@ final class StatusItemController {
     }
 
     @objc private func clicked() {
+        // Mantel: with the menu bar hider on, this icon is Ice's control item.
+        switch MenuBarHiderService.shared.mainIconAction(for: NSApp.currentEvent) {
+        case .toggleHidden: MenuBarHiderService.shared.toggleHidden(); return
+        case .toggleAlwaysHidden: MenuBarHiderService.shared.toggleAlwaysHidden(); return
+        case .openPanel: onLeftClick?(); return
+        case .openMenu: onRightClick?(statusItem.button); return
+        case .vorssaintDefault: break
+        }
         if NSApp.currentEvent?.type == .rightMouseUp {
             onRightClick?(statusItem.button)
         } else {

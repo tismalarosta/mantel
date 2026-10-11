@@ -190,6 +190,7 @@ struct MetricsTests {
                 MacDuoCoreTests.run(suite)
                 LidAnimationTests.run(suite)
             }),
+            ("menu-bar-hider", { MenuBarHiderTests.run(suite) }),
         ]
         var selected = Set<String>()
         var listOnly = false

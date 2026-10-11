@@ -180,6 +180,8 @@ enum SettingsDirectory {
                                                   FeatureStrings.appearance(language).dark],
                                        featureKeywords: [
                                         (.musicBlock, [s.musicBlockTitle, s.musicBlockSection]),
+                                        (.menuBarHider, [FeatureStrings.menuBarHider(language).title,
+                                                         FeatureStrings.menuBarHider(language).enable]),
                                        ]),
                 // Searching any feature name lands here even when the feature
                 // is hidden, so the hub is always the way back.

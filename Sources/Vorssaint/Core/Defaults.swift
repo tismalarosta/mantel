@@ -587,6 +587,19 @@ enum DefaultsKey {
     static let lidAnimationSoftness = "lidAnimationSoftness"
     static let lidAnimationShadow = "lidAnimationShadow"
     static let lidAnimationPauseShortcut = "lidAnimationPauseShortcut"
+    // Mantel: menu bar hider (from Ice)
+    static let menuBarHiderEnabled = "menuBarHiderEnabled"
+    static let menuBarHiderShowOnClick = "menuBarHiderShowOnClick"
+    static let menuBarHiderShowOnHover = "menuBarHiderShowOnHover"
+    static let menuBarHiderHoverDelay = "menuBarHiderHoverDelay"
+    static let menuBarHiderShowOnScroll = "menuBarHiderShowOnScroll"
+    static let menuBarHiderAutoRehide = "menuBarHiderAutoRehide"
+    static let menuBarHiderRehideStrategy = "menuBarHiderRehideStrategy"
+    static let menuBarHiderRehideInterval = "menuBarHiderRehideInterval"
+    static let menuBarHiderAlwaysHiddenEnabled = "menuBarHiderAlwaysHiddenEnabled"
+    static let menuBarHiderShortcutsEnabled = "menuBarHiderShortcutsEnabled"
+    static let menuBarHiderToggleHiddenShortcut = "menuBarHiderToggleHiddenShortcut"
+    static let menuBarHiderToggleAlwaysHiddenShortcut = "menuBarHiderToggleAlwaysHiddenShortcut"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1779,6 +1792,19 @@ enum Defaults {
         DefaultsKey.lidAnimationSoftness: 0.65,
         DefaultsKey.lidAnimationShadow: 0.65,
         DefaultsKey.lidAnimationPauseShortcut: GlobalShortcut.lidAnimationPauseDefault.storageValue,
+        DefaultsKey.menuBarHiderEnabled: false,
+        DefaultsKey.menuBarHiderShowOnClick: true,
+        DefaultsKey.menuBarHiderShowOnHover: false,
+        DefaultsKey.menuBarHiderHoverDelay: 0.2,
+        DefaultsKey.menuBarHiderShowOnScroll: true,
+        DefaultsKey.menuBarHiderAutoRehide: true,
+        DefaultsKey.menuBarHiderRehideStrategy: "smart",
+        DefaultsKey.menuBarHiderRehideInterval: 15.0,
+        DefaultsKey.menuBarHiderAlwaysHiddenEnabled: false,
+        DefaultsKey.menuBarHiderShortcutsEnabled: false,
+        DefaultsKey.menuBarHiderToggleHiddenShortcut: GlobalShortcut.menuBarHiderToggleHiddenDefault.storageValue,
+        DefaultsKey.menuBarHiderToggleAlwaysHiddenShortcut:
+            GlobalShortcut.menuBarHiderToggleAlwaysHiddenDefault.storageValue,
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

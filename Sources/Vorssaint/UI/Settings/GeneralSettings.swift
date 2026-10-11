@@ -28,6 +28,11 @@ struct GeneralSettings: View {
                 Text(l10n.s.tabGeneral).font(.title2.bold())
                 basicsCard
                 appearanceCard
+                // Mantel
+                if AppFeature.menuBarHider.isAvailable {
+                    MenuBarHiderSettingsCard()
+                        .settingsSectionAnchor(.menuBarHider, cornerRadius: 16)
+                }
                 if AppFeature.keepAwake.isAvailable {
                     shortcutCard
                 }

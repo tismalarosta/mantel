@@ -1022,6 +1022,7 @@ extension AppFeature {
         case .pastePlain: return s.pastePlainName
         case .typeClipboard: return FeatureStrings.typeClipboard(L10n.shared.language).title
         case .lidAnimation: return FeatureStrings.lidAnimation(L10n.shared.language).title
+        case .menuBarHider: return FeatureStrings.menuBarHider(L10n.shared.language).title
         case .finderCutPaste: return s.cutPasteName
         case .finderRename: return FeatureStrings.finderRename(L10n.shared.language).hubTitle
         case .shelf: return s.shelfName
@@ -1108,6 +1109,7 @@ extension AppFeature {
         case .pastePlain: return hub.descPastePlain
         case .typeClipboard: return FeatureStrings.typeClipboard(L10n.shared.language).hubDescription
         case .lidAnimation: return FeatureStrings.lidAnimation(L10n.shared.language).hubDescription
+        case .menuBarHider: return FeatureStrings.menuBarHider(L10n.shared.language).hubDescription
         case .finderCutPaste: return hub.descFinderCutPaste
         case .finderRename: return FeatureStrings.finderRename(L10n.shared.language).hubDescription
         case .shelf: return hub.descShelf

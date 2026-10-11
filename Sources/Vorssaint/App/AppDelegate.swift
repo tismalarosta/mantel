@@ -125,6 +125,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             // any status item.
             ClipboardHistoryService.shared.toggleHistoryWindow()
         }
+        // Mantel: the menu bar hider keeps its divider left of this icon.
+        MenuBarHiderService.shared.mainIconFrameProvider = { [weak self] in
+            guard let item = self?.statusController.statusItem, item.isVisible,
+                  let frame = self?.statusController.button?.window?.frame,
+                  StatusItemAnchorSupport.isTrustworthyStatusFrame(frame) else { return nil }
+            return frame
+        }
         // The shelf drop zone chip anchors itself under the menu bar icon.
         ShelfService.shared.statusItemFrameProvider = { [weak self] in
             guard let item = self?.statusController.statusItem, item.isVisible,

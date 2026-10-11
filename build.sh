@@ -394,6 +394,8 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/TypeClipboard/TypeClipboardStrings.swift
         Sources/Vorssaint/Mantel/LidAnimation/Core/*.swift
         Sources/Vorssaint/Mantel/LidAnimation/LidAnimationStrings.swift
+        Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderSupport.swift
+        Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderStrings.swift
         Sources/Vorssaint/Core/KillProcessStrings.swift
         Sources/Vorssaint/Core/PortManagerStrings.swift
         Sources/Vorssaint/Core/WhatsAppDownloadStrings.swift
