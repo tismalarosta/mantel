@@ -22,7 +22,7 @@ enum AppFeature: String, CaseIterable {
     case clipboardHistory, pastePlain, finderCutPaste, finderRename, shelf, urlCleaner,
          diskImageInstaller
     // Mantel additions, appended so every Vorssaint id keeps its place
-    case typeClipboard
+    case typeClipboard, lidAnimation
     // Sound
     case mixer, soundOutputSwitcher, audioPriority, micMute, musicBlock
     // Energy and display
@@ -113,7 +113,7 @@ extension AppFeature {
             return .clipboardFiles
         case .mixer, .soundOutputSwitcher, .audioPriority, .micMute, .musicBlock:
             return .sound
-        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep:
+        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation:
             return .energyDisplay
         case .quickLauncher, .quickToggles, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
@@ -158,6 +158,7 @@ extension AppFeature {
         case .clipboardHistory: return "doc.on.clipboard"
         case .pastePlain: return "doc.plaintext"
         case .typeClipboard: return "keyboard.badge.ellipsis"
+        case .lidAnimation: return "macbook"
         case .finderCutPaste: return "scissors"
         case .finderRename: return "pencil"
         case .shelf: return "tray.full"
@@ -277,6 +278,7 @@ extension AppFeature {
         case .clipboardHistory: return [DefaultsKey.clipboardHistoryEnabled]
         case .pastePlain: return [DefaultsKey.pastePlainEnabled]
         case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
+        case .lidAnimation: return [DefaultsKey.lidAnimationEnabled]
         case .finderCutPaste: return [DefaultsKey.finderCutPasteEnabled,
                                       DefaultsKey.finderPasteImageAsFile]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
@@ -367,6 +369,8 @@ extension AppFeature {
         // (dark mode included) works without a permission.
         case .quickToggles: return [.automationFinder]
         case .switcher: return [.accessibility, .screenRecording]
+        // The effect is drawn from a live frame of the desktop.
+        case .lidAnimation: return [.screenRecording]
         case .dockPreview: return [.accessibility, .screenRecording]
         case .screenOCR: return [.screenRecording]
         case .screenshot: return [.screenRecording]
@@ -489,7 +493,8 @@ extension AppFeature {
              .connectedDevices:
             return true
         case .focusFollowsMouse, .scrollHorizontal, .linearScroll, .diskImageInstaller, .audioPriority,
-             .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder:
+             .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder,
+             .lidAnimation:
             return false
         }
     }

@@ -577,6 +577,16 @@ enum DefaultsKey {
     static let typeClipboardSpeed = "typeClipboardSpeed"
     static let typeClipboardCustomDelay = "typeClipboardCustomDelay"
     static let typeClipboardEscapeStops = "typeClipboardEscapeStops"
+    // Mantel: lid animation (from Mac Duo)
+    static let lidAnimationEnabled = "lidAnimationEnabled"
+    static let lidAnimationEffect = "lidAnimationEffect"
+    static let lidAnimationClearAngle = "lidAnimationClearAngle"
+    static let lidAnimationClearWhenStill = "lidAnimationClearWhenStill"
+    static let lidAnimationStillnessDelay = "lidAnimationStillnessDelay"
+    static let lidAnimationPerspective = "lidAnimationPerspective"
+    static let lidAnimationSoftness = "lidAnimationSoftness"
+    static let lidAnimationShadow = "lidAnimationShadow"
+    static let lidAnimationPauseShortcut = "lidAnimationPauseShortcut"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1760,6 +1770,15 @@ enum Defaults {
         DefaultsKey.typeClipboardSpeed: "fast",
         DefaultsKey.typeClipboardCustomDelay: 20,
         DefaultsKey.typeClipboardEscapeStops: true,
+        DefaultsKey.lidAnimationEnabled: false,
+        DefaultsKey.lidAnimationEffect: "duo",
+        DefaultsKey.lidAnimationClearAngle: 105.0,
+        DefaultsKey.lidAnimationClearWhenStill: true,
+        DefaultsKey.lidAnimationStillnessDelay: 2.0,
+        DefaultsKey.lidAnimationPerspective: 0.7,
+        DefaultsKey.lidAnimationSoftness: 0.65,
+        DefaultsKey.lidAnimationShadow: 0.65,
+        DefaultsKey.lidAnimationPauseShortcut: GlobalShortcut.lidAnimationPauseDefault.storageValue,
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

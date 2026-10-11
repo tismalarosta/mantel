@@ -186,6 +186,10 @@ struct MetricsTests {
             }),
             ("wallpaper", { WallpaperContract.run(suite) }),
             ("emoji", { CommandBarEmojiContract.run(suite) }),
+            ("lid-animation", {
+                MacDuoCoreTests.run(suite)
+                LidAnimationTests.run(suite)
+            }),
         ]
         var selected = Set<String>()
         var listOnly = false

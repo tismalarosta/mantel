@@ -386,7 +386,7 @@ enum FeatureCatalogTests {
 
         // MARK: Features hub catalog
 
-        suite.expect(AppFeature.allCases.count == 78, "feature catalog has 78 features")
+        suite.expect(AppFeature.allCases.count == 79, "feature catalog has 79 features")
         suite.expect(Set(AppFeature.allCases.map(\.rawValue)).count == AppFeature.allCases.count,
                "feature ids are unique")
         suite.expect(AppFeature.allCases.map(\.rawValue) == [
@@ -394,7 +394,7 @@ enum FeatureCatalogTests {
             "scrollInverter", "scrollHorizontal", "focusFollowsMouse", "smoothScroll", "linearScroll", "mouseAcceleration", "mouseNavigation", "mouseButtonShortcuts", "middleClick",
             "mouseClickDebounce", "keyboardDebounce", "textSnippets", "superKey", "quitWindowProtection",
             "clipboardHistory", "pastePlain", "finderCutPaste", "finderRename", "shelf", "urlCleaner",
-            "diskImageInstaller", "typeClipboard",
+            "diskImageInstaller", "typeClipboard", "lidAnimation",
             "mixer", "soundOutputSwitcher", "audioPriority", "micMute", "musicBlock",
             "keepAwake", "brightness", "extraBrightness", "bluetoothSleep",
             "quickLauncher", "quickToggles", "colorPicker", "screenOCR", "cleaningMode", "mediaTools",
@@ -1950,8 +1950,11 @@ enum FeatureCatalogTests {
                "the mouse page hides only with all eight mouse features off")
         suite.expect(!pageVisible(.energy, available: allFeatures.subtracting([.keepAwake, .brightness,
                                                                          .extraBrightness,
-                                                                         .bluetoothSleep])),
-               "energy hides when all four of its features are off")
+                                                                         .bluetoothSleep,
+                                                                         .lidAnimation])),
+               "energy hides when all five of its features are off")
+        suite.expect(pageVisible(.energy, available: [.lidAnimation]),
+               "Mantel's lid animation alone keeps the energy page")
         suite.expect(pageVisible(.energy, available: [.extraBrightness]), "XDR alone keeps the energy page")
         suite.expect(pageVisible(.energy, available: [.brightness]),
                "brightness control alone keeps the energy page")

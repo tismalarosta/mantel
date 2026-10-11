@@ -126,6 +126,8 @@ extension AppFeature {
         // drawn by Core Animation, with one timer waiting for the next visit.
         case .notchMascot: return .periodic
         case .notchAccessories: return .periodic
+        // Mantel: reads the lid angle sensor many times a second.
+        case .lidAnimation: return .periodic
         // Log changes arrive as file events; a timer keeps countdowns and
         // limits current while the section is on.
         case .notch, .notchCalendar, .notchLyrics, .notchLiveEqualizer, .notchAgents: return .periodic

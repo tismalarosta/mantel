@@ -201,6 +201,9 @@ struct GlobalShortcut: Equatable, Hashable {
     // Mantel: Type Clipboard, a paste that types (Keyboard Maestro style).
     static let typeClipboardDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_V),
                                                      modifiers: [.control, .command])
+    // Mantel: pauses the lid animation, Mac Duo's own ⌃⌥⌘F.
+    static let lidAnimationPauseDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_F),
+                                                         modifiers: [.control, .option, .command])
     // Default screenshot shortcut on the available control-option-command layer.
     static let screenshotDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_4),
                                                   modifiers: [.control, .option, .command])
@@ -703,6 +706,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
     case soundOutputSwitcher
     case pastePlain
     case typeClipboard
+    case lidAnimationPause
     case finderRename
     case colorPicker
     case screenOCR
@@ -738,6 +742,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .soundOutputSwitcher: return DefaultsKey.soundOutputSwitcherShortcut
         case .pastePlain: return DefaultsKey.pastePlainShortcut
         case .typeClipboard: return DefaultsKey.typeClipboardShortcut
+        case .lidAnimationPause: return DefaultsKey.lidAnimationPauseShortcut
         case .finderRename: return DefaultsKey.finderRenameShortcut
         case .colorPicker: return DefaultsKey.colorPickerShortcut
         case .screenOCR: return DefaultsKey.screenOCRShortcut
@@ -773,6 +778,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .soundOutputSwitcher: return .soundOutputSwitcherDefault
         case .pastePlain: return .pastePlainDefault
         case .typeClipboard: return .typeClipboardDefault
+        case .lidAnimationPause: return .lidAnimationPauseDefault
         case .finderRename: return .finderRenameDefault
         case .colorPicker: return .colorPickerDefault
         case .screenOCR: return .screenOCRDefault
@@ -827,6 +833,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .soundOutputSwitcher: return strings.soundOutputSwitcherTitle
         case .pastePlain: return strings.pastePlainName
         case .typeClipboard: return FeatureStrings.typeClipboard(L10n.shared.language).title
+        case .lidAnimationPause: return FeatureStrings.lidAnimation(L10n.shared.language).pauseShortcut
         case .finderRename: return FeatureStrings.finderRename(L10n.shared.language).hubTitle
         case .colorPicker: return strings.colorPickerName
         case .screenOCR: return strings.ocrName
@@ -895,6 +902,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .soundOutputSwitcher: return [DefaultsKey.soundOutputSwitcherEnabled]
         case .pastePlain: return [DefaultsKey.pastePlainEnabled]
         case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
+        case .lidAnimationPause: return [DefaultsKey.lidAnimationEnabled]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
         case .colorPicker: return [DefaultsKey.colorPickerShortcutEnabled]
         case .screenOCR: return [DefaultsKey.screenOCRShortcutEnabled]
@@ -932,6 +940,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .soundOutputSwitcher: return .soundOutputSwitcher
         case .pastePlain: return .pastePlain
         case .typeClipboard: return .typeClipboard
+        case .lidAnimationPause: return .lidAnimation
         case .finderRename: return .finderRename
         case .colorPicker: return .colorPicker
         case .screenOCR: return .screenOCR

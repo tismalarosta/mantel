@@ -65,6 +65,11 @@ struct EnergySettings: View {
                     bluetoothCard
                         .settingsSectionAnchor(.bluetoothSleep, cornerRadius: 16)
                 }
+                // Mantel
+                if (focus == nil || focus == .lidAnimation), AppFeature.lidAnimation.isAvailable {
+                    LidAnimationSettingsCard()
+                        .settingsSectionAnchor(.lidAnimation, cornerRadius: 16)
+                }
             }
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
