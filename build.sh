@@ -30,11 +30,13 @@ trap 'exit 1' INT TERM HUP
 # bundle id, so it coexists with the official app); --install puts it in /Applications.
 DEV=0
 INSTALL=0
+FRIENDS=0  # Mantel
 TEST=0
 TEST_ARGS=()
 for arg in "$@"; do
     case "$arg" in
         --dev)     DEV=1 ;;
+        --friends) DEV=1; FRIENDS=1 ;;  # Mantel: the build to share, see below
         --install) INSTALL=1 ;;
         --test)    TEST=1 ;;
         --test-suite=*) TEST=1; TEST_ARGS+=("--suite=${arg#*=}") ;;
@@ -54,6 +56,16 @@ else
     EXECUTABLE="Vorssaint"
     APP_BUNDLE_ID="com.vorssaint.utils"
     BUILD_VARIANT_FLAGS=()
+    APP_OPTIMIZATION_FLAGS=(-O)
+    BUILD_CONFIGURATION="release"
+fi
+# Mantel: the build friends get. The Developer variant's separate identity
+# (its id ends in .dev, so Vorssaint's updater never replaces it), named
+# Mantel and optimized; zipped at the end.
+if (( FRIENDS )); then
+    APP_NAME="Mantel"
+    EXECUTABLE="Mantel"
+    APP_BUNDLE_ID="app.mantel.dev"
     APP_OPTIMIZATION_FLAGS=(-O)
     BUILD_CONFIGURATION="release"
 fi
@@ -911,4 +923,16 @@ if (( INSTALL )); then
     ditto --noextattr --noqtn "$STAGE" "$INSTALL_DEST"
     sign_installed_bundle "$INSTALL_DEST"
     echo "✓ Installed: $INSTALL_DEST"
+fi
+
+# Mantel: zip the friends build with its how-to-open note.
+if (( FRIENDS )); then
+    SHARE_DIR="build/share"
+    rm -rf "$SHARE_DIR"
+    mkdir -p "$SHARE_DIR"
+    ditto --noextattr --noqtn "$STAGE" "$SHARE_DIR/Mantel.app"
+    cp "Tools/Mantel-how-to-open.txt" "$SHARE_DIR/How to open Mantel.txt"
+    rm -f build/Mantel.zip
+    (cd "$SHARE_DIR" && ditto -c -k --sequesterRsrc . ../Mantel.zip)
+    echo "✓ Zip for friends: build/Mantel.zip"
 fi
