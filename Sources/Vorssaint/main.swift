@@ -5,6 +5,7 @@ import AppKit
 
 SuperKeyMappingGuard.runIfRequestedAndExit()
 Defaults.register()
+MantelBuild.applyAtLaunch()  // Mantel: no share links to Vorssaint's server
 NotchControlItem.keyboardLightIsSupported = { BrightnessService.keyboardLightIsSupported }
 MouseAccelerationGuard.runIfRequestedAndExit()
 MouseAccelerationService.recoverPendingAtLaunch()

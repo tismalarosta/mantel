@@ -152,7 +152,8 @@ struct ScreenRecordingCaptureSettings: View {
                 }
             }
 
-            Section {
+            // Mantel: share links use Vorssaint's server; not offered in Mantel.
+            if !MantelBuild.isMantel { Section {
                 Toggle(screenshotStrings.shareEnabledToggle, isOn: $sharingEnabled)
                 if sharingEnabled {
                     Text(shareStrings.caption)
@@ -182,7 +183,7 @@ struct ScreenRecordingCaptureSettings: View {
                 }
             } header: {
                 Text(screenshotStrings.shareSectionTitle)
-            }
+            } }
         }
         .onAppear { sharing.refresh() }
         .sheet(isPresented: $showingSharedLinks) {

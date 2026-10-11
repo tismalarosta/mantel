@@ -25,7 +25,9 @@ let iconSizes: [(name: String, px: Int, icnsType: String?)] = [
 let outDir = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "AppIcon.iconset"
 let scriptDir = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
 let projectDir = scriptDir.deletingLastPathComponent()
-let logoPath = projectDir.appendingPathComponent("Resources/Brand/logo.png").path
+// Mantel: BRAND_DIR picks another set of masters (Mantel's own, Resources/MantelBrand).
+let brandDir = ProcessInfo.processInfo.environment["BRAND_DIR"] ?? "Resources/Brand"
+let logoPath = projectDir.appendingPathComponent("\(brandDir)/logo.png").path
 
 guard let logo = NSImage(contentsOfFile: logoPath),
       let logoTIFF = logo.tiffRepresentation,
@@ -35,7 +37,7 @@ else {
     exit(1)
 }
 
-let appIconPath = projectDir.appendingPathComponent("Resources/Brand/AppIcon-Default.png").path
+let appIconPath = projectDir.appendingPathComponent("\(brandDir)/AppIcon-Default.png").path
 guard let appIconMaster = NSImage(contentsOfFile: appIconPath) else {
     print("could not load \(appIconPath)")
     exit(1)

@@ -21,9 +21,13 @@
 # Run this only to get the same permission-preserving behavior for local builds.
 set -euo pipefail
 
-IDENTITY="Vorssaint Utils Signing"
-KC="$HOME/Library/Keychains/vorssaint-signing.keychain-db"
-KCPASS="vorssaint-signing"
+# Mantel: build.sh passes Mantel's own identity (Vorssaint's TRADEMARKS.md: a
+# fork signs with its own); run alone, this still makes Vorssaint's.
+IDENTITY="${SIGNING_IDENTITY:-Vorssaint Utils Signing}"
+SIGNING_SLUG="${SIGNING_SLUG:-vorssaint}"
+SIGNING_ORG="${SIGNING_ORG:-Vorssaint}"
+KC="$HOME/Library/Keychains/$SIGNING_SLUG-signing.keychain-db"
+KCPASS="$SIGNING_SLUG-signing"
 
 # A find-identity listing also names certificates codesign then rejects, and -v
 # excludes every self-signed one; ask codesign itself with a throwaway copy.
@@ -48,7 +52,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 openssl req -x509 -newkey rsa:2048 -keyout "$WORK/key.pem" -out "$WORK/cert.pem" -days 3650 -nodes \
-    -subj "/CN=$IDENTITY/O=Vorssaint" \
+    -subj "/CN=$IDENTITY/O=$SIGNING_ORG" \
     -addext "keyUsage=critical,digitalSignature" \
     -addext "extendedKeyUsage=critical,codeSigning" \
     -addext "basicConstraints=critical,CA:false" 2>/dev/null
