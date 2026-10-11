@@ -96,7 +96,9 @@ struct NotchView: View {
         } else if service.expanded {
             if service.showingCommandBar {
                 commandBarPage
-            } else if NotchDesign.isBoringNotch, !service.showingSections {
+            } else if BoringNotchHooks.drawsOpenPage(showingSections: service.showingSections,
+                                                     showingAppPanel: service.showingAppPanel,
+                                                     showingMetric: service.selectedMetric != nil, selected: service.selected) {
                 // Mantel: Boring Notch's open notch.
                 BoringNotchOpenView(service: service)
             } else {

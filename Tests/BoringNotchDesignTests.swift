@@ -17,6 +17,117 @@ enum BoringNotchDesignTests {
         hud(suite)
         calendarPanel(suite)
         shelf(suite)
+        tabs(suite)
+        choices(suite)
+    }
+
+    /// Slice 5f: Vorssaint's pages as tabs in Boring Notch's frame.
+    private static func tabs(_ suite: TestSuite) {
+        typealias T = BoringNotchTabs
+        suite.expect(Set(T.extras).isDisjoint(with: T.native) && !T.extras.contains(.captures)
+                        && [.timer, .notifications, .downloads, .agents, .watch, .mixer, .clipboard, .scratchpad]
+                            .allSatisfy(T.extras.contains),
+                     "SPEC §3D's eight Vorssaint pages can be tabs; Home and Shelf cover the rest, captures stays Vorssaint's")
+        suite.expect(T.parse("timer,bogus,music,tools") == [.timer, .tools] && T.parse("") == []
+                        && T.stored([.tools, .timer]) == "timer,tools",
+                     "hidden tabs are stored in a stable order and unknown or native names are dropped")
+        let defaults = UserDefaults(suiteName: "mantel.tabs.\(UUID().uuidString)")!
+        suite.expect(T.hidden(defaults) == [.system, .tools], "System and Tools start hidden, the eight pages shown")
+        defaults.set("", forKey: DefaultsKey.notchBoringHiddenTabs)
+        suite.expect(T.hidden(defaults).isEmpty, "an emptied list shows every page")
+        suite.expect(T.visible(modules: [.controls, .watch, .music, .timer, .tools, .files], hidden: [.tools]) == [.watch, .timer],
+                     "tabs follow the island's own section order, without hidden or native sections")
+        suite.expect(T.page(selected: .music, storedTab: .shelf) == .shelf && T.page(selected: .controls, storedTab: .home) == .home
+                        && T.page(selected: .files, storedTab: .home) == .shelf
+                        && T.page(selected: .timer, storedTab: .shelf) == .module(.timer),
+                     "the page follows Vorssaint's section, so its shortcuts and activities land on their tab")
+        suite.expect(T.anchor(for: .home, modules: [.files, .timer, .controls]) == .controls
+                        && T.anchor(for: .shelf, modules: [.music, .files]) == .files
+                        && T.anchor(for: .home, modules: [.timer]) == nil,
+                     "Home and Shelf select a section of their own, leaving a Vorssaint page behind")
+        suite.expect(T.drawsOpenPage(showingSections: false, showingAppPanel: false, showingMetric: false, selected: .timer)
+                        && !T.drawsOpenPage(showingSections: false, showingAppPanel: false, showingMetric: false, selected: .captures)
+                        && !T.drawsOpenPage(showingSections: false, showingAppPanel: true, showingMetric: false, selected: .music)
+                        && !T.drawsOpenPage(showingSections: false, showingAppPanel: false, showingMetric: true, selected: .system),
+                     "the app panel, a metric's detail and captures keep Vorssaint's own page")
+        let tall = CGSize(width: 440, height: 320)
+        suite.expect(T.openSize(selected: .music, vorssaint: tall, mirrorIsBoringNotch: true) == BoringNotchMetrics.openSize
+                        && T.openSize(selected: .camera, vorssaint: tall, mirrorIsBoringNotch: true) == BoringNotchMetrics.openSize
+                        && T.openSize(selected: .timer, vorssaint: tall, mirrorIsBoringNotch: true) == CGSize(width: 640, height: 320)
+                        && T.openSize(selected: .timer, vorssaint: CGSize(width: 440, height: 120), mirrorIsBoringNotch: true)
+                            == BoringNotchMetrics.openSize,
+                     "Home, Shelf and the mirror keep 640 × 190; a Vorssaint page only ever makes the notch taller")
+        suite.expect(T.pageSize(island: CGSize(width: 640, height: 190), headerHeight: 32) == CGSize(width: 578, height: 146),
+                     "a page gets the room inside Boring Notch's insets")
+        let few = T.layout(count: 3, left: 190, right: 146)
+        let many = T.layout(count: 11, left: 190, right: 146)
+        suite.expect(few.width == 46 && few.leftCount == 3, "three tabs keep Boring Notch's width, all left of the camera")
+        suite.expect(many.width >= T.minimumTabWidth && many.width < 46 && many.leftCount < 11
+                        && CGFloat(many.leftCount) * many.width <= 190,
+                     "many tabs narrow, then continue right of the camera")
+        suite.expect(T.layout(count: 0, left: 100, right: 100).leftCount == 0, "no tabs, no row")
+    }
+
+    /// Slice 5f: gestures, mirror and lock screen pick-ones.
+    private static func choices(_ suite: TestSuite) {
+        suite.expect(BoringNotchGestureStyle.sanitized(nil) == .boringNotch && BoringNotchLockScreenStyle.sanitized("x") == .boringNotch
+                        && BoringNotchMirrorShape.sanitized(nil) == .rectangle
+                        && BoringNotchGestureSensitivity.sanitized(7) == .medium,
+                     "Boring Notch wins the notch by default (SPEC rule 2), at its own default sensitivity")
+        suite.expect(BoringNotchMirrorShape.circle.cornerRadius(side: 140) == 70
+                        && BoringNotchMirrorShape.rectangle.cornerRadius(side: 140) == BoringNotchMetrics.openArtRadius
+                        && !BoringNotchMirrorShape.vorssaint.isBoringNotch,
+                     "the mirror is a rounded square or a circle, or Vorssaint's own preview")
+        var tracker = BoringNotchGestureTracker()
+        var fired: [BoringNotchGestureTracker.Action] = []
+        for step in 0..<30 {
+            if let action = tracker.handle(x: 0, y: 10, timestamp: Double(step) * 0.01, ended: false, allowVertical: true,
+                                           expanded: false, sensitivity: 200, closes: true) { fired.append(action) }
+        }
+        suite.expect(fired == [.open], "a long pull down opens once, after 200 pt of travel")
+        tracker = BoringNotchGestureTracker()
+        var short: BoringNotchGestureTracker.Action?
+        for step in 0..<10 {
+            short = short ?? tracker.handle(x: 0, y: 10, timestamp: Double(step) * 0.01, ended: false, allowVertical: true,
+                                            expanded: false, sensitivity: 200, closes: true)
+        }
+        suite.expect(short == nil, "a short pull does nothing")
+        tracker = BoringNotchGestureTracker()
+        var paused: BoringNotchGestureTracker.Action?
+        for step in 0..<30 {
+            paused = paused ?? tracker.handle(x: 0, y: 10, timestamp: Double(step) * 0.4, ended: false, allowVertical: true,
+                                              expanded: false, sensitivity: 200, closes: true)
+        }
+        suite.expect(paused == nil, "travel split by pauses longer than 0.3 s never adds up")
+        tracker = BoringNotchGestureTracker()
+        var sideways: BoringNotchGestureTracker.Action?
+        for step in 0..<40 {
+            sideways = sideways ?? tracker.handle(x: 20, y: 10, timestamp: Double(step) * 0.01, ended: false, allowVertical: true,
+                                                  expanded: false, sensitivity: 100, closes: true)
+        }
+        suite.expect(sideways == nil, "sideways travel never opens, and skips nothing (Boring Notch has no track swipe)")
+        tracker = BoringNotchGestureTracker()
+        var up: BoringNotchGestureTracker.Action?
+        var upOff: BoringNotchGestureTracker.Action?
+        var other = BoringNotchGestureTracker()
+        for step in 0..<20 {
+            up = up ?? tracker.handle(x: 0, y: -10, timestamp: Double(step) * 0.01, ended: false, allowVertical: true,
+                                      expanded: true, sensitivity: 100, closes: true)
+            upOff = upOff ?? other.handle(x: 0, y: -10, timestamp: Double(step) * 0.01, ended: false, allowVertical: true,
+                                          expanded: true, sensitivity: 100, closes: false)
+        }
+        suite.expect(up == .close && upOff == nil, "a push up closes the open notch, unless the close gesture is off")
+        func source(_ path: String) -> String { (try? String(contentsOfFile: path, encoding: .utf8)) ?? "" }
+        let service = source("Sources/Vorssaint/Services/Notch/NotchService.swift")
+        let lock = source("Sources/Vorssaint/Services/Notch/NotchLockScreenService.swift")
+        let mirror = source("Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMirrorView.swift")
+        suite.expect(service.contains("if BoringNotchHooks.handlesGestures() {") && service.contains("NotchGestureSupport.isEnabled(), let panel"),
+                     "Boring Notch's gestures ride on Vorssaint's own scroll handling and switch (one owner)")
+        suite.expect(lock.contains("BoringNotchHooks.lockScreenIsBoring()") && lock.contains("BoringNotchLockScreenChoice("),
+                     "the lock screen keeps Vorssaint's service and Space, only its parts change")
+        suite.expect(mirror.contains("CameraPreviewService.shared") && !mirror.contains("AVCaptureSession()")
+                        && !mirror.contains("AVCaptureDevice.requestAccess"),
+                     "the mirror shows Vorssaint's camera session; it never opens the camera itself")
     }
 
     /// Slice 5e: Boring Notch's shelf menu on Vorssaint's shelf and tools.
@@ -254,7 +365,7 @@ enum BoringNotchDesignTests {
                         && view.contains("BoringNotchMusicActivity(service: service)")
                         && view.contains("BoringNotchMetrics.outline(in: rect"),
                      "the design swaps the open page, the music strip and the outline inside Vorssaint's view")
-        suite.expect(service.contains("if NotchDesign.isBoringNotch { return BoringNotchMetrics.openSize }")
+        suite.expect(service.contains("return BoringNotchHooks.openSize(selected: selected, vorssaint: size)")
                         && support.contains("BoringNotchMetrics.openSpring"),
                      "the open size and the springs come from Boring Notch's numbers")
         suite.expect(!service.contains("BoringNotchWindow") && !design.contains("NSPanel"),

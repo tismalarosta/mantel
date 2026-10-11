@@ -195,7 +195,7 @@ final class NotchService: ObservableObject {
     private var activitySelection = NotchActivitySelection()
     private var activityPickerMenuOpen = false
     private var hoverState = NotchHoverState()
-    private var openedByHover = false
+    private(set) var openedByHover = false  // Mantel: read by Boring Notch's tabs
     /// A click inside the open island, which may be what brings another app forward.
     private var clickedSinceOpening = false
     /// Whether the open detail was reached from inside the island, so Escape
@@ -744,11 +744,9 @@ final class NotchService: ObservableObject {
         if showingSections {
             return geometry.sectionPickerSize(count: filteredSections.count)
         }
-        // Mantel: Boring Notch's open notch is one fixed size.
-        if NotchDesign.isBoringNotch { return BoringNotchMetrics.openSize }
         let musicExtras = NotchLyricsSupport.isEnabled() || NotchQueueSupport.isEnabled()
         let launcher = QuickLauncherService.shared
-        return pageSize(in: expandedGeometry, module: showingAppPanel ? .tools : selected,
+        let size = pageSize(in: expandedGeometry, module: showingAppPanel ? .tools : selected,
                         detail: selectedMetric != nil, panel: showingAppPanel,
                         detailHeight: selectedMetric == .fan ? fanDetailHeight : nil,
                         musicExtraHeight: musicExtras && musicDetailVisible ? geometry.musicExtrasHeight : 0,
@@ -756,6 +754,10 @@ final class NotchService: ObservableObject {
                             && NotchFileToolsService.shared.mediaPresented ? NotchFileToolsService.shared.mediaContentHeight : nil,
                         toolCount: launcher.isEditing || launcher.activeUtility != nil ? nil : launcher.visibleItems.count,
                         capturePreviewHeight: captureContent == nil ? nil : captureContentHeight)
+        // Mantel: Boring Notch's open notch, as tall as a Vorssaint page in it needs.
+        guard BoringNotchHooks.drawsOpenPage(showingSections: false, showingAppPanel: showingAppPanel,
+                                             showingMetric: selectedMetric != nil, selected: selected) else { return size }
+        return BoringNotchHooks.openSize(selected: selected, vorssaint: size)
     }
 
     /// The open island as Settings previews a section: at rest, with no
@@ -3668,6 +3670,14 @@ final class NotchService: ObservableObject {
                                              inverted: event.isDirectionInvertedFromDevice)
         let y = NotchGestureSupport.movement(Double(event.scrollingDeltaY), precise: event.hasPreciseScrollingDeltas,
                                              inverted: event.isDirectionInvertedFromDevice)
+        // Mantel: Boring Notch's pull-down and push-up, when chosen.
+        if BoringNotchHooks.handlesGestures() {
+            guard let action = BoringNotchHooks.gestureAction(
+                x: x, y: y, timestamp: event.timestamp, ended: !event.phase.intersection([.ended, .cancelled]).isEmpty,
+                expanded: expanded, inHeader: inHeader, control: interaction.control, scroll: interaction.scroll) else { return false }
+            if action == .open { open() } else { collapse() }
+            return true
+        }
         guard let action = gesture.handle(x: x, y: y, timestamp: event.timestamp,
                                           began: event.phase.contains(.began),
                                           ended: !event.phase.intersection([.ended, .cancelled]).isEmpty,

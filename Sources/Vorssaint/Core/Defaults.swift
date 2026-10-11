@@ -617,6 +617,12 @@ enum DefaultsKey {
     static let notchBoringHideCompleted = "notchBoringHideCompleted"
     static let notchBoringHUDStyle = "notchBoringHUDStyle"
     static let notchBoringFullscreen = "notchBoringFullscreen"
+    static let notchBoringHiddenTabs = "notchBoringHiddenTabs"
+    static let notchBoringGestureStyle = "notchBoringGestureStyle"
+    static let notchBoringGestureSensitivity = "notchBoringGestureSensitivity"
+    static let notchBoringCloseGesture = "notchBoringCloseGesture"
+    static let notchBoringMirrorShape = "notchBoringMirrorShape"
+    static let notchBoringLockScreenStyle = "notchBoringLockScreenStyle"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1837,6 +1843,12 @@ enum Defaults {
         DefaultsKey.notchBoringHideCompleted: true,
         DefaultsKey.notchBoringHUDStyle: "inline",
         DefaultsKey.notchBoringFullscreen: "mediaApp",
+        DefaultsKey.notchBoringHiddenTabs: "system,tools",
+        DefaultsKey.notchBoringGestureStyle: "boringNotch",
+        DefaultsKey.notchBoringGestureSensitivity: 200,
+        DefaultsKey.notchBoringCloseGesture: true,
+        DefaultsKey.notchBoringMirrorShape: "rectangle",
+        DefaultsKey.notchBoringLockScreenStyle: "boringNotch",
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

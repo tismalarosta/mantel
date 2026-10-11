@@ -84,6 +84,7 @@ struct NotchDesignCard: View {
                 musicOptions
                 BoringNotchHUDOptions()
                 BoringNotchCalendarOptions()
+                BoringNotchMoreOptions()
             }
         }
         .onChange(of: design) { _, _ in
