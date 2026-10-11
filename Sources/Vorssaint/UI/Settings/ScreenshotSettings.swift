@@ -203,7 +203,8 @@ struct ScreenshotCaptureSettings: View {
                 Text(strings.toolShortcutsTitle)
             }
 
-            Section {
+            // Mantel: share links use Vorssaint's server; not offered in Mantel.
+            if !MantelBuild.isMantel { Section {
                 Toggle(strings.shareEnabledToggle, isOn: $sharingEnabled)
                     .onChange(of: sharingEnabled) { _, _ in service.syncWithPreferences() }
                 if sharingEnabled {
@@ -252,7 +253,7 @@ struct ScreenshotCaptureSettings: View {
                 }
             } header: {
                 Text(strings.shareSectionTitle)
-            }
+            } }
         }
         .onAppear { sharing.refresh() }
         .sheet(isPresented: $showingSharedLinks) {

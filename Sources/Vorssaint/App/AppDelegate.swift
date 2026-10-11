@@ -1754,6 +1754,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
 
     func openFeedbackWindow(kind: FeedbackKind = .bug) {
         closePopover()
+        // Mantel: feedback goes to Mantel's GitHub issues, not Vorssaint's server.
+        if MantelBuild.isMantel {
+            NSWorkspace.shared.open(MantelBuild.issues)
+            return
+        }
         let host = NSHostingController(rootView: FeedbackView(initialKind: kind) { [weak self] in
             self?.feedbackWindow?.close()
         })

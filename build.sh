@@ -75,6 +75,13 @@ NOW_PLAYING_ADAPTER="libVorssaintNowPlaying.dylib"
 TARGET="arm64-apple-macosx14.0"
 ENTITLEMENTS="Resources/Vorssaint.entitlements"
 LEGACY_IDENTITY="Vorssaint Utils Signing"
+SIGNING_SLUG="vorssaint"
+# Mantel: Mantel builds sign with Mantel's own local identity, in its own keychain.
+if (( DEV )); then
+    LEGACY_IDENTITY="Mantel Signing"
+    SIGNING_SLUG="mantel"
+fi
+export SIGNING_IDENTITY="$LEGACY_IDENTITY" SIGNING_SLUG SIGNING_ORG="${${LEGACY_IDENTITY%% *}}"
 
 developer_id_identity() {
     security find-identity -v -p codesigning 2>/dev/null \
@@ -90,8 +97,8 @@ legacy_identity_installed() {
     local probe signed=1
     # A locked keychain still lists its identities but cannot sign with them,
     # and this one is locked after every reboot; unlock it before asking.
-    security unlock-keychain -p vorssaint-signing \
-        "$HOME/Library/Keychains/vorssaint-signing.keychain-db" 2>/dev/null || true
+    security unlock-keychain -p "$SIGNING_SLUG-signing" \
+        "$HOME/Library/Keychains/$SIGNING_SLUG-signing.keychain-db" 2>/dev/null || true
     probe="$(mktemp)"
     cp /bin/echo "$probe"
     /usr/bin/codesign --force --strip-disallowed-xattrs --sign "$LEGACY_IDENTITY" "$probe" \
@@ -407,6 +414,7 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderSupport.swift
         Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderStrings.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasSupport.swift
+        Sources/Vorssaint/Mantel/MantelBuild.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasStrings.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchDesign.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMusicSupport.swift
@@ -667,7 +675,13 @@ swiftc -O -target "$TARGET" -sdk "$SDK" "${SDK_COMPAT_FLAGS[@]}" -emit-library \
     -o "build/$NOW_PLAYING_ADAPTER"
 
 echo "▸ Generating app icon…"
-swift Tools/MakeIcon.swift build/AppIcon.iconset
+# Mantel: Mantel builds draw their icon and menu bar glyph from Mantel's own
+# masters (Vorssaint's TRADEMARKS.md: a fork uses its own icon and logo).
+if (( DEV )); then
+    BRAND_DIR=Resources/MantelBrand swift Tools/MakeIcon.swift build/AppIcon.iconset
+else
+    swift Tools/MakeIcon.swift build/AppIcon.iconset
+fi
 xattr -c -r build/AppIcon.iconset build/AppIcon.icns build/MenuBarIcon.png build/MenuBarIcon@2x.png build/BrandMark.png 2>/dev/null || true
 ACTOOL_BIN="$(xcrun --find actool 2>/dev/null || true)"
 ICON_TMP="$(mktemp -d)"
