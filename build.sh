@@ -986,6 +986,6 @@ if (( ${FRIENDS:-0} )); then
     (cd "$SHARE_DIR" && ditto -c -k --sequesterRsrc . ../Mantel.zip)
     # Only the zip stays: a second unzipped Mantel.app with the same id would
     # make macOS mix up the copies (icon, permissions).
-    rm -rf "$SHARE_DIR"
+    rm -rf "$SHARE_DIR" build/friends.noindex
     echo "✓ Zip for friends: build/Mantel.zip"
 fi
