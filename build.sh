@@ -925,8 +925,9 @@ if (( INSTALL )); then
     echo "✓ Installed: $INSTALL_DEST"
 fi
 
-# Mantel: zip the friends build with its how-to-open note.
-if (( FRIENDS )); then
+# Mantel: zip the friends build with its how-to-open note. The default keeps
+# this tail runnable where a test lifts it out of the script on its own.
+if (( ${FRIENDS:-0} )); then
     SHARE_DIR="build/share"
     rm -rf "$SHARE_DIR"
     mkdir -p "$SHARE_DIR"
