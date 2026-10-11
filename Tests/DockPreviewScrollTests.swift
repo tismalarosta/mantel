@@ -48,6 +48,15 @@ enum DockPreviewScrollTests {
         var body: some View { EmptyView() }
     }
 
+    /// Mantel: the preview swipe adds nothing to the layout under test.
+    struct DockPreviewSwipeModifier: ViewModifier {
+        let window: SwitcherItem
+        let orientation: DockPreviewOrientation
+        let onToggleMinimized: () -> Void
+        let onOpen: () -> Void
+        func body(content: Content) -> some View { content }
+    }
+
     struct DockPreviewCard: View {
         let window: SwitcherItem
         let preview: CGImage?

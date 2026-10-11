@@ -94,7 +94,7 @@ extension AppFeature {
              .dockPreview, .dockClick, .shelf,
              // Mantel: click, hover and scroll monitors on the menu bar;
              // right clicks and scrolls through the Dock tap.
-             .menuBarHider, .dockQuitClick, .dockScroll:
+             .menuBarHider, .dockQuitClick, .dockScroll, .titleBarScroll:
             return .mouse
         case .keyboardDebounce, .finderCutPaste, .finderRename, .quitWindowProtection, .musicBlock:
             return .keyboard
@@ -152,7 +152,8 @@ extension AppFeature {
                     defaults.string(forKey: DefaultsKey.brightnessKeyStep)) != .standard
                 ? .keyboard : .idle
         case .mouseAcceleration, .spacesOrder, .pastePlain, .typeClipboard, .soundOutputSwitcher,
-             .dockPreviewMassActions, .dockPreviewWindowButtons, .audioPriority, .micMute,
+             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake,
+             .audioPriority, .micMute,
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,
              .cameraPreview, .scratchpad, .commandBar, .screenRecorder, .wallpaper, .fanControl,

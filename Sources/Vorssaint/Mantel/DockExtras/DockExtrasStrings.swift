@@ -23,6 +23,15 @@ struct DockExtrasFeatureStrings {
     let windowButtonsTitle: String
     let windowButtonsHub: String
     let windowButtonsCaption: String
+    let swipeTitle: String
+    let swipeHub: String
+    let swipeCaption: String
+    let shakeTitle: String
+    let shakeHub: String
+    let shakeCaption: String
+    let titleBarTitle: String
+    let titleBarHub: String
+    let titleBarCaption: String
     let closeAll: String
     let minimizeAll: String
     let fullScreen: String
@@ -56,6 +65,15 @@ extension DockExtrasFeatureStrings {
         windowButtonsTitle: "More window buttons",
         windowButtonsHub: "Full screen and quit buttons on Dock previews",
         windowButtonsCaption: "Adds full screen and quit beside close and minimize on each preview. Hold Option to force quit.",
+        swipeTitle: "Swipe on previews",
+        swipeHub: "Swipe on a Dock preview to minimize or maximize its window",
+        swipeCaption: "With two fingers on the trackpad, swipe a preview toward the Dock to minimize its window, away from it to open it filling the screen.",
+        shakeTitle: "Shake to minimize the others",
+        shakeHub: "Shake a dragged Dock preview to minimize the app’s other windows",
+        shakeCaption: "Drag a preview out of the panel and shake it: the app’s other windows minimize and this one comes forward.",
+        titleBarTitle: "Scroll on title bars",
+        titleBarHub: "Scroll on a window’s title bar to maximize or centre it",
+        titleBarCaption: "Scroll up on the title bar of the window in front to fill the screen, down to centre it. Scrolling down on a window maximized this way puts it back as it was.",
         closeAll: "Close All",
         minimizeAll: "Minimize All",
         fullScreen: "Full screen",
@@ -79,6 +97,15 @@ extension DockExtrasFeatureStrings {
         windowButtonsTitle: "Plus de boutons de fenêtre",
         windowButtonsHub: "Boutons plein écran et quitter sur les aperçus du Dock",
         windowButtonsCaption: "Ajoute plein écran et quitter à côté de fermer et réduire sur chaque aperçu. Maintenez Option pour forcer.",
+        swipeTitle: "Balayer les aperçus",
+        swipeHub: "Balayez un aperçu du Dock pour réduire ou agrandir sa fenêtre",
+        swipeCaption: "À deux doigts sur le trackpad, balayez un aperçu vers le Dock pour réduire sa fenêtre, à l’opposé pour l’ouvrir sur tout l’écran.",
+        shakeTitle: "Secouer pour réduire les autres",
+        shakeHub: "Secouez un aperçu du Dock glissé pour réduire les autres fenêtres de l’app",
+        shakeCaption: "Sortez un aperçu du panneau et secouez-le : les autres fenêtres de l’app se réduisent et celle-ci passe devant.",
+        titleBarTitle: "Défiler sur les barres de titre",
+        titleBarHub: "Défilez sur la barre de titre d’une fenêtre pour l’agrandir ou la centrer",
+        titleBarCaption: "Défilez vers le haut sur la barre de titre de la fenêtre au premier plan pour remplir l’écran, vers le bas pour la centrer. Vers le bas sur une fenêtre agrandie ainsi, elle reprend sa taille d’avant.",
         closeAll: "Tout fermer",
         minimizeAll: "Tout réduire",
         fullScreen: "Plein écran",

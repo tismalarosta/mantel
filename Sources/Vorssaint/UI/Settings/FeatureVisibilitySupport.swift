@@ -289,7 +289,8 @@ extension AppFeature {
         case .switcher: return FeatureSettingsDestination(.switcher, sectionAnchor: .switcher)
         case .dockPreview: return FeatureSettingsDestination(.dock, sectionAnchor: .dock)
         case .dockClick: return FeatureSettingsDestination(.dock, sectionAnchor: .dockClick)
-        case .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons:
+        case .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
+             .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll:
             return FeatureSettingsDestination(.dock, sectionAnchor: .dockExtras)
         case .spacesOrder: return FeatureSettingsDestination(.dock, sectionAnchor: .spacesOrder)
         case .windowMaximizer:
@@ -416,7 +417,8 @@ enum FeatureVisibilitySupport {
                              .middleClick, .mouseClickDebounce]
         case .switcher: return [.switcher]
         case .dock: return [.dockPreview, .dockClick, .spacesOrder,
-                            .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons]
+                            .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
+                            .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll]
         case .windowLayout: return [.windowLayout, .windowMaximizer]
         case .autoQuit: return [.autoQuit]
         case .quitProtection: return [.quitWindowProtection]

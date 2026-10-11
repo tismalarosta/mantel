@@ -1003,6 +1003,9 @@ extension AppFeature {
         case .dockScroll: return FeatureStrings.dockExtras(L10n.shared.language).scrollTitle
         case .dockPreviewMassActions: return FeatureStrings.dockExtras(L10n.shared.language).massActionsTitle
         case .dockPreviewWindowButtons: return FeatureStrings.dockExtras(L10n.shared.language).windowButtonsTitle
+        case .dockPreviewSwipe: return FeatureStrings.dockExtras(L10n.shared.language).swipeTitle
+        case .dockPreviewShake: return FeatureStrings.dockExtras(L10n.shared.language).shakeTitle
+        case .titleBarScroll: return FeatureStrings.dockExtras(L10n.shared.language).titleBarTitle
         case .windowMaximizer: return s.windowMaximizeName
         case .windowLayout: return FeatureStrings.windowLayout(L10n.shared.language).title
         case .autoQuit: return s.autoQuitName
@@ -1094,6 +1097,9 @@ extension AppFeature {
         case .dockScroll: return FeatureStrings.dockExtras(L10n.shared.language).scrollHub
         case .dockPreviewMassActions: return FeatureStrings.dockExtras(L10n.shared.language).massActionsHub
         case .dockPreviewWindowButtons: return FeatureStrings.dockExtras(L10n.shared.language).windowButtonsHub
+        case .dockPreviewSwipe: return FeatureStrings.dockExtras(L10n.shared.language).swipeHub
+        case .dockPreviewShake: return FeatureStrings.dockExtras(L10n.shared.language).shakeHub
+        case .titleBarScroll: return FeatureStrings.dockExtras(L10n.shared.language).titleBarHub
         case .windowMaximizer: return hub.descWindowMaximizer
         case .windowLayout: return hub.descWindowLayout
         case .autoQuit: return hub.descAutoQuit

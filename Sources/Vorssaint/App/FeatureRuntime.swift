@@ -249,6 +249,9 @@ final class FeatureRuntime: ObservableObject {
         .dockScroll: { DockClickService.shared.syncWithPreferences() },
         .dockPreviewMassActions: {},
         .dockPreviewWindowButtons: {},
+        .dockPreviewSwipe: { DockPreviewSwipe.shared.syncWithPreferences() },
+        .dockPreviewShake: {},
+        .titleBarScroll: { DockClickService.shared.syncWithPreferences() },
         .windowMaximizer: { WindowMaximizer.shared.syncWithPreferences() },
         .windowLayout: {
             WindowUseTracker.shared.syncWithFeatures()

@@ -289,6 +289,7 @@ final class DockPreviewService: ObservableObject {
         else { return }
 
         isDraggingWindow = true
+        DockPreviewShake.shared.begin(item) // Mantel
         releaseDockAutohideHold()
         cancelPendingHide()
         cancelPendingHover()
@@ -297,6 +298,14 @@ final class DockPreviewService: ObservableObject {
 
     func updateWindowDrag() {
         guard isDraggingWindow else { return }
+        // Mantel: a shaken card minimizes the app's other windows (DockDoor).
+        if let shaken = DockPreviewShake.shared.shaken(at: NSEvent.mouseLocation) {
+            isDraggingWindow = false
+            DockPreviewDragGhost.shared.end()
+            DockPreviewShake.shared.minimizeOthers(than: shaken, in: windows)
+            commit(shaken)
+            return
+        }
         DockPreviewDragGhost.shared.move(to: NSEvent.mouseLocation)
     }
 
