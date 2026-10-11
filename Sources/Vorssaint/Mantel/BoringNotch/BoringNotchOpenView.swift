@@ -76,12 +76,9 @@ struct BoringNotchOpenView: View {
         .font(.system(.headline, design: .rounded))
     }
 
-    /// Slice 5a hosts Vorssaint's files page here; slice 5e brings Boring
-    /// Notch's shelf.
+    /// Boring Notch's shelf on Vorssaint's shelf service (slice 5e).
     private var shelf: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            NotchFilesView(service: service)
-        }
+        BoringNotchShelfView(service: service)
     }
 }
 

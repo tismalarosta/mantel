@@ -16,6 +16,39 @@ enum BoringNotchDesignTests {
         music(suite)
         hud(suite)
         calendarPanel(suite)
+        shelf(suite)
+    }
+
+    /// Slice 5e: Boring Notch's shelf menu on Vorssaint's shelf and tools.
+    private static func shelf(_ suite: TestSuite) {
+        typealias S = BoringNotchShelfSupport
+        let photo = URL(fileURLWithPath: "/tmp/Photo.HEIC")
+        let pdf = URL(fileURLWithPath: "/tmp/Report.pdf")
+        suite.expect(S.isImage(photo) && S.isImage(URL(fileURLWithPath: "/a/b.png")) && !S.isImage(pdf),
+                     "images are told apart by their type, whatever the case of the extension")
+        suite.expect(S.outputName(for: photo, suffix: "no background", extension: "png") == "Photo no background.png"
+                        && S.outputName(for: URL(fileURLWithPath: "/tmp/My File.jpeg"), suffix: nil, extension: "zip")
+                            == "My File.zip",
+                     "results are named after their source")
+        let image = S.actions(fileURLs: [photo], hasOtherItems: false, mediaToolsAvailable: true)
+        suite.expect(image == [.open, .openWith, .showInFinder, .share, .copyPath, .removeBackground, .convert,
+                               .makePDF, .compress, .remove],
+                     "an image gets Boring Notch's whole menu")
+        let document = S.actions(fileURLs: [pdf], hasOtherItems: false, mediaToolsAvailable: true)
+        suite.expect(!document.contains(.removeBackground) && !document.contains(.makePDF)
+                        && document.contains(.compress),
+                     "image actions only show for images")
+        let noTools = S.actions(fileURLs: [photo], hasOtherItems: false, mediaToolsAvailable: false)
+        suite.expect(!noTools.contains(.convert) && !noTools.contains(.compress) && noTools.contains(.removeBackground),
+                     "convert and compress need Vorssaint's media tools installed; remove background is Mantel's own")
+        let text = S.actions(fileURLs: [], hasOtherItems: true, mediaToolsAvailable: true)
+        suite.expect(text == [.remove], "a note or link can only be removed")
+        func source(_ path: String) -> String { (try? String(contentsOfFile: path, encoding: .utf8)) ?? "" }
+        let view = source("Sources/Vorssaint/Mantel/BoringNotch/BoringNotchShelfView.swift")
+        suite.expect(view.contains("ShelfService.shared") && view.contains("NotchFileToolsService.shared.openMedia(.imageCompressor")
+                        && view.contains("NotchFileToolsService.shared.archive(")
+                        && view.contains("ShelfSharePickerAnchor"),
+                     "the shelf reuses Vorssaint's shelf, image tool, archive tool and share sheet")
     }
 
     /// Slice 5d: the calendar panel's days, events, reminders and panel order.

@@ -403,6 +403,7 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchHUDSupport.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchHooks.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchCalendarSupport.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchShelfSupport.swift
         Sources/Vorssaint/Core/KillProcessStrings.swift
         Sources/Vorssaint/Core/PortManagerStrings.swift
         Sources/Vorssaint/Core/WhatsAppDownloadStrings.swift
