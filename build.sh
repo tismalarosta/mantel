@@ -984,5 +984,8 @@ if (( ${FRIENDS:-0} )); then
     cp "Tools/Mantel-how-to-open.txt" "$SHARE_DIR/How to open Mantel.txt"
     rm -f build/Mantel.zip
     (cd "$SHARE_DIR" && ditto -c -k --sequesterRsrc . ../Mantel.zip)
+    # Only the zip stays: a second unzipped Mantel.app with the same id would
+    # make macOS mix up the copies (icon, permissions).
+    rm -rf "$SHARE_DIR"
     echo "✓ Zip for friends: build/Mantel.zip"
 fi
