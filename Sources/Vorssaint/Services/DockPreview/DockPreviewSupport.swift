@@ -409,12 +409,16 @@ enum DockPreviewSupport {
     /// unpin or close, and the only place that says which app it belongs to
     /// once the pointer has gone.
     static func showsPanelHeader(isPinned: Bool) -> Bool {
-        isPinned
+        // Mantel: Close All / Minimize All live in the header (DockDoor).
+        isPinned || DockExtrasSupport.massActionsOn
     }
 
     /// The room the window's name has in the title band: the band less the two
     /// controls beside it, whose place is held whether or not they are drawn.
-    static var cardTitleTextWidth: CGFloat { cardThumbnailWidth - 40 }
+    static var cardTitleTextWidth: CGFloat {
+        // Mantel: two more controls when the extra window buttons are on.
+        cardThumbnailWidth - (DockExtrasSupport.windowButtonsOn ? 80 : 40)
+    }
 
     /// Whether a name is longer than the room it has. Measured against the font
     /// it is drawn in rather than a layout pass, so the answer is the same

@@ -38,6 +38,11 @@ final class DockClickService {
 
     private var tap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
+    /// Mantel: the tap also serves the DockDoor extras (DockExtrasTap), so
+    /// Vorssaint's own click actions keep their own gate, and the event mask
+    /// only grows by what an installed extra needs.
+    private var clickActionsWanted = false
+    private var tapMask: CGEventMask = 0
     private var dockPIDCache: pid_t?
     private var pendingClick: PendingClick?
     /// Last handled click per app: follow-up clicks toggle from this record
@@ -68,11 +73,13 @@ final class DockClickService {
         let minimizeEnabled = UserDefaults.standard.bool(forKey: DefaultsKey.dockClickMinimize)
         let hideEnabled = UserDefaults.standard.bool(forKey: DefaultsKey.dockClickHide)
         let cycleEnabled = UserDefaults.standard.bool(forKey: DefaultsKey.dockClickCycleWindows)
+        clickActionsWanted = AppFeature.dockClick.isAvailable
+            && (minimizeEnabled || hideEnabled || cycleEnabled)
         if SessionActivitySupport.tapShouldRun(
-            featureWanted: AppFeature.dockClick.isAvailable
-                && (minimizeEnabled || hideEnabled || cycleEnabled),
+            featureWanted: clickActionsWanted || DockExtrasSupport.wantsDockTap,
             accessibilityGranted: AXIsProcessTrusted(),
             sessionIsActive: SessionActivity.shared.isActive) {
+            if tap != nil, tapMask != Self.wantedMask() { stop() }
             start()
         } else {
             stop()
@@ -86,13 +93,12 @@ final class DockClickService {
 
     private func start() {
         guard tap == nil else { return }
+        let mask = Self.wantedMask()
         guard let tap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
-            eventsOfInterest: CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
-                | CGEventMask(1 << CGEventType.leftMouseDragged.rawValue)
-                | CGEventMask(1 << CGEventType.leftMouseUp.rawValue),
+            eventsOfInterest: mask,
             callback: { _, type, event, userInfo in
                 guard let userInfo else { return Unmanaged.passUnretained(event) }
                 let service = Unmanaged<DockClickService>.fromOpaque(userInfo).takeUnretainedValue()
@@ -102,6 +108,7 @@ final class DockClickService {
         ) else { return }
 
         self.tap = tap
+        tapMask = mask
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
         runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
@@ -139,6 +146,14 @@ final class DockClickService {
         if event.getIntegerValueField(.eventSourceUserData) == Self.syntheticEventMarker {
             return Unmanaged.passUnretained(event)
         }
+        // Mantel: right clicks and scrolls belong to the DockDoor extras.
+        if type == .rightMouseDown || type == .rightMouseUp || type == .scrollWheel {
+            let consumed = DockExtrasTap.shared.handle(type: type, event: event,
+                                                       insideDock: Self.insideDockStrip,
+                                                       applicationAt: { [weak self] in self?.dockApplication(at: $0) })
+            return consumed ? nil : Unmanaged.passUnretained(event)
+        }
+        guard clickActionsWanted else { return Unmanaged.passUnretained(event) }
         switch type {
         case .leftMouseDragged:
             return handleDragged(event)
@@ -780,6 +795,19 @@ final class DockClickService {
             windowIDs: ids,
             onScreenFrontToBack: onScreenWindowIDs(pid: pid))
         return indices.map { windows[$0] }
+    }
+
+    /// Vorssaint's left-click events, plus what the installed extras need.
+    private static func wantedMask() -> CGEventMask {
+        var mask = CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
+            | CGEventMask(1 << CGEventType.leftMouseDragged.rawValue)
+            | CGEventMask(1 << CGEventType.leftMouseUp.rawValue)
+        if DockExtrasSupport.quitClickOn {
+            mask |= CGEventMask(1 << CGEventType.rightMouseDown.rawValue)
+                | CGEventMask(1 << CGEventType.rightMouseUp.rawValue)
+        }
+        if DockExtrasSupport.scrollOn { mask |= CGEventMask(1 << CGEventType.scrollWheel.rawValue) }
+        return mask
     }
 
     // MARK: - Geometry

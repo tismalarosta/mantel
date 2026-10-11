@@ -60,6 +60,7 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
     case typeClipboard
     case lidAnimation
     case menuBarHider
+    case dockExtras
 
     var page: SettingsPage {
         switch self {
@@ -71,7 +72,7 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
              .middleClick, .mouseClickDebounce:
             return .mouse
         case .switcher: return .switcher
-        case .dock, .dockClick, .spacesOrder: return .dock
+        case .dock, .dockClick, .spacesOrder, .dockExtras: return .dock
         case .finderCutPaste, .finderRename: return .cutPaste
         case .clipboardHistory, .pastePlain, .typeClipboard: return .clipboard
         case .quickLauncher, .quickToggles, .micMute, .cameraPreview, .wallpaper, .scratchpad, .cleaningMode:
@@ -288,6 +289,8 @@ extension AppFeature {
         case .switcher: return FeatureSettingsDestination(.switcher, sectionAnchor: .switcher)
         case .dockPreview: return FeatureSettingsDestination(.dock, sectionAnchor: .dock)
         case .dockClick: return FeatureSettingsDestination(.dock, sectionAnchor: .dockClick)
+        case .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons:
+            return FeatureSettingsDestination(.dock, sectionAnchor: .dockExtras)
         case .spacesOrder: return FeatureSettingsDestination(.dock, sectionAnchor: .spacesOrder)
         case .windowMaximizer:
             return FeatureSettingsDestination(.windowLayout, sectionAnchor: .windowMaximizer)
@@ -412,7 +415,8 @@ enum FeatureVisibilitySupport {
         case .mouse: return [.scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts,
                              .middleClick, .mouseClickDebounce]
         case .switcher: return [.switcher]
-        case .dock: return [.dockPreview, .dockClick, .spacesOrder]
+        case .dock: return [.dockPreview, .dockClick, .spacesOrder,
+                            .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons]
         case .windowLayout: return [.windowLayout, .windowMaximizer]
         case .autoQuit: return [.autoQuit]
         case .quitProtection: return [.quitWindowProtection]

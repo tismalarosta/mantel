@@ -600,6 +600,12 @@ enum DefaultsKey {
     static let menuBarHiderShortcutsEnabled = "menuBarHiderShortcutsEnabled"
     static let menuBarHiderToggleHiddenShortcut = "menuBarHiderToggleHiddenShortcut"
     static let menuBarHiderToggleAlwaysHiddenShortcut = "menuBarHiderToggleAlwaysHiddenShortcut"
+    // Mantel: DockDoor extras
+    static let dockQuitClickEnabled = "dockQuitClickEnabled"
+    static let dockScrollEnabled = "dockScrollEnabled"
+    static let dockScrollMediaVolume = "dockScrollMediaVolume"
+    static let dockPreviewMassActionsEnabled = "dockPreviewMassActionsEnabled"
+    static let dockPreviewWindowButtonsEnabled = "dockPreviewWindowButtonsEnabled"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1805,6 +1811,11 @@ enum Defaults {
         DefaultsKey.menuBarHiderToggleHiddenShortcut: GlobalShortcut.menuBarHiderToggleHiddenDefault.storageValue,
         DefaultsKey.menuBarHiderToggleAlwaysHiddenShortcut:
             GlobalShortcut.menuBarHiderToggleAlwaysHiddenDefault.storageValue,
+        DefaultsKey.dockQuitClickEnabled: true,
+        DefaultsKey.dockScrollEnabled: true,
+        DefaultsKey.dockScrollMediaVolume: true,
+        DefaultsKey.dockPreviewMassActionsEnabled: true,
+        DefaultsKey.dockPreviewWindowButtonsEnabled: true,
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

@@ -2193,6 +2193,13 @@ final class AppVolumeMixer: ObservableObject {
         return applied
     }
 
+    /// Mantel (Dock scroll volume): the default output's main level, nil
+    /// when it has no software volume. Static like the setter above.
+    static func systemOutputVolume() -> Double? {
+        guard let device = defaultOutputDeviceID(), let volume = outputVolume(for: device) else { return nil }
+        return Double(volume)
+    }
+
     /// Whether the sound is currently cut, or nil when this output has no
     /// mute switch of its own.
     static func systemOutputIsMuted() -> Bool? {

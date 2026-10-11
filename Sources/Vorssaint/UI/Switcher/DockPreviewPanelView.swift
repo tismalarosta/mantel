@@ -223,6 +223,8 @@ private struct DockPreviewPanelContent: View {
         HStack(spacing: 7) {
             dragTitleArea
             windowNavigationButtons(proxy: proxy)
+            // Mantel
+            DockPreviewMassActionButtons(windows: windows)
             // Both belong to the pinned panel alone. A hovered panel is
             // dismissed by moving off it, and pinning one is a named item in
             // any card's menu.
@@ -565,6 +567,11 @@ private struct DockPreviewCard: View {
             HStack(spacing: 4) {
                 closeButton
                 minimizeButton
+                // Mantel
+                DockPreviewExtraWindowButtons(window: window, visible: showsPreviewControls) {
+                    suppressNextCommit = true
+                    DispatchQueue.main.async { suppressNextCommit = false }
+                }
             }
         }
         .frame(width: DockPreviewSupport.cardThumbnailWidth,

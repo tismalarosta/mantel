@@ -23,6 +23,8 @@ enum AppFeature: String, CaseIterable {
          diskImageInstaller
     // Mantel additions, appended so every Vorssaint id keeps its place
     case typeClipboard, lidAnimation, menuBarHider
+    // Mantel: DockDoor extras (SPEC §3C)
+    case dockQuitClick, dockScroll, dockPreviewMassActions, dockPreviewWindowButtons
     // Sound
     case mixer, soundOutputSwitcher, audioPriority, micMute, musicBlock
     // Energy and display
@@ -103,7 +105,8 @@ extension AppFeature {
 
     var group: FeatureGroup {
         switch self {
-        case .switcher, .dockPreview, .dockClick, .windowMaximizer, .windowLayout, .autoQuit, .spacesOrder:
+        case .switcher, .dockPreview, .dockClick, .windowMaximizer, .windowLayout, .autoQuit, .spacesOrder,
+             .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons:
             return .windowsDock
         case .scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts, .middleClick,
              .keyboardDebounce, .textSnippets, .superKey, .quitWindowProtection, .mouseClickDebounce:
@@ -161,6 +164,10 @@ extension AppFeature {
         case .typeClipboard: return "keyboard.badge.ellipsis"
         case .lidAnimation: return "macbook"
         case .menuBarHider: return "menubar.rectangle"
+        case .dockQuitClick: return "power"
+        case .dockScroll: return "scroll"
+        case .dockPreviewMassActions: return "rectangle.stack.badge.minus"
+        case .dockPreviewWindowButtons: return "circle.grid.2x1"
         case .finderCutPaste: return "scissors"
         case .finderRename: return "pencil"
         case .shelf: return "tray.full"
@@ -282,6 +289,10 @@ extension AppFeature {
         case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
         case .lidAnimation: return [DefaultsKey.lidAnimationEnabled]
         case .menuBarHider: return [DefaultsKey.menuBarHiderEnabled]
+        case .dockQuitClick: return [DefaultsKey.dockQuitClickEnabled]
+        case .dockScroll: return [DefaultsKey.dockScrollEnabled]
+        case .dockPreviewMassActions: return [DefaultsKey.dockPreviewMassActionsEnabled]
+        case .dockPreviewWindowButtons: return [DefaultsKey.dockPreviewWindowButtonsEnabled]
         case .finderCutPaste: return [DefaultsKey.finderCutPasteEnabled,
                                       DefaultsKey.finderPasteImageAsFile]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
@@ -364,6 +375,9 @@ extension AppFeature {
              .autoQuit, .quitWindowProtection, .cleaningMode, .pastePlain, .typeClipboard, .radialMenu,
              // Tells the app's menus from empty menu bar space.
              .menuBarHider,
+             // The Dock tap reads clicks and scrolls; the preview buttons
+             // act on windows through Accessibility.
+             .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              // The bar reads other apps' menus and windows and types at the
              // caret, all of it through Accessibility.
              .commandBar:
@@ -499,7 +513,8 @@ extension AppFeature {
             return true
         case .focusFollowsMouse, .scrollHorizontal, .linearScroll, .diskImageInstaller, .audioPriority,
              .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder,
-             .lidAnimation, .menuBarHider:
+             .lidAnimation, .menuBarHider,
+             .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons:
             return false
         }
     }

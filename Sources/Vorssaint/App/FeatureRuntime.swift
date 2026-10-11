@@ -243,6 +243,12 @@ final class FeatureRuntime: ObservableObject {
         },
         .dockPreview: { DockPreviewService.shared.syncWithPreferences() },
         .dockClick: { DockClickService.shared.syncWithPreferences() },
+        // Mantel: the input extras ride on the Dock Click tap; the preview
+        // buttons read their switch when the panel draws.
+        .dockQuitClick: { DockClickService.shared.syncWithPreferences() },
+        .dockScroll: { DockClickService.shared.syncWithPreferences() },
+        .dockPreviewMassActions: {},
+        .dockPreviewWindowButtons: {},
         .windowMaximizer: { WindowMaximizer.shared.syncWithPreferences() },
         .windowLayout: {
             WindowUseTracker.shared.syncWithFeatures()

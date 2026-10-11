@@ -306,6 +306,21 @@ enum WindowActivator {
         SpaceWindowBridge.frontWindow(windowID, ownerPID: item.windowOwnerPID)
     }
 
+    /// Mantel (DockDoor extras): toggles a window's full screen through
+    /// Accessibility's `AXFullScreen`, the same switch as the green button.
+    @discardableResult
+    static func toggleFullScreen(windowID: CGWindowID, pid: pid_t) -> Bool {
+        guard Permissions.shared.accessibility else { return false }
+        let axApp = AXUIElementCreateApplication(pid)
+        AXUIElementSetMessagingTimeout(axApp, 0.35)
+        guard let axWindow = axElement(windowID: windowID, in: axApp) else { return false }
+        var value: CFTypeRef?
+        let isFullScreen = AXUIElementCopyAttributeValue(axWindow, "AXFullScreen" as CFString, &value) == .success
+            && (value as? Bool) == true
+        return AXUIElementSetAttributeValue(axWindow, "AXFullScreen" as CFString,
+                                            isFullScreen ? kCFBooleanFalse : kCFBooleanTrue) == .success
+    }
+
     @discardableResult
     static func setWindowMinimized(_ minimized: Bool, windowID: CGWindowID, pid: pid_t) -> Bool {
         if pid == ProcessInfo.processInfo.processIdentifier {

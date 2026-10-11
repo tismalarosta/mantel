@@ -42,6 +42,12 @@ enum DockPreviewScrollTests {
         }
     }
 
+    /// Mantel: the Close All / Minimize All header buttons draw nothing here.
+    struct DockPreviewMassActionButtons: View {
+        let windows: [SwitcherItem]
+        var body: some View { EmptyView() }
+    }
+
     struct DockPreviewCard: View {
         let window: SwitcherItem
         let preview: CGImage?

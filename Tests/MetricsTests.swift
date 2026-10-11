@@ -191,6 +191,7 @@ struct MetricsTests {
                 LidAnimationTests.run(suite)
             }),
             ("menu-bar-hider", { MenuBarHiderTests.run(suite) }),
+            ("dock-extras", { DockExtrasTests.run(suite) }),
         ]
         var selected = Set<String>()
         var listOnly = false

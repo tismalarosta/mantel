@@ -52,6 +52,11 @@ struct DockSettings: View {
                     spacesOrderCard
                         .settingsSectionAnchor(.spacesOrder, cornerRadius: 16)
                 }
+                // Mantel
+                if DockExtrasSettingsCard.hasInstalledExtra {
+                    DockExtrasSettingsCard()
+                        .settingsSectionAnchor(.dockExtras, cornerRadius: 16)
+                }
                 if AppFeature.dockPreview.isAvailable {
                     WindowPreviewsCard(sizeKey: DefaultsKey.previewSize,
                                        excludedAppsKey: DefaultsKey.windowPreviewExcludedApps)
