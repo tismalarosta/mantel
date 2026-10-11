@@ -32,6 +32,7 @@ struct MenuBarHiderFeatureStrings {
     let toggleAlwaysHidden: String
     let needsAccessibility: String
     let dividerHelp: String
+    let unsupported: String
 
     func label(for strategy: MenuBarRehideStrategy) -> String {
         switch strategy {
@@ -76,7 +77,8 @@ extension MenuBarHiderFeatureStrings {
         toggleHidden: "Show or hide menu bar icons",
         toggleAlwaysHidden: "Show or hide always-hidden icons",
         needsAccessibility: "Show on click and on hover need Accessibility to tell the app’s menus from empty space.",
-        dividerHelp: "Icons to the left of this divider are hidden. ⌘-drag icons across it to choose."
+        dividerHelp: "Icons to the left of this divider are hidden. ⌘-drag icons across it to choose.",
+        unsupported: "macOS 27 changed how the menu bar works, and hiding icons this way no longer works there. To remove icons you don’t want, use System Settings, Menu Bar, Allow in the Menu Bar."
     )
 
     static let fr = MenuBarHiderFeatureStrings(
@@ -103,6 +105,7 @@ extension MenuBarHiderFeatureStrings {
         toggleHidden: "Afficher ou masquer les icônes de la barre des menus",
         toggleAlwaysHidden: "Afficher ou masquer les icônes toujours masquées",
         needsAccessibility: "L’affichage au clic et au survol nécessite l’accessibilité pour distinguer les menus de l’app de l’espace vide.",
-        dividerHelp: "Les icônes à gauche de ce séparateur sont masquées. Faites glisser des icônes avec ⌘ pour choisir."
+        dividerHelp: "Les icônes à gauche de ce séparateur sont masquées. Faites glisser des icônes avec ⌘ pour choisir.",
+        unsupported: "macOS 27 a changé le fonctionnement de la barre des menus, et masquer les icônes de cette façon n’y marche plus. Pour retirer les icônes dont vous ne voulez pas, utilisez Réglages Système, Barre des menus, Autoriser dans la barre des menus."
     )
 }

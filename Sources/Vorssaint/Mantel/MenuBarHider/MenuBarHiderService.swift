@@ -82,7 +82,7 @@ final class MenuBarHiderService: ObservableObject {
     // MARK: Feature lifecycle
 
     func syncWithPreferences() {
-        let wanted = AppFeature.menuBarHider.isAvailable
+        let wanted = AppFeature.menuBarHider.isAvailable && MenuBarHiderSupport.isSupported()
             && UserDefaults.standard.bool(forKey: DefaultsKey.menuBarHiderEnabled)
         settings = .current()
         if wanted { activate() } else { deactivate() }

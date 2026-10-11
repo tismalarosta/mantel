@@ -39,6 +39,13 @@ enum MenuBarHiderSupport {
     /// Ice's expanded length: wide enough to push every item to its left
     /// past the screen edge on any display.
     static let expandedLength: CGFloat = 10_000
+
+    /// macOS 27 rebuilt the menu bar (MenuBarAgent) and drops any item wider
+    /// than half the display, so the expanded divider hides nothing there.
+    /// shortcut: off on macOS 27+, port Ice's concealment (jordanbaird/Ice PR #995) once it ships.
+    static func isSupported(majorVersion: Int = ProcessInfo.processInfo.operatingSystemVersion.majorVersion) -> Bool {
+        majorVersion < 27
+    }
     /// The divider autosave names. Stable: macOS keys the saved position on them.
     static let hiddenDividerName = "MantelHiddenDivider"
     static let alwaysHiddenDividerName = "MantelAlwaysHiddenDivider"

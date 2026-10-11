@@ -38,6 +38,9 @@ enum MenuBarHiderTests {
     }
 
     private static func lengths(_ suite: TestSuite) {
+        suite.expect(MenuBarHiderSupport.isSupported(majorVersion: 26) && !MenuBarHiderSupport.isSupported(majorVersion: 27)
+                        && !MenuBarHiderSupport.isSupported(majorVersion: 28),
+                     "the hider runs on macOS 26 and steps aside from macOS 27, which drops wide menu bar items")
         typealias Support = MenuBarHiderSupport
         let hidden = Support.dividerLengths(hiddenShown: false, alwaysHiddenShown: false)
         suite.expect(hidden.hidden == 10_000 && hidden.alwaysHidden == 10_000,
