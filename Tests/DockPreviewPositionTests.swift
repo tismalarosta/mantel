@@ -29,9 +29,15 @@ enum DockPreviewPositionTests {
         }
         func orderFrontRegardless() { isVisible = true }
     }
+    /// Mantel: Dock folders are looked up where no app is hit; nothing here.
+    final class DockFolderPop {
+        static let shared = DockFolderPop()
+        func pointerMoved(at point: CGPoint) {}
+    }
     final class Service {
         typealias DockHit = DockPreviewPositionTests.DockHit
         typealias Zone = DockPreviewPositionTests.Zone
+        typealias DockFolderPop = DockPreviewPositionTests.DockFolderPop
         var panel: Panel? = Panel()
         var isVisible: Bool { panel?.isVisible == true }
         var isPinned = false

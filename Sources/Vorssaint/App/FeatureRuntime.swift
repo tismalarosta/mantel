@@ -252,6 +252,15 @@ final class FeatureRuntime: ObservableObject {
         .dockPreviewSwipe: { DockPreviewSwipe.shared.syncWithPreferences() },
         .dockPreviewShake: {},
         .titleBarScroll: { DockClickService.shared.syncWithPreferences() },
+        .trackpadSwitcherSwipe: { TrackpadSwitcherSwipe.shared.syncWithPreferences() },
+        .dockActiveIndicator: { DockActiveIndicator.shared.syncWithPreferences() },
+        .dockAppCards: { if !DockExtrasSupport.appCardsOn { DockAppCard.shared.hide() } },
+        .dockFolderPop: { if !DockExtrasSupport.folderPopOn { DockFolderPop.shared.hide() } },
+        .dockLivePreviews: { if !DockExtrasSupport.livePreviewsOn { DockPreviewLive.shared.stop() } },
+        .dockLock: {
+            DockLock.shared.syncWithPreferences()
+            DockClickService.shared.syncWithPreferences()
+        },
         .windowMaximizer: { WindowMaximizer.shared.syncWithPreferences() },
         .windowLayout: {
             WindowUseTracker.shared.syncWithFeatures()

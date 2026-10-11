@@ -342,6 +342,16 @@ final class DockPreviewService: ObservableObject {
         }
     }
 
+    /// Mantel (live previews, C1): captures the open panel's windows again.
+    func refreshVisiblePreviews() {
+        guard isVisible, !isDraggingWindow, !windows.isEmpty else { return }
+        WindowPreviewProvider.shared.refreshPreviews(for: windows, maxPixelSize: 420 * PreviewSizing.scale,
+                                                     excludedAppsKey: DefaultsKey.windowPreviewExcludedApps) { [weak self] windowID, image in
+            guard let self, self.isVisible, self.windows.contains(where: { $0.previewWindowID == windowID }) else { return }
+            self.previews[windowID] = image
+        }
+    }
+
     func togglePinned() {
         guard isVisible, let panel, !windows.isEmpty else { return }
         createPinnedPanel(from: panel.frame)
@@ -579,6 +589,7 @@ final class DockPreviewService: ObservableObject {
 
         guard let hit = dockHit(at: axPoint) else {
             cancelPendingHover()
+            DockFolderPop.shared.pointerMoved(at: axPoint) // Mantel: Dock folders (DockDoor)
             return
         }
         scheduleHover(hit)
@@ -744,6 +755,13 @@ final class DockPreviewService: ObservableObject {
         cancelPendingHover()
         cancelPendingHide()
 
+        // Mantel: music and calendar apps can show their card instead (DockDoor).
+        if DockAppCard.shared.show(for: hit.app, iconFrame: hit.iconFrame,
+                                   orientation: hit.preferences.orientation) {
+            if isVisible { endSession() }
+            return
+        }
+
         let list = prefetched ?? Self.previewableWindows(for: hit.app.processIdentifier)
         // An app with no real windows shows nothing; if a panel is already up
         // (the user moved here from another app), close it cleanly.
@@ -775,6 +793,7 @@ final class DockPreviewService: ObservableObject {
             guard let self, self.isVisible, self.windows.contains(where: { $0.previewWindowID == windowID }) else { return }
             self.previews[windowID] = image
         }
+        DockPreviewLive.shared.begin() // Mantel
 
         if hit.preferences.autohide,
            UserDefaults.standard.bool(forKey: DefaultsKey.dockPreviewKeepDockVisible) {

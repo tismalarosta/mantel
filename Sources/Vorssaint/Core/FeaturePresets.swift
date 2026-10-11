@@ -94,7 +94,7 @@ extension AppFeature {
              .dockPreview, .dockClick, .shelf,
              // Mantel: click, hover and scroll monitors on the menu bar;
              // right clicks and scrolls through the Dock tap.
-             .menuBarHider, .dockQuitClick, .dockScroll, .titleBarScroll:
+             .menuBarHider, .dockQuitClick, .dockScroll, .titleBarScroll, .trackpadSwitcherSwipe, .dockLock:
             return .mouse
         case .keyboardDebounce, .finderCutPaste, .finderRename, .quitWindowProtection, .musicBlock:
             return .keyboard
@@ -131,6 +131,10 @@ extension AppFeature {
         case .notchAccessories: return .periodic
         // Mantel: reads the lid angle sensor many times a second.
         case .lidAnimation: return .periodic
+        // Mantel: looks at the Dock once a second to follow its icons.
+        case .dockActiveIndicator: return .periodic
+        // Mantel: captures the open Dock preview again several times a second.
+        case .dockLivePreviews: return .periodic
         // Log changes arrive as file events; a timer keeps countdowns and
         // limits current while the section is on.
         case .notch, .notchCalendar, .notchLyrics, .notchLiveEqualizer, .notchAgents: return .periodic
@@ -152,7 +156,7 @@ extension AppFeature {
                     defaults.string(forKey: DefaultsKey.brightnessKeyStep)) != .standard
                 ? .keyboard : .idle
         case .mouseAcceleration, .spacesOrder, .pastePlain, .typeClipboard, .soundOutputSwitcher,
-             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake,
+             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake, .dockAppCards, .dockFolderPop,
              .audioPriority, .micMute,
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,

@@ -32,6 +32,41 @@ struct DockExtrasFeatureStrings {
     let titleBarTitle: String
     let titleBarHub: String
     let titleBarCaption: String
+    let switcherSwipeTitle: String
+    let switcherSwipeHub: String
+    let switcherSwipeCaption: String
+    let switcherSwipeFingers: String
+    let switcherSwipeDirection: String
+    let horizontal: String
+    let vertical: String
+    let switcherNeeded: String
+    let indicatorTitle: String
+    let indicatorHub: String
+    let indicatorCaption: String
+    let indicatorStyle: String
+    let styleLine: String
+    let styleDots: String
+    let dockLockTitle: String
+    let dockLockHub: String
+    let dockLockCaption: String
+    let dockLockScreen: String
+    let menuBarScreen: String
+    let titleBarDesktop: String
+    let titleBarDesktopCaption: String
+    let appCardsTitle: String
+    let appCardsHub: String
+    let appCardsCaption: String
+    let nothingToday: String
+    let allDay: String
+    let folderPopTitle: String
+    let folderPopHub: String
+    let folderPopCaption: String
+    let openInFinder: String
+    let folderEmpty: String
+    let livePreviewsTitle: String
+    let livePreviewsHub: String
+    let livePreviewsCaption: String
+    let livePreviewsRate: String
     let closeAll: String
     let minimizeAll: String
     let fullScreen: String
@@ -74,6 +109,41 @@ extension DockExtrasFeatureStrings {
         titleBarTitle: "Scroll on title bars",
         titleBarHub: "Scroll on a window’s title bar to maximize or centre it",
         titleBarCaption: "Scroll up on the title bar of the window in front to fill the screen, down to centre it. Scrolling down on a window maximized this way puts it back as it was.",
+        switcherSwipeTitle: "Swipe to switch windows",
+        switcherSwipeHub: "Swipe with three or four fingers to open the window switcher",
+        switcherSwipeCaption: "Swipe with the chosen number of fingers to open the switcher, keep moving to step through it, lift to switch. If macOS uses the same swipe, change one of them in System Settings › Trackpad.",
+        switcherSwipeFingers: "Fingers",
+        switcherSwipeDirection: "Direction",
+        horizontal: "Sideways",
+        vertical: "Up and down",
+        switcherNeeded: "Needs the window switcher, in Features.",
+        indicatorTitle: "Mark the active app",
+        indicatorHub: "A line or dots under Dock icons for the active app",
+        indicatorCaption: "Draws a mark in the accent colour under the front app’s Dock icon, or a dot under every open app.",
+        indicatorStyle: "Style",
+        styleLine: "Line under the front app",
+        styleDots: "Dots under open apps",
+        dockLockTitle: "Keep the Dock on one screen",
+        dockLockHub: "Stop the Dock from moving to another screen",
+        dockLockCaption: "With several screens, the Dock stays on the one chosen here. Hold Option to let it move.",
+        dockLockScreen: "Screen",
+        menuBarScreen: "Screen with the menu bar",
+        titleBarDesktop: "Sideways switches desktop",
+        titleBarDesktopCaption: "Scrolling sideways on a title bar moves to the next or previous desktop.",
+        appCardsTitle: "Music and calendar cards",
+        appCardsHub: "Hover Music, Spotify or Calendar in the Dock for a small card",
+        appCardsCaption: "Hovering a music app that is playing shows its song with play controls; hovering Calendar shows today’s events (needs the island’s calendar). Click the card to open the app.",
+        nothingToday: "Nothing else today",
+        allDay: "All day",
+        folderPopTitle: "Folder Pop",
+        folderPopHub: "Rest on a Dock folder to browse and drag its files",
+        folderPopCaption: "Rest the pointer on a folder in the Dock, like Downloads, to see its newest files. Click one to open it, drag it out to move or attach it.",
+        openInFinder: "Open in Finder",
+        folderEmpty: "This folder is empty.",
+        livePreviewsTitle: "Live previews",
+        livePreviewsHub: "Dock previews that keep moving, videos included",
+        livePreviewsCaption: "Captures the open Dock preview again several times a second. Uses more battery.",
+        livePreviewsRate: "Frames per second",
         closeAll: "Close All",
         minimizeAll: "Minimize All",
         fullScreen: "Full screen",
@@ -106,6 +176,41 @@ extension DockExtrasFeatureStrings {
         titleBarTitle: "Défiler sur les barres de titre",
         titleBarHub: "Défilez sur la barre de titre d’une fenêtre pour l’agrandir ou la centrer",
         titleBarCaption: "Défilez vers le haut sur la barre de titre de la fenêtre au premier plan pour remplir l’écran, vers le bas pour la centrer. Vers le bas sur une fenêtre agrandie ainsi, elle reprend sa taille d’avant.",
+        switcherSwipeTitle: "Balayer pour changer de fenêtre",
+        switcherSwipeHub: "Balayez à trois ou quatre doigts pour ouvrir le sélecteur de fenêtres",
+        switcherSwipeCaption: "Balayez avec le nombre de doigts choisi pour ouvrir le sélecteur, continuez pour avancer, levez les doigts pour changer. Si macOS utilise le même geste, changez l’un des deux dans Réglages Système › Trackpad.",
+        switcherSwipeFingers: "Doigts",
+        switcherSwipeDirection: "Direction",
+        horizontal: "Sur le côté",
+        vertical: "Haut et bas",
+        switcherNeeded: "Nécessite le sélecteur de fenêtres, dans Fonctionnalités.",
+        indicatorTitle: "Marquer l’app active",
+        indicatorHub: "Un trait ou des points sous les icônes du Dock pour l’app active",
+        indicatorCaption: "Dessine une marque de la couleur d’accent sous l’icône de l’app au premier plan, ou un point sous chaque app ouverte.",
+        indicatorStyle: "Style",
+        styleLine: "Trait sous l’app au premier plan",
+        styleDots: "Points sous les apps ouvertes",
+        dockLockTitle: "Garder le Dock sur un écran",
+        dockLockHub: "Empêchez le Dock de passer sur un autre écran",
+        dockLockCaption: "Avec plusieurs écrans, le Dock reste sur celui choisi ici. Maintenez Option pour le laisser passer.",
+        dockLockScreen: "Écran",
+        menuBarScreen: "Écran avec la barre des menus",
+        titleBarDesktop: "Sur le côté change de bureau",
+        titleBarDesktopCaption: "Défiler sur le côté sur une barre de titre passe au bureau suivant ou précédent.",
+        appCardsTitle: "Cartes musique et calendrier",
+        appCardsHub: "Survolez Musique, Spotify ou Calendrier dans le Dock pour une petite carte",
+        appCardsCaption: "Survoler une app de musique en lecture montre son morceau avec les commandes ; survoler Calendrier montre les événements du jour (nécessite le calendrier de l’île). Cliquez sur la carte pour ouvrir l’app.",
+        nothingToday: "Rien d’autre aujourd’hui",
+        allDay: "Toute la journée",
+        folderPopTitle: "Dossiers du Dock",
+        folderPopHub: "Arrêtez-vous sur un dossier du Dock pour parcourir et glisser ses fichiers",
+        folderPopCaption: "Arrêtez le pointeur sur un dossier du Dock, comme Téléchargements, pour voir ses fichiers les plus récents. Cliquez pour ouvrir, glissez pour déplacer ou joindre.",
+        openInFinder: "Ouvrir dans le Finder",
+        folderEmpty: "Ce dossier est vide.",
+        livePreviewsTitle: "Aperçus animés",
+        livePreviewsHub: "Des aperçus du Dock qui bougent, vidéos comprises",
+        livePreviewsCaption: "Recapture l’aperçu ouvert du Dock plusieurs fois par seconde. Consomme plus de batterie.",
+        livePreviewsRate: "Images par seconde",
         closeAll: "Tout fermer",
         minimizeAll: "Tout réduire",
         fullScreen: "Plein écran",

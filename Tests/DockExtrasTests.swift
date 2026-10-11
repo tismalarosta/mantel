@@ -15,6 +15,10 @@ enum DockExtrasTests {
         swipe(suite)
         shake(suite)
         titleBar(suite)
+        switcherSwipe(suite)
+        indicator(suite)
+        dockLock(suite)
+        folders(suite)
         registration(suite)
         offMeansOff(suite)
         sourceContracts(suite)
@@ -75,6 +79,12 @@ enum DockExtrasTests {
             (.dockPreviewSwipe, DefaultsKey.dockPreviewSwipeEnabled),
             (.dockPreviewShake, DefaultsKey.dockPreviewShakeEnabled),
             (.titleBarScroll, DefaultsKey.titleBarScrollEnabled),
+            (.trackpadSwitcherSwipe, DefaultsKey.trackpadSwitcherSwipeEnabled),
+            (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
+            (.dockLock, DefaultsKey.dockLockEnabled),
+            (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
+            (.dockFolderPop, DefaultsKey.dockFolderPopEnabled),
+            (.dockLivePreviews, DefaultsKey.dockLivePreviewsEnabled),
         ]
         for (feature, key) in extras {
             suite.expect(!feature.installedByDefault && feature.group == .windowsDock
@@ -90,12 +100,30 @@ enum DockExtrasTests {
                         && AppFeature.dockPreviewSwipe.energyProfile == .idle
                         && AppFeature.dockPreviewShake.energyProfile == .idle,
                      "title bar scrolling rides the scroll tap; swipe and shake only watch the panel")
+        suite.expect(AppFeature.trackpadSwitcherSwipe.energyProfile == .mouse
+                        && AppFeature.dockLock.energyProfile == .mouse
+                        && AppFeature.dockActiveIndicator.energyProfile == .periodic,
+                     "the swipe and the Dock lock are input taps; the indicator looks at the Dock on a timer")
+        suite.expect(Defaults.registeredDefaults[DefaultsKey.titleBarScrollSwitchesDesktop] as? Bool == false
+                        && Defaults.registeredDefaults[DefaultsKey.trackpadSwitcherSwipeFingers] as? Int == 3
+                        && Defaults.registeredDefaults[DefaultsKey.dockActiveIndicatorStyle] as? String == "line"
+                        && Defaults.registeredDefaults[DefaultsKey.dockLockScreen] as? String == "",
+                     "desktop switching stays off for existing title bar users; 3 fingers, a line, the menu bar screen")
         for language in AppLanguage.allCases {
             let text = FeatureStrings.dockExtras(language)
             suite.expect(![text.quitClickTitle, text.scrollTitle, text.massActionsTitle, text.windowButtonsTitle,
                            text.closeAll, text.minimizeAll, text.fullScreen, text.quit, text.forceQuit,
                            text.swipeTitle, text.swipeHub, text.swipeCaption, text.shakeTitle, text.shakeHub,
-                           text.shakeCaption, text.titleBarTitle, text.titleBarHub, text.titleBarCaption]
+                           text.shakeCaption, text.titleBarTitle, text.titleBarHub, text.titleBarCaption,
+                           text.switcherSwipeTitle, text.switcherSwipeHub, text.switcherSwipeCaption,
+                           text.switcherNeeded, text.indicatorTitle, text.indicatorHub, text.indicatorCaption,
+                           text.styleLine, text.styleDots, text.dockLockTitle, text.dockLockHub,
+                           text.dockLockCaption, text.menuBarScreen, text.titleBarDesktop,
+                           text.titleBarDesktopCaption, text.appCardsTitle, text.appCardsHub,
+                           text.appCardsCaption, text.nothingToday, text.allDay,
+                           text.folderPopTitle, text.folderPopHub, text.folderPopCaption, text.openInFinder,
+                           text.folderEmpty, text.livePreviewsTitle, text.livePreviewsHub,
+                           text.livePreviewsCaption, text.livePreviewsRate]
                             .contains(where: \.isEmpty),
                          "the Dock extras have complete strings in \(language.rawValue)")
         }
@@ -119,6 +147,12 @@ enum DockExtrasTests {
             (.dockPreviewSwipe, DefaultsKey.dockPreviewSwipeEnabled),
             (.dockPreviewShake, DefaultsKey.dockPreviewShakeEnabled),
             (.titleBarScroll, DefaultsKey.titleBarScrollEnabled),
+            (.trackpadSwitcherSwipe, DefaultsKey.trackpadSwitcherSwipeEnabled),
+            (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
+            (.dockLock, DefaultsKey.dockLockEnabled),
+            (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
+            (.dockFolderPop, DefaultsKey.dockFolderPopEnabled),
+            (.dockLivePreviews, DefaultsKey.dockLivePreviewsEnabled),
         ]
         suite.expect(features.allSatisfy { !DockExtrasSupport.isOn($0.0, key: $0.1, in: defaults) },
                      "an update installs none of the extras")
@@ -139,9 +173,42 @@ enum DockExtrasTests {
         let titleBar = source("Sources/Vorssaint/Mantel/DockExtras/DockExtrasTitleBarScroll.swift")
         let swipe = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewSwipe.swift")
         let shake = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewShake.swift")
-        suite.expect(![tap, buttons, titleBar, swipe, shake].contains(where: \.isEmpty),
+        let switcherSwipe = source("Sources/Vorssaint/Mantel/DockExtras/TrackpadSwitcherSwipe.swift")
+        let indicator = source("Sources/Vorssaint/Mantel/DockExtras/DockActiveIndicator.swift")
+        let lock = source("Sources/Vorssaint/Mantel/DockExtras/DockLock.swift")
+        let card = source("Sources/Vorssaint/Mantel/DockExtras/DockAppCard.swift")
+        suite.expect(!card.isEmpty && card.contains("NotchMusicService.shared") && card.contains("NotchCalendarService.shared")
+                        && !card.contains("tapCreate") && !card.contains("mediaremote"),
+                     "the Dock cards read Vorssaint's music and calendar services, no second source")
+        suite.expect(source("Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift")
+                        .contains("DockAppCard.shared.show(for: hit.app"),
+                     "the card is offered where the Dock preview opens")
+        suite.expect(AppFeature.dockAppCards.energyProfile == .idle
+                        && DockExtrasSupport.mediaBundleIDs.contains("com.github.th-ch.youtube-music"),
+                     "the cards cost nothing at rest; YouTube Music counts as a music app")
+        let previewService = source("Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift")
+        let live = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewLive.swift")
+        let folderPop = source("Sources/Vorssaint/Mantel/DockExtras/DockFolderPop.swift")
+        suite.expect(previewService.contains("DockFolderPop.shared.pointerMoved(at: axPoint)")
+                        && previewService.contains("DockPreviewLive.shared.begin()")
+                        && live.contains("service.refreshVisiblePreviews()")
+                        && !live.contains("SCStream") && !folderPop.contains("tapCreate"),
+                     "folders and live previews ride on Vorssaint's Dock preview and its one capture path")
+        suite.expect(AppFeature.dockLivePreviews.energyProfile == .periodic
+                        && AppFeature.dockFolderPop.energyProfile == .idle
+                        && DockExtrasSupport.sanitizedLiveFPS(10) == 10 && DockExtrasSupport.sanitizedLiveFPS(60) == 5
+                        && Defaults.registeredDefaults[DefaultsKey.dockLivePreviewFPS] as? Int == 5,
+                     "live previews are labelled as periodic, 2, 5 or 10 frames a second, 5 by default")
+        suite.expect(![tap, buttons, titleBar, swipe, shake, switcherSwipe, indicator, lock].contains(where: \.isEmpty),
                      "the Dock extras sources are readable")
-        let mantel = tap + buttons + titleBar + swipe + shake
+        let mantel = tap + buttons + titleBar + swipe + shake + indicator + lock
+        suite.expect(switcherSwipe.components(separatedBy: "tapCreate").count == 2
+                        && switcherSwipe.contains("options: .listenOnly")
+                        && switcherSwipe.contains("AppFeature.switcher.isAvailable")
+                        && switcherSwipe.contains("DefaultsKey.switcherShortcut"),
+                     "the switcher swipe only listens, and drives Vorssaint's own switcher by its shortcut")
+        suite.expect(titleBar.contains("SpaceWindowBridge.pressSpaceShortcut"),
+                     "sideways title bar scrolls change desktop the way Vorssaint's mouse gestures do")
         suite.expect(!mantel.contains("tapCreate") && !mantel.contains("addGlobalMonitorForEvents"),
                      "the extras add no event tap or monitor of their own (SPEC rule 4)")
         suite.expect(tap.contains("AppVolumeMixer.setSystemOutputVolume")
@@ -154,7 +221,9 @@ enum DockExtrasTests {
         let dockClick = source("Sources/Vorssaint/Services/DockClick/DockClickService.swift")
         suite.expect(dockClick.contains("DockExtrasTap.shared.handle(")
                         && dockClick.contains("guard clickActionsWanted else")
-                        && dockClick.contains("if DockExtrasSupport.wantsScrollEvents"),
+                        && dockClick.contains("if DockExtrasSupport.wantsScrollEvents")
+                        && dockClick.contains("if DockLock.shared.wantsPointerMoves")
+                        && dockClick.contains("DockLock.shared.filter(event)"),
                      "the Dock Click tap hosts the extras, listens to scrolls only for them, "
                         + "and keeps its own clicks behind their own switches")
         suite.expect(tap.contains("DockExtrasTitleBarScroll.shared.handle(")
@@ -246,5 +315,108 @@ enum DockExtrasTests {
         suite.expect(Support.topLeftRect(fromAppKit: CGRect(x: 0, y: 0, width: 1512, height: 900),
                                          primaryScreenHeight: 982) == CGRect(x: 0, y: 82, width: 1512, height: 900),
                      "screen areas convert to the top-left coordinates windows use")
+    }
+
+    private static func switcherSwipe(_ suite: TestSuite) {
+        typealias Support = DockExtrasSupport
+        func touches(_ x: CGFloat, _ count: Int = 3, y: CGFloat = 0.5) -> [Support.SwipeTouch] {
+            (0..<count).map { Support.SwipeTouch(id: $0, position: CGPoint(x: x + CGFloat($0) * 0.1, y: y)) }
+        }
+        var detector = Support.SwitcherSwipeDetector()
+        suite.expect(detector.handle(touches(0.2), fingers: 3, horizontal: true) == nil
+                        && detector.handle(touches(0.25), fingers: 3, horizontal: true) == .open,
+                     "three fingers moving sideways together open the switcher")
+        suite.expect(detector.handle(touches(0.3), fingers: 3, horizontal: true) == nil
+                        && detector.handle(touches(0.42), fingers: 3, horizontal: true) == .forward
+                        && detector.handle(touches(0.37), fingers: 3, horizontal: true) == .backward,
+                     "further travel steps the selection, either way")
+        suite.expect(detector.handle(touches(0.37, 2), fingers: 3, horizontal: true) == .release,
+                     "lifting a finger switches")
+        var four = Support.SwitcherSwipeDetector()
+        _ = four.handle(touches(0.2), fingers: 4, horizontal: true)
+        suite.expect(four.handle(touches(0.3), fingers: 4, horizontal: true) == nil,
+                     "three fingers do nothing when four are chosen")
+        var diagonal = Support.SwitcherSwipeDetector()
+        _ = diagonal.handle(touches(0.2), fingers: 3, horizontal: true)
+        suite.expect(diagonal.handle(touches(0.25, y: 0.7), fingers: 3, horizontal: true) == nil
+                        && diagonal.handle(touches(0.4, y: 0.7), fingers: 3, horizontal: true) == nil,
+                     "a swipe that wanders off its axis is spent")
+        suite.expect(Support.sanitizedSwipeFingers(4) == 4 && Support.sanitizedSwipeFingers(0) == 3
+                        && Support.sanitizedSwipeFingers(7) == 3, "only three or four fingers")
+        func side(_ dx: Double, natural: Bool = false, desktops: Bool = true) -> Support.TitleBarDecision {
+            Support.titleBarDecision(deltaX: dx, deltaY: 0.2, natural: natural, isMomentum: false,
+                                     sinceLastAction: 1, sidewaysSwitchesDesktop: desktops)
+        }
+        suite.expect(side(3) == .nextDesktop && side(-3) == .previousDesktop
+                        && side(3, natural: true) == .previousDesktop && side(3, desktops: false) == .pass,
+                     "sideways on a title bar switches desktop only when chosen (C8)")
+    }
+
+    private static func indicator(_ suite: TestSuite) {
+        typealias Support = DockExtrasSupport
+        let icon = CGRect(x: 100, y: 900, width: 60, height: 60)
+        let line = Support.indicatorRect(icon: icon, dock: .bottom, style: .line)
+        suite.expect(abs(line.midX - icon.midX) < 0.01 && line.minY == icon.maxY + 2 && line.height == 3
+                        && line.width == 27,
+                     "a bottom Dock's line sits centred 2 pt under the icon")
+        let left = Support.indicatorRect(icon: icon, dock: .left, style: .dots)
+        let right = Support.indicatorRect(icon: icon, dock: .right, style: .dots)
+        suite.expect(left.maxX == icon.minX - 2 && right.minX == icon.maxX + 2
+                        && abs(left.midY - icon.midY) < 0.01 && left.width == 5 && left.height == 5,
+                     "side Docks get the mark beside the icon, on the screen's side")
+        suite.expect(Support.indicatorStyle("dots") == .dots && Support.indicatorStyle("bogus") == .line
+                        && Support.indicatorStyle(nil) == .line, "an unknown style reads as the line")
+    }
+
+    private static func dockLock(_ suite: TestSuite) {
+        typealias Support = DockExtrasSupport
+        let laptop = CGRect(x: 0, y: 0, width: 1512, height: 982)
+        let beside = CGRect(x: 1512, y: 0, width: 2560, height: 1440)
+        let below = CGRect(x: 0, y: 982, width: 1920, height: 1080)
+        suite.expect(Support.lockZones(screens: [laptop], locked: 0, dock: .bottom).isEmpty,
+                     "one screen needs no lock")
+        let zones = Support.lockZones(screens: [laptop, beside], locked: 0, dock: .bottom)
+        suite.expect(zones == [Support.LockZone(rect: CGRect(x: 1512, y: 1433, width: 2560, height: 7),
+                                                nudge: CGVector(dx: 0, dy: -7))],
+                     "the other screen's bottom edge is guarded 7 pt deep")
+        suite.expect(Support.heldPointer(CGPoint(x: 2000, y: 1438), zones: zones) == CGPoint(x: 2000, y: 1431)
+                        && Support.heldPointer(CGPoint(x: 2000, y: 1400), zones: zones) == nil,
+                     "a pointer pushing that edge is held back; elsewhere it is left alone")
+        suite.expect(Support.lockZones(screens: [laptop, below], locked: 0, dock: .bottom).isEmpty,
+                     "a screen whose Dock edge is fully covered cannot hold the Dock, so nothing is locked")
+        let covered = Support.exposedEdge(of: CGRect(x: 0, y: 0, width: 2000, height: 1000), dock: .bottom,
+                                          screens: [CGRect(x: 0, y: 0, width: 2000, height: 1000),
+                                                    CGRect(x: 500, y: 1000, width: 1000, height: 800)])
+        suite.expect(covered == [0...500, 1500...2000], "a screen below covers only its own stretch of the edge")
+        suite.expect(Support.screenHoldingDock(CGRect(x: 2400, y: 1370, width: 600, height: 64),
+                                               screens: [laptop, beside], orientation: .bottom) == 1
+                        && Support.screenHoldingDock(CGRect(x: 400, y: 910, width: 600, height: 64),
+                                                     screens: [laptop, beside], orientation: .bottom) == 0,
+                     "the Dock's screen is read from where its icons are")
+        let path = Support.callBackPath(locked: laptop, dock: .bottom, screens: [laptop, beside])
+        suite.expect(path?.end == CGPoint(x: 60, y: 981) && path?.push == CGVector(dx: 0, dy: 8),
+                     "the Dock is called back by pushing on the chosen screen's free edge")
+    }
+
+    private static func folders(_ suite: TestSuite) {
+        let fileManager = FileManager.default
+        let folder = fileManager.temporaryDirectory.appendingPathComponent("mantel-folder-pop-\(UUID().uuidString)")
+        defer { try? fileManager.removeItem(at: folder) }
+        guard (try? fileManager.createDirectory(at: folder, withIntermediateDirectories: true)) != nil else {
+            suite.expect(false, "a scratch folder is available")
+            return
+        }
+        for (index, name) in ["old.txt", "middle.txt", "new.txt", ".hidden"].enumerated() {
+            let url = folder.appendingPathComponent(name)
+            fileManager.createFile(atPath: url.path, contents: Data())
+            try? fileManager.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_000_000 + Double(index) * 100)],
+                                           ofItemAtPath: url.path)
+        }
+        let items = DockExtrasSupport.folderItems(in: folder, limit: 10)
+        suite.expect(!items.contains { $0.url.lastPathComponent == ".hidden" } && items.count == 3,
+                     "a Dock folder lists its visible files")
+        suite.expect(DockExtrasSupport.folderItems(in: folder, limit: 2).count == 2
+                        && DockExtrasSupport.folderItems(in: folder.appendingPathComponent("missing"), limit: 5).isEmpty,
+                     "the list is capped, and a missing folder lists nothing")
     }
 }

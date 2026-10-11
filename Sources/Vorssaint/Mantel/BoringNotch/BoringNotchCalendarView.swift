@@ -18,13 +18,13 @@ struct BoringNotchCalendarStrings {
 
     static let enUS = BoringNotchCalendarStrings(
         allDay: "All-day", noEvents: "No events", enjoy: "Enjoy your free time!",
-        allowReminders: "Show reminders", calendarAccess: "Allow Calendar for Vorssaint to see your events.",
+        allowReminders: "Show reminders", calendarAccess: "Allow Calendar for Mantel to see your events.",
         reminders: "Reminders in the calendar", remindersCaption: "Tick a reminder off from the notch; Reminders keeps it done.",
         hideCompleted: "Hide completed reminders", markDone: "Mark as complete", markOpen: "Mark as incomplete")
 
     static let fr = BoringNotchCalendarStrings(
         allDay: "Journée", noEvents: "Aucun événement", enjoy: "Profitez de votre temps libre\u{00A0}!",
-        allowReminders: "Afficher les rappels", calendarAccess: "Autorisez Calendrier pour Vorssaint afin de voir vos événements.",
+        allowReminders: "Afficher les rappels", calendarAccess: "Autorisez Calendrier pour Mantel afin de voir vos événements.",
         reminders: "Rappels dans le calendrier", remindersCaption: "Cochez un rappel depuis l’encoche, Rappels le garde terminé.",
         hideCompleted: "Masquer les rappels terminés", markDone: "Marquer comme terminé", markOpen: "Marquer comme à faire")
 }
