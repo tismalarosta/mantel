@@ -606,6 +606,9 @@ enum DefaultsKey {
     static let dockScrollMediaVolume = "dockScrollMediaVolume"
     static let dockPreviewMassActionsEnabled = "dockPreviewMassActionsEnabled"
     static let dockPreviewWindowButtonsEnabled = "dockPreviewWindowButtonsEnabled"
+    // Mantel: Boring Notch design
+    static let notchDesign = "notchDesign"
+    static let notchBoringTab = "notchBoringTab"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1816,6 +1819,8 @@ enum Defaults {
         DefaultsKey.dockScrollMediaVolume: true,
         DefaultsKey.dockPreviewMassActionsEnabled: true,
         DefaultsKey.dockPreviewWindowButtonsEnabled: true,
+        DefaultsKey.notchDesign: "boringNotch",
+        DefaultsKey.notchBoringTab: "home",
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

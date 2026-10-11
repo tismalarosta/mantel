@@ -744,6 +744,8 @@ final class NotchService: ObservableObject {
         if showingSections {
             return geometry.sectionPickerSize(count: filteredSections.count)
         }
+        // Mantel: Boring Notch's open notch is one fixed size.
+        if NotchDesign.isBoringNotch { return BoringNotchMetrics.openSize }
         let musicExtras = NotchLyricsSupport.isEnabled() || NotchQueueSupport.isEnabled()
         let launcher = QuickLauncherService.shared
         return pageSize(in: expandedGeometry, module: showingAppPanel ? .tools : selected,
@@ -1152,6 +1154,14 @@ final class NotchService: ObservableObject {
 
     private func metricIsAvailable(_ metric: MetricDetailKind) -> Bool {
         MenuBarMetric.allCases.contains { $0.detailKind == metric && $0.feature.isAvailable }
+    }
+
+    /// Mantel: a design switch rebuilds the island, so its window, mask and
+    /// content are all drawn in the new design.
+    func rebuildForDesignChange() {
+        guard running else { return }
+        tearDownPresentation()
+        syncWithPreferences()
     }
 
     func stop(restoreCapture: Bool = true) {

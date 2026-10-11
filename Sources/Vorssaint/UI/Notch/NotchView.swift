@@ -96,6 +96,9 @@ struct NotchView: View {
         } else if service.expanded {
             if service.showingCommandBar {
                 commandBarPage
+            } else if NotchDesign.isBoringNotch, !service.showingSections {
+                // Mantel: Boring Notch's open notch.
+                BoringNotchOpenView(service: service)
             } else {
                 expanded
                     // The companion beside the camera watches the pointer go
@@ -256,7 +259,10 @@ struct NotchView: View {
             case .downloads: NotchDownloadStrip(service: service, displayGeometry: geometry)
             case .agents: NotchAgentStrip(service: service, displayGeometry: geometry)
             case .calendar: NotchCalendarStrip(service: service, displayGeometry: geometry)
-            case .music: NotchMusicStrip(service: service, displayGeometry: geometry, interactive: true)
+            case .music:
+                // Mantel: Boring Notch's closed music activity in its design.
+                if NotchDesign.isBoringNotch { BoringNotchMusicActivity(service: service) }
+                else { NotchMusicStrip(service: service, displayGeometry: geometry, interactive: true) }
             case .keepAwake: NotchKeepAwakeStrip(service: service, displayGeometry: geometry)
             }
         }
@@ -919,6 +925,11 @@ struct NotchShape: Shape {
     func path(in rect: CGRect) -> Path {
         guard attached else { return Path(roundedRect: rect, cornerRadius: radius) }
         if let floatingGap { return Path(NotchLayout.capsulePath(in: rect, gap: floatingGap)) }
+        // Mantel: Boring Notch's outline, its corners following the height.
+        if NotchDesign.isBoringNotch {
+            let radii = BoringNotchMetrics.radii(height: rect.height)
+            return Path(BoringNotchMetrics.outline(in: rect, top: radii.top, bottom: radii.bottom))
+        }
         let shoulder = NotchLayout.shoulder(height: rect.height)
         let bottom = min(radius, rect.height / 2, (rect.width - shoulder * 2) / 2)
         let tangent: CGFloat = 0.55228475

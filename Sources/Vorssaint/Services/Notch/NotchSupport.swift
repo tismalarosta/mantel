@@ -2536,6 +2536,12 @@ enum NotchMotion {
 
     static func spring(from: CGFloat, to: CGFloat, width: Bool, steady: Bool = false) -> Spring {
         if steady && width { return steadyWidth }
+        // Mantel: Boring Notch's open and close springs in its design.
+        if NotchDesign.isBoringNotch {
+            let boring = to > from ? BoringNotchMetrics.openSpring : BoringNotchMetrics.closeSpring
+            return Spring(duration: boring.duration, bounce: boring.bounce)
+                .limited(travel: abs(to - from), limit: overshootLimit)
+        }
         let spring = to > from ? (width ? growingWidth : growingHeight) : (width ? shrinkingWidth : shrinkingHeight)
         return spring.limited(travel: abs(to - from), limit: overshootLimit)
     }
