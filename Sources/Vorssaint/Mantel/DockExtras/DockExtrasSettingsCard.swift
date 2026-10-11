@@ -14,9 +14,13 @@ struct DockExtrasSettingsCard: View {
     @AppStorage(DefaultsKey.dockScrollMediaVolume) private var mediaVolume = true
     @AppStorage(DefaultsKey.dockPreviewMassActionsEnabled) private var massActions = true
     @AppStorage(DefaultsKey.dockPreviewWindowButtonsEnabled) private var windowButtons = true
+    @AppStorage(DefaultsKey.dockPreviewSwipeEnabled) private var swipe = true
+    @AppStorage(DefaultsKey.dockPreviewShakeEnabled) private var shake = true
+    @AppStorage(DefaultsKey.titleBarScrollEnabled) private var titleBarScroll = true
 
     static var hasInstalledExtra: Bool {
-        [AppFeature.dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons]
+        [AppFeature.dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
+         .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll]
             .contains { $0.isAvailable }
     }
 
@@ -52,9 +56,26 @@ struct DockExtrasSettingsCard: View {
                     Toggle(text.windowButtonsTitle, isOn: $windowButtons).labelsHidden()
                 }
             }
+            if AppFeature.dockPreviewSwipe.isAvailable {
+                SettingsRow(symbol: "hand.draw", title: text.swipeTitle, caption: text.swipeCaption) {
+                    Toggle(text.swipeTitle, isOn: $swipe).labelsHidden()
+                }
+            }
+            if AppFeature.dockPreviewShake.isAvailable {
+                SettingsRow(symbol: "wind", title: text.shakeTitle, caption: text.shakeCaption) {
+                    Toggle(text.shakeTitle, isOn: $shake).labelsHidden()
+                }
+            }
+            if AppFeature.titleBarScroll.isAvailable {
+                SettingsRow(symbol: "macwindow", title: text.titleBarTitle, caption: text.titleBarCaption) {
+                    Toggle(text.titleBarTitle, isOn: $titleBarScroll).labelsHidden()
+                }
+            }
         }
-        // The Dock tap's mask follows the two input extras.
+        // The Dock tap's mask follows the three input extras.
         .onChange(of: quitClick) { _, _ in DockClickService.shared.syncWithPreferences() }
         .onChange(of: scroll) { _, _ in DockClickService.shared.syncWithPreferences() }
+        .onChange(of: titleBarScroll) { _, _ in DockClickService.shared.syncWithPreferences() }
+        .onChange(of: swipe) { _, _ in DockPreviewSwipe.shared.syncWithPreferences() }
     }
 }

@@ -6,7 +6,8 @@
 
 import AppKit
 
-/// C6 (⌘ right-click quits) and C7 (scroll on an icon) as a guest of
+/// C6 (⌘ right-click quits), C7 (scroll on an icon) and C8 (scroll on a
+/// title bar, `DockExtrasTitleBarScroll`) as a guest of
 /// Vorssaint's Dock Click tap: one Dock tap, one Dock hit test (SPEC rule 4).
 /// `DockClickService` forwards right clicks and scrolls here and swallows
 /// the event when this returns true.
@@ -32,7 +33,10 @@ final class DockExtrasTap {
             guard swallowNextRightUp else { return false }
             swallowNextRightUp = false
             return true
-        case .scrollWheel: return handleScroll(event, insideDock: insideDock, applicationAt: applicationAt)
+        case .scrollWheel:
+            // Dock icons first (C7), then the front window's title bar (C8).
+            if handleScroll(event, insideDock: insideDock, applicationAt: applicationAt) { return true }
+            return DockExtrasTitleBarScroll.shared.handle(event)
         default: return false
         }
     }

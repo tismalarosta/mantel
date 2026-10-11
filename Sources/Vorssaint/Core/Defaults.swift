@@ -606,6 +606,9 @@ enum DefaultsKey {
     static let dockScrollMediaVolume = "dockScrollMediaVolume"
     static let dockPreviewMassActionsEnabled = "dockPreviewMassActionsEnabled"
     static let dockPreviewWindowButtonsEnabled = "dockPreviewWindowButtonsEnabled"
+    static let dockPreviewSwipeEnabled = "dockPreviewSwipeEnabled"
+    static let dockPreviewShakeEnabled = "dockPreviewShakeEnabled"
+    static let titleBarScrollEnabled = "titleBarScrollEnabled"
     // Mantel: Boring Notch design
     static let notchDesign = "notchDesign"
     static let notchBoringTab = "notchBoringTab"
@@ -1833,6 +1836,9 @@ enum Defaults {
         DefaultsKey.dockScrollMediaVolume: true,
         DefaultsKey.dockPreviewMassActionsEnabled: true,
         DefaultsKey.dockPreviewWindowButtonsEnabled: true,
+        DefaultsKey.dockPreviewSwipeEnabled: true,
+        DefaultsKey.dockPreviewShakeEnabled: true,
+        DefaultsKey.titleBarScrollEnabled: true,
         DefaultsKey.notchDesign: "boringNotch",
         DefaultsKey.notchBoringTab: "home",
         DefaultsKey.notchBoringMusicSlots: "none,previous,playPause,next,none",

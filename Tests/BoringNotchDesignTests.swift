@@ -31,7 +31,9 @@ enum BoringNotchDesignTests {
         suite.expect(T.parse("timer,bogus,music,tools") == [.timer, .tools] && T.parse("") == []
                         && T.stored([.tools, .timer]) == "timer,tools",
                      "hidden tabs are stored in a stable order and unknown or native names are dropped")
-        let defaults = UserDefaults(suiteName: "mantel.tabs.\(UUID().uuidString)")!
+        let tabsSuite = "com.vorssaint.tests.notch-tabs.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: tabsSuite)!
+        defer { defaults.removePersistentDomain(forName: tabsSuite) }
         suite.expect(T.hidden(defaults) == [.system, .tools], "System and Tools start hidden, the eight pages shown")
         defaults.set("", forKey: DefaultsKey.notchBoringHiddenTabs)
         suite.expect(T.hidden(defaults).isEmpty, "an emptied list shows every page")

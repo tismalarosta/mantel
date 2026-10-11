@@ -806,7 +806,7 @@ final class DockClickService {
             mask |= CGEventMask(1 << CGEventType.rightMouseDown.rawValue)
                 | CGEventMask(1 << CGEventType.rightMouseUp.rawValue)
         }
-        if DockExtrasSupport.scrollOn { mask |= CGEventMask(1 << CGEventType.scrollWheel.rawValue) }
+        if DockExtrasSupport.wantsScrollEvents { mask |= CGEventMask(1 << CGEventType.scrollWheel.rawValue) }
         return mask
     }
 

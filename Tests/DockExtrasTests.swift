@@ -2,15 +2,19 @@
 // Copyright (C) 2026 Matisse Lurie-Giner
 // Part of Mantel, a fork of Vorssaint (github.com/vorssaint/vorssaint-utils).
 
+import CoreGraphics
 import Foundation
 
-/// Mantel's DockDoor extras, batch 1 (C2, C5, C6, C7): the pure decisions,
+/// Mantel's DockDoor extras, batches 1 (C2, C5, C6, C7) and 2 (C3, C4, C8): the pure decisions,
 /// the hub registration, "nothing changes while off", and source contracts
 /// keeping them on Vorssaint's Dock tap, window helpers and mixer.
 enum DockExtrasTests {
     static func run(_ suite: TestSuite) {
         quitClick(suite)
         scroll(suite)
+        swipe(suite)
+        shake(suite)
+        titleBar(suite)
         registration(suite)
         offMeansOff(suite)
         sourceContracts(suite)
@@ -68,6 +72,9 @@ enum DockExtrasTests {
             (.dockScroll, DefaultsKey.dockScrollEnabled),
             (.dockPreviewMassActions, DefaultsKey.dockPreviewMassActionsEnabled),
             (.dockPreviewWindowButtons, DefaultsKey.dockPreviewWindowButtonsEnabled),
+            (.dockPreviewSwipe, DefaultsKey.dockPreviewSwipeEnabled),
+            (.dockPreviewShake, DefaultsKey.dockPreviewShakeEnabled),
+            (.titleBarScroll, DefaultsKey.titleBarScrollEnabled),
         ]
         for (feature, key) in extras {
             suite.expect(!feature.installedByDefault && feature.group == .windowsDock
@@ -79,10 +86,16 @@ enum DockExtrasTests {
                         && AppFeature.dockPreviewMassActions.energyProfile == .idle
                         && AppFeature.dockPreviewWindowButtons.energyProfile == .idle,
                      "the input extras are labelled as mouse taps, the preview buttons as idle")
+        suite.expect(AppFeature.titleBarScroll.energyProfile == .mouse
+                        && AppFeature.dockPreviewSwipe.energyProfile == .idle
+                        && AppFeature.dockPreviewShake.energyProfile == .idle,
+                     "title bar scrolling rides the scroll tap; swipe and shake only watch the panel")
         for language in AppLanguage.allCases {
             let text = FeatureStrings.dockExtras(language)
             suite.expect(![text.quitClickTitle, text.scrollTitle, text.massActionsTitle, text.windowButtonsTitle,
-                           text.closeAll, text.minimizeAll, text.fullScreen, text.quit, text.forceQuit]
+                           text.closeAll, text.minimizeAll, text.fullScreen, text.quit, text.forceQuit,
+                           text.swipeTitle, text.swipeHub, text.swipeCaption, text.shakeTitle, text.shakeHub,
+                           text.shakeCaption, text.titleBarTitle, text.titleBarHub, text.titleBarCaption]
                             .contains(where: \.isEmpty),
                          "the Dock extras have complete strings in \(language.rawValue)")
         }
@@ -103,6 +116,9 @@ enum DockExtrasTests {
             (.dockQuitClick, DefaultsKey.dockQuitClickEnabled), (.dockScroll, DefaultsKey.dockScrollEnabled),
             (.dockPreviewMassActions, DefaultsKey.dockPreviewMassActionsEnabled),
             (.dockPreviewWindowButtons, DefaultsKey.dockPreviewWindowButtonsEnabled),
+            (.dockPreviewSwipe, DefaultsKey.dockPreviewSwipeEnabled),
+            (.dockPreviewShake, DefaultsKey.dockPreviewShakeEnabled),
+            (.titleBarScroll, DefaultsKey.titleBarScrollEnabled),
         ]
         suite.expect(features.allSatisfy { !DockExtrasSupport.isOn($0.0, key: $0.1, in: defaults) },
                      "an update installs none of the extras")
@@ -120,8 +136,12 @@ enum DockExtrasTests {
         }
         let tap = source("Sources/Vorssaint/Mantel/DockExtras/DockExtrasTap.swift")
         let buttons = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewExtraButtons.swift")
-        suite.expect(!tap.isEmpty && !buttons.isEmpty, "the Dock extras sources are readable")
-        let mantel = tap + buttons
+        let titleBar = source("Sources/Vorssaint/Mantel/DockExtras/DockExtrasTitleBarScroll.swift")
+        let swipe = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewSwipe.swift")
+        let shake = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewShake.swift")
+        suite.expect(![tap, buttons, titleBar, swipe, shake].contains(where: \.isEmpty),
+                     "the Dock extras sources are readable")
+        let mantel = tap + buttons + titleBar + swipe + shake
         suite.expect(!mantel.contains("tapCreate") && !mantel.contains("addGlobalMonitorForEvents"),
                      "the extras add no event tap or monitor of their own (SPEC rule 4)")
         suite.expect(tap.contains("AppVolumeMixer.setSystemOutputVolume")
@@ -134,11 +154,97 @@ enum DockExtrasTests {
         let dockClick = source("Sources/Vorssaint/Services/DockClick/DockClickService.swift")
         suite.expect(dockClick.contains("DockExtrasTap.shared.handle(")
                         && dockClick.contains("guard clickActionsWanted else")
-                        && dockClick.contains("if DockExtrasSupport.scrollOn"),
+                        && dockClick.contains("if DockExtrasSupport.wantsScrollEvents"),
                      "the Dock Click tap hosts the extras, listens to scrolls only for them, "
                         + "and keeps its own clicks behind their own switches")
+        suite.expect(tap.contains("DockExtrasTitleBarScroll.shared.handle(")
+                        && titleBar.contains("WindowLayoutService.shared")
+                        && titleBar.contains("apply(.maximize)") && titleBar.contains("apply(.center)")
+                        && titleBar.contains("apply(.restore)"),
+                     "title bar scrolls ride the Dock tap and move windows through Vorssaint's Window Layout")
+        suite.expect(swipe.contains("addLocalMonitorForEvents") && swipe.contains("apply(.maximize)")
+                        && swipe.contains("NSEvent.removeMonitor"),
+                     "preview swipes watch only this app's scrolls, maximize through Window Layout, "
+                        + "and drop the watcher when switched off")
+        let panel = source("Sources/Vorssaint/UI/Switcher/DockPreviewPanelView.swift")
+        let service = source("Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift")
+        suite.expect(panel.contains("DockPreviewSwipeModifier(")
+                        && service.contains("DockPreviewShake.shared.begin(item)")
+                        && service.contains("DockPreviewShake.shared.shaken(at:")
+                        && shake.contains("WindowActivator.setWindowMinimized"),
+                     "swipe and shake hook into Vorssaint's own preview cards and drag to place")
         suite.expect(!DockPreviewSupport.showsPanelHeader(isPinned: false)
                         && DockPreviewSupport.showsPanelHeader(isPinned: true),
                      "without Close All installed, a hovered preview keeps Vorssaint's headerless look")
+    }
+
+    private static func swipe(_ suite: TestSuite) {
+        typealias Support = DockExtrasSupport
+        suite.expect(Support.swipeDirection(totalX: 0, totalY: 80, natural: false) == .up
+                        && Support.swipeDirection(totalX: 0, totalY: -80, natural: true) == .up
+                        && Support.swipeDirection(totalX: 0, totalY: -80, natural: false) == .down,
+                     "an upward swipe reads as up with either scrolling direction")
+        suite.expect(Support.swipeDirection(totalX: 80, totalY: 0, natural: true) == .right
+                        && Support.swipeDirection(totalX: -80, totalY: 0, natural: false) == .right
+                        && Support.swipeDirection(totalX: -80, totalY: 0, natural: true) == .left,
+                     "sideways swipes are normalized too, for a Dock on the side")
+        suite.expect(Support.swipeDirection(totalX: 0, totalY: 40, natural: false) == nil
+                        && Support.swipeDirection(totalX: 60, totalY: 60, natural: false) == nil
+                        && Support.swipeDirection(totalX: .nan, totalY: 90, natural: false) == nil,
+                     "short, diagonal or broken swipes do nothing (DockDoor's 50 pt threshold)")
+        suite.expect(Support.swipeAction(.down, dock: .bottom) == .minimize
+                        && Support.swipeAction(.up, dock: .bottom) == .maximize
+                        && Support.swipeAction(.left, dock: .bottom) == .none,
+                     "Dock at the bottom: down minimizes, up maximizes, sideways does nothing")
+        suite.expect(Support.swipeAction(.left, dock: .left) == .minimize
+                        && Support.swipeAction(.right, dock: .left) == .maximize
+                        && Support.swipeAction(.right, dock: .right) == .minimize
+                        && Support.swipeAction(.left, dock: .right) == .maximize
+                        && Support.swipeAction(.up, dock: .left) == .none
+                        && Support.swipeAction(nil, dock: .bottom) == .none,
+                     "Dock on a side: toward it minimizes, away maximizes")
+    }
+
+    private static func shake(_ suite: TestSuite) {
+        let zigzag = (0..<10).map { CGPoint(x: $0 % 2 == 0 ? 0 : 30, y: 0) }
+        suite.expect(DockExtrasSupport.isShake(zigzag), "a quick back-and-forth is a shake")
+        suite.expect(!DockExtrasSupport.isShake(Array(zigzag.prefix(7))), "fewer than 8 samples is not yet a shake")
+        let straight = (0..<12).map { CGPoint(x: CGFloat($0) * 40, y: 0) }
+        suite.expect(!DockExtrasSupport.isShake(straight), "a straight drag is not a shake")
+        let jitter = (0..<12).map { CGPoint(x: $0 % 2 == 0 ? 0 : 4, y: 0) }
+        suite.expect(!DockExtrasSupport.isShake(jitter), "a trembling hand is not a shake (5 pt and 100 pt floors)")
+    }
+
+    private static func titleBar(_ suite: TestSuite) {
+        typealias Support = DockExtrasSupport
+        func decide(_ dx: Double, _ dy: Double, natural: Bool = false, momentum: Bool = false,
+                    since: TimeInterval = 1) -> Support.TitleBarDecision {
+            Support.titleBarDecision(deltaX: dx, deltaY: dy, natural: natural, isMomentum: momentum,
+                                     sinceLastAction: since)
+        }
+        suite.expect(decide(0, 2) == .maximize && decide(0, -2) == .centre
+                        && decide(0, -2, natural: true) == .maximize,
+                     "scrolling up maximizes, down centres, with either scrolling direction")
+        suite.expect(decide(3, 1) == .pass, "sideways scrolls go on to the app (desktop switching dropped)")
+        suite.expect(decide(0, 0.1) == .pass && decide(0, 2, momentum: true) == .pass
+                        && decide(.nan, 2) == .pass,
+                     "noise, momentum and broken deltas go on to the app")
+        suite.expect(decide(0, 2, since: 0.2) == .swallow && decide(0, 2, since: 0.35) == .maximize,
+                     "one action per 0.35 s; the scrolls in between stay away from the app")
+        let window = CGRect(x: 100, y: 50, width: 800, height: 600)
+        suite.expect(Support.titleBarRect(window: window, closeButton: CGRect(x: 108, y: 56, width: 14, height: 14))
+                        == CGRect(x: 100, y: 50, width: 800, height: 48)
+                        && Support.titleBarRect(window: window, closeButton: CGRect(x: 108, y: 80, width: 14, height: 14))
+                        .height == 56
+                        && Support.titleBarRect(window: window, closeButton: CGRect(x: 108, y: 140, width: 14, height: 14))
+                        .height == 72,
+                     "the title bar runs to 12 pt below the close button, between 48 and 72 pt")
+        let visible = CGRect(x: 0, y: 33, width: 1512, height: 900)
+        suite.expect(Support.fills(CGRect(x: 2, y: 35, width: 1508, height: 897), visibleFrame: visible)
+                        && !Support.fills(window, visibleFrame: visible),
+                     "a window already filling the screen is told apart, so it has nothing to restore")
+        suite.expect(Support.topLeftRect(fromAppKit: CGRect(x: 0, y: 0, width: 1512, height: 900),
+                                         primaryScreenHeight: 982) == CGRect(x: 0, y: 82, width: 1512, height: 900),
+                     "screen areas convert to the top-left coordinates windows use")
     }
 }

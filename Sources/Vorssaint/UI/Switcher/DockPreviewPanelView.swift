@@ -159,6 +159,10 @@ private struct DockPreviewPanelContent: View {
                                     onEndPreview(window)
                                 }
                             }
+                            // Mantel: swipe toward the Dock minimizes, away maximizes.
+                            .modifier(DockPreviewSwipeModifier(window: window, orientation: orientation,
+                                                               onToggleMinimized: { onToggleMinimized(window) },
+                                                               onOpen: { onCommit(window) }))
                         }
                     }
                     .padding(.horizontal, DockPreviewSupport.panelPadding)
