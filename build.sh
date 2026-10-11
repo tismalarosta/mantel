@@ -45,9 +45,11 @@ for arg in "$@"; do
 done
 
 if (( DEV )); then
-    APP_NAME="Vorssaint (Developer)"
-    EXECUTABLE="VorssaintDeveloper"
-    APP_BUNDLE_ID="com.vorssaint.utils.dev"
+    # Mantel: the app is Mantel throughout, with its own identity. The id
+    # keeps the .dev ending, which keeps Vorssaint's updater away from it.
+    APP_NAME="Mantel"
+    EXECUTABLE="Mantel"
+    APP_BUNDLE_ID="app.mantel.dev"
     BUILD_VARIANT_FLAGS=(-D VORSSAINT_DEVELOPMENT)
     APP_OPTIMIZATION_FLAGS=(-Onone)
     BUILD_CONFIGURATION="debug"
@@ -59,13 +61,9 @@ else
     APP_OPTIMIZATION_FLAGS=(-O)
     BUILD_CONFIGURATION="release"
 fi
-# Mantel: the build friends get. The Developer variant's separate identity
-# (its id ends in .dev, so Vorssaint's updater never replaces it), named
-# Mantel and optimized; zipped at the end.
+# Mantel: the build friends get is the same Mantel app, optimized and
+# zipped at the end.
 if (( FRIENDS )); then
-    APP_NAME="Mantel"
-    EXECUTABLE="Mantel"
-    APP_BUNDLE_ID="app.mantel.dev"
     APP_OPTIMIZATION_FLAGS=(-O)
     BUILD_CONFIGURATION="release"
 fi
@@ -598,6 +596,34 @@ fi
 
 echo "▸ Compiling ($BUILD_CONFIGURATION) against $(basename "$SDK")…"
 APP_SOURCES=(Sources/Vorssaint/**/*.swift)
+# Mantel: the text people read says Mantel. Vorssaint's own sentences keep
+# their wording in the repository (so upstream merges stay clean); a copy of
+# each text file with "Vorssaint" as a whole word swapped is compiled in its
+# place. Code names (VorssaintX, libVorssaintNowPlaying…) never match.
+if (( DEV )); then
+    BRANDED_DIR="build/branded"
+    branded_sources=()
+    for src in "${APP_SOURCES[@]}"; do
+        case "$src" in
+            Sources/Vorssaint/Core/Localization.swift|Sources/Vorssaint/Core/Localizations/*.swift|\
+            Sources/Vorssaint/Core/*Strings.swift|Sources/Vorssaint/UI/Feedback/FeedbackView.swift|\
+            Sources/Vorssaint/UI/UpdateHighlightsView.swift|Sources/Vorssaint/Services/Notch/NotchService.swift|\
+            Sources/Vorssaint/Services/QuickTools/QuickLauncherService.swift|\
+            Sources/Vorssaint/Services/QuickTools/CameraPreviewService.swift|\
+            Sources/Vorssaint/Services/QuickTools/ScratchpadService.swift|\
+            Sources/Vorssaint/Services/Snippets/SnippetLibraryService.swift|\
+            Sources/Vorssaint/Services/SettingsBackup.swift|Sources/Vorssaint/Services/KeepAwakeManager.swift)
+                out="$BRANDED_DIR/$src"
+                mkdir -p "${out:h}"
+                perl -pe 's/(?<![A-Za-z])Vorssaint(?![A-Za-z])/Mantel/g' "$src" > "$out.new"
+                # Unchanged copies keep their date, so incremental builds stay fast.
+                if cmp -s "$out.new" "$out"; then rm "$out.new"; else mv "$out.new" "$out"; fi
+                branded_sources+=("$out") ;;
+            *) branded_sources+=("$src") ;;
+        esac
+    done
+    APP_SOURCES=("${branded_sources[@]}")
+fi
 if (( ! DEV )); then
     # A release starts from an empty build directory, so nothing an earlier
     # build left behind (an old icon catalog, a staged bundle) can reach it.
@@ -697,6 +723,11 @@ if (( DEV )); then
     /usr/libexec/PlistBuddy -c "Set :CFBundleName $APP_NAME" "$STAGE/Contents/Info.plist"
     /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" "$STAGE/Contents/Info.plist"
     /usr/libexec/PlistBuddy -c "Set :CFBundleExecutable $EXECUTABLE" "$STAGE/Contents/Info.plist"
+    # Mantel: permission prompts and Finder's Get Info say Mantel; the
+    # copyright line keeps crediting Vorssaint.
+    perl -pi -e 's/(?<![A-Za-z])Vorssaint(?![A-Za-z])/Mantel/g' "$STAGE/Contents/Info.plist" \
+        "$STAGE"/Contents/Resources/*.lproj/InfoPlist.strings(N)
+    /usr/libexec/PlistBuddy -c "Set :NSHumanReadableCopyright Mantel, built on Vorssaint (GPL-3.0)" "$STAGE/Contents/Info.plist"
     FAN_PLIST="$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
     /usr/libexec/PlistBuddy -c "Set :Label $FAN_HELPER_ID" "$FAN_PLIST"
     /usr/libexec/PlistBuddy -c "Set :BundleProgram Contents/Library/LaunchServices/$FAN_HELPER_ID" "$FAN_PLIST"
@@ -875,8 +906,11 @@ wait_for_install_metadata() {
 
 # Installed development builds only need the copy in /Applications. Retaining
 # another app in each checkout pollutes application search with stale builds.
-if (( DEV )); then
-    for old_bundle in "build/stage/$APP_NAME.app" "build/stage.noindex/$APP_NAME.app"; do
+# Mantel: the friends build stages elsewhere and leaves the dev copy alone.
+if (( DEV && ! ${FRIENDS:-0} )); then
+    # Mantel: also the bundle staged under the Developer build's old name.
+    for old_bundle in "build/stage/$APP_NAME.app" "build/stage.noindex/$APP_NAME.app" \
+                      "build/stage.noindex/Vorssaint (Developer).app"; do
         if [[ -d "$old_bundle" ]]; then
             /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
                 -u "$PWD/$old_bundle" >/dev/null 2>&1 || true
@@ -888,6 +922,7 @@ fi
 if (( !DEV || !INSTALL )); then
     STAGE_DIRECTORY="build/stage"
     (( DEV )) && STAGE_DIRECTORY="build/stage.noindex"
+    (( ${FRIENDS:-0} )) && STAGE_DIRECTORY="build/friends.noindex"  # Mantel: never mixed with the dev build
     mkdir -p "$STAGE_DIRECTORY"
     BUILD_STAGE="$STAGE_DIRECTORY/$APP_NAME.app"
     rm -rf "$BUILD_STAGE"

@@ -192,6 +192,7 @@ struct MetricsTests {
             }),
             ("menu-bar-hider", { MenuBarHiderTests.run(suite) }),
             ("dock-extras", { DockExtrasTests.run(suite) }),
+            ("mantel-branding", { MantelBrandingTests.run(suite) }),
             ("boring-notch", { BoringNotchDesignTests.run(suite) }),
         ]
         var selected = Set<String>()
