@@ -96,6 +96,11 @@ struct NotchView: View {
         } else if service.expanded {
             if service.showingCommandBar {
                 commandBarPage
+            } else if BoringNotchHooks.drawsOpenPage(showingSections: service.showingSections,
+                                                     showingAppPanel: service.showingAppPanel,
+                                                     showingMetric: service.selectedMetric != nil, selected: service.selected) {
+                // Mantel: Boring Notch's open notch.
+                BoringNotchOpenView(service: service)
             } else {
                 expanded
                     // The companion beside the camera watches the pointer go
@@ -150,6 +155,15 @@ struct NotchView: View {
                             NotchCapsuleNoticeView(notice: notice, geometry: service.geometry,
                                                    size: service.notice == nil ? service.capsuleNoticeSurface(notice)
                                                        : service.surfaceSize)
+                        } else if service.boringNoticeSize(for: notice) != nil {
+                            // Mantel: Boring Notch's HUD, battery banner or sneak peek.
+                            if BoringNotchHUDSupport.isHUD(notice.event) {
+                                BoringNotchHUDView(notice: notice, geometry: service.geometry)
+                            } else if notice.event == .battery {
+                                BoringNotchBatteryBanner(notice: notice, geometry: service.geometry, service: service)
+                            } else {
+                                BoringNotchSneakPeek(notice: notice, geometry: service.geometry)
+                            }
                         } else {
                             NotchNoticeView(notice: notice, geometry: service.geometry, hidesMascot: service.mascotBridging)
                         }
@@ -256,13 +270,20 @@ struct NotchView: View {
             case .downloads: NotchDownloadStrip(service: service, displayGeometry: geometry)
             case .agents: NotchAgentStrip(service: service, displayGeometry: geometry)
             case .calendar: NotchCalendarStrip(service: service, displayGeometry: geometry)
-            case .music: NotchMusicStrip(service: service, displayGeometry: geometry, interactive: true)
+            case .music:
+                // Mantel: Boring Notch's closed music activity in its design.
+                if NotchDesign.isBoringNotch { BoringNotchMusicActivity(service: service) }
+                else { NotchMusicStrip(service: service, displayGeometry: geometry, interactive: true) }
             case .keepAwake: NotchKeepAwakeStrip(service: service, displayGeometry: geometry)
             }
         }
     }
 
-    private var compact: some View { NotchRestingStrip(service: service) }
+    // Mantel: Boring Notch's resting notch shows nothing beside the camera.
+    @ViewBuilder private var compact: some View {
+        if NotchDesign.isBoringNotch { Color.clear.accessibilityHidden(true) }
+        else { NotchRestingStrip(service: service) }
+    }
 
     /// Open beside a camera, the companion stays where it rested closed, and
     /// plays there what happens while the island is open.
@@ -919,6 +940,11 @@ struct NotchShape: Shape {
     func path(in rect: CGRect) -> Path {
         guard attached else { return Path(roundedRect: rect, cornerRadius: radius) }
         if let floatingGap { return Path(NotchLayout.capsulePath(in: rect, gap: floatingGap)) }
+        // Mantel: Boring Notch's outline, its corners following the height.
+        if NotchDesign.isBoringNotch {
+            let radii = BoringNotchMetrics.radii(height: rect.height)
+            return Path(BoringNotchMetrics.outline(in: rect, top: radii.top, bottom: radii.bottom))
+        }
         let shoulder = NotchLayout.shoulder(height: rect.height)
         let bottom = min(radius, rect.height / 2, (rect.width - shoulder * 2) / 2)
         let tangent: CGFloat = 0.55228475

@@ -606,6 +606,23 @@ enum DefaultsKey {
     static let dockScrollMediaVolume = "dockScrollMediaVolume"
     static let dockPreviewMassActionsEnabled = "dockPreviewMassActionsEnabled"
     static let dockPreviewWindowButtonsEnabled = "dockPreviewWindowButtonsEnabled"
+    // Mantel: Boring Notch design
+    static let notchDesign = "notchDesign"
+    static let notchBoringTab = "notchBoringTab"
+    static let notchBoringMusicSlots = "notchBoringMusicSlots"
+    static let notchBoringMusicSlotCount = "notchBoringMusicSlotCount"
+    static let notchBoringVisualizer = "notchBoringVisualizer"
+    static let notchBoringLyricsStyle = "notchBoringLyricsStyle"
+    static let notchBoringReminders = "notchBoringReminders"
+    static let notchBoringHideCompleted = "notchBoringHideCompleted"
+    static let notchBoringHUDStyle = "notchBoringHUDStyle"
+    static let notchBoringFullscreen = "notchBoringFullscreen"
+    static let notchBoringHiddenTabs = "notchBoringHiddenTabs"
+    static let notchBoringGestureStyle = "notchBoringGestureStyle"
+    static let notchBoringGestureSensitivity = "notchBoringGestureSensitivity"
+    static let notchBoringCloseGesture = "notchBoringCloseGesture"
+    static let notchBoringMirrorShape = "notchBoringMirrorShape"
+    static let notchBoringLockScreenStyle = "notchBoringLockScreenStyle"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1816,6 +1833,22 @@ enum Defaults {
         DefaultsKey.dockScrollMediaVolume: true,
         DefaultsKey.dockPreviewMassActionsEnabled: true,
         DefaultsKey.dockPreviewWindowButtonsEnabled: true,
+        DefaultsKey.notchDesign: "boringNotch",
+        DefaultsKey.notchBoringTab: "home",
+        DefaultsKey.notchBoringMusicSlots: "none,previous,playPause,next,none",
+        DefaultsKey.notchBoringMusicSlotCount: 5,
+        DefaultsKey.notchBoringVisualizer: "boringNotch",
+        DefaultsKey.notchBoringLyricsStyle: "boringNotch",
+        DefaultsKey.notchBoringReminders: true,
+        DefaultsKey.notchBoringHideCompleted: true,
+        DefaultsKey.notchBoringHUDStyle: "inline",
+        DefaultsKey.notchBoringFullscreen: "mediaApp",
+        DefaultsKey.notchBoringHiddenTabs: "system,tools",
+        DefaultsKey.notchBoringGestureStyle: "boringNotch",
+        DefaultsKey.notchBoringGestureSensitivity: 200,
+        DefaultsKey.notchBoringCloseGesture: true,
+        DefaultsKey.notchBoringMirrorShape: "rectangle",
+        DefaultsKey.notchBoringLockScreenStyle: "boringNotch",
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

@@ -195,7 +195,7 @@ final class NotchService: ObservableObject {
     private var activitySelection = NotchActivitySelection()
     private var activityPickerMenuOpen = false
     private var hoverState = NotchHoverState()
-    private var openedByHover = false
+    private(set) var openedByHover = false  // Mantel: read by Boring Notch's tabs
     /// A click inside the open island, which may be what brings another app forward.
     private var clickedSinceOpening = false
     /// Whether the open detail was reached from inside the island, so Escape
@@ -746,7 +746,7 @@ final class NotchService: ObservableObject {
         }
         let musicExtras = NotchLyricsSupport.isEnabled() || NotchQueueSupport.isEnabled()
         let launcher = QuickLauncherService.shared
-        return pageSize(in: expandedGeometry, module: showingAppPanel ? .tools : selected,
+        let size = pageSize(in: expandedGeometry, module: showingAppPanel ? .tools : selected,
                         detail: selectedMetric != nil, panel: showingAppPanel,
                         detailHeight: selectedMetric == .fan ? fanDetailHeight : nil,
                         musicExtraHeight: musicExtras && musicDetailVisible ? geometry.musicExtrasHeight : 0,
@@ -754,6 +754,10 @@ final class NotchService: ObservableObject {
                             && NotchFileToolsService.shared.mediaPresented ? NotchFileToolsService.shared.mediaContentHeight : nil,
                         toolCount: launcher.isEditing || launcher.activeUtility != nil ? nil : launcher.visibleItems.count,
                         capturePreviewHeight: captureContent == nil ? nil : captureContentHeight)
+        // Mantel: Boring Notch's open notch, as tall as a Vorssaint page in it needs.
+        guard BoringNotchHooks.drawsOpenPage(showingSections: false, showingAppPanel: showingAppPanel,
+                                             showingMetric: selectedMetric != nil, selected: selected) else { return size }
+        return BoringNotchHooks.openSize(selected: selected, vorssaint: size)
     }
 
     /// The open island as Settings previews a section: at rest, with no
@@ -879,6 +883,8 @@ final class NotchService: ObservableObject {
         if expanded { return showingCommandBar ? commandBarSurfaceSize : expandedSize }
         if dragPlaceholder { return CGSize(width: geometry.peek.width, height: geometry.safeContentTop + 66) }
         if let notice {
+            // Mantel: Boring Notch's HUD, battery banner and sneak peek.
+            if !noticeExpanded, let boring = BoringNotchHooks.noticeSize(event: notice.event, geometry: geometry) { return boring }
             guard noticeExpanded else { return geometry.noticeSize(wings: notice.wings(in: geometry)) }
             return geometry.notificationPreviewSize(
                 contentHeight: notice.previewContentHeight(width: geometry.notificationPreviewContentWidth))
@@ -896,7 +902,9 @@ final class NotchService: ObservableObject {
                                           reach: named.map { ($0.leading - $0.trailing) / 2 } ?? 0)
                 : resting
         }
-        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry))
+        // Mantel: Boring Notch rests as a bare notch, without Vorssaint's extras.
+        let resting = geometry.restingSize(showsContent: !NotchDesign.isBoringNotch
+            && (idleContent != .none || mascotShows(on: geometry)))
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
@@ -905,7 +913,10 @@ final class NotchService: ObservableObject {
     /// further toward its wider side. A capsule runs its strips end to end.
     var surfaceShift: CGFloat {
         guard !geometry.floats, !fullscreenCompact, captureControls == nil, !expanded, !dragPlaceholder else { return 0 }
-        if let notice { return noticeExpanded ? 0 : geometry.noticeShift(notice.wings(in: geometry)) }
+        if let notice {
+            if !noticeExpanded, BoringNotchHooks.noticeSize(event: notice.event, geometry: geometry) != nil { return 0 }  // Mantel
+            return noticeExpanded ? 0 : geometry.noticeShift(notice.wings(in: geometry))
+        }
         return namedMusicWings.map { ($0.trailing - $0.leading) / 2 } ?? 0
     }
 
@@ -1152,6 +1163,14 @@ final class NotchService: ObservableObject {
 
     private func metricIsAvailable(_ metric: MetricDetailKind) -> Bool {
         MenuBarMetric.allCases.contains { $0.detailKind == metric && $0.feature.isAvailable }
+    }
+
+    /// Mantel: a design switch rebuilds the island, so its window, mask and
+    /// content are all drawn in the new design.
+    func rebuildForDesignChange() {
+        guard running else { return }
+        tearDownPresentation()
+        syncWithPreferences()
     }
 
     func stop(restoreCapture: Bool = true) {
@@ -3310,8 +3329,11 @@ final class NotchService: ObservableObject {
     }
 
     private func updateFullscreenVisibility(displayID: CGDirectDisplayID) {
-        let hidden = UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen)
-            && SpaceWindowBridge.topology()?.isFullscreen(on: displayID, separateSpaces: NSScreen.screensHaveSeparateSpaces) == true
+        // Mantel: in the Boring Notch design its own fullscreen rule applies.
+        let hidden = BoringNotchHooks.hidesInFullscreen(
+            vorssaintSetting: UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen),
+            isFullscreen: SpaceWindowBridge.topology()?.isFullscreen(
+                on: displayID, separateSpaces: NSScreen.screensHaveSeparateSpaces) == true)
         guard hidden != hiddenInFullscreen else { return }
         hiddenInFullscreen = hidden
         if hidden {
@@ -3336,7 +3358,8 @@ final class NotchService: ObservableObject {
     private func fullscreenEnvironmentDidChange() {
         // Only the opt-in option depends on Spaces and the active app.
         guard running, !suspended,
-              hiddenInFullscreen || UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen)
+              hiddenInFullscreen || BoringNotchHooks.watchesFullscreen(
+                vorssaintSetting: UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen))
         else { return }
         let wasHidden = hiddenInFullscreen
         updateScreen()
@@ -3647,6 +3670,14 @@ final class NotchService: ObservableObject {
                                              inverted: event.isDirectionInvertedFromDevice)
         let y = NotchGestureSupport.movement(Double(event.scrollingDeltaY), precise: event.hasPreciseScrollingDeltas,
                                              inverted: event.isDirectionInvertedFromDevice)
+        // Mantel: Boring Notch's pull-down and push-up, when chosen.
+        if BoringNotchHooks.handlesGestures() {
+            guard let action = BoringNotchHooks.gestureAction(
+                x: x, y: y, timestamp: event.timestamp, ended: !event.phase.intersection([.ended, .cancelled]).isEmpty,
+                expanded: expanded, inHeader: inHeader, control: interaction.control, scroll: interaction.scroll) else { return false }
+            if action == .open { open() } else { collapse() }
+            return true
+        }
         guard let action = gesture.handle(x: x, y: y, timestamp: event.timestamp,
                                           began: event.phase.contains(.began),
                                           ended: !event.phase.intersection([.ended, .cancelled]).isEmpty,
@@ -4039,6 +4070,8 @@ final class NotchService: ObservableObject {
         let musicWanted = modules.contains(.music) && ((expanded && (selected == .music || (selected == .controls && NotchSupport.controls().contains(.music)))
             && !showingAppPanel && !showingSections && !showingCommandBar)
             || (!hiddenUntilHover && (NotchSupport.watchesMusicActivity() || NotchSupport.routes(.track))))
+            // Mantel: Boring Notch's Home tab always shows the player.
+            || (expanded && NotchDesign.isBoringNotch && !showingSections && !showingCommandBar)
         if musicWanted { NotchMusicService.shared.start() } else { NotchMusicService.shared.stop() }
         let needs = expanded && selected == .system && selectedMetric == nil && modules.contains(.system) && !showingAppPanel
             && !showingSections && !showingCommandBar

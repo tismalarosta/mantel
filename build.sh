@@ -398,6 +398,14 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderStrings.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasSupport.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasStrings.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchDesign.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMusicSupport.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchHUDSupport.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchHooks.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchCalendarSupport.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchShelfSupport.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchTabs.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchChoices.swift
         Sources/Vorssaint/Core/KillProcessStrings.swift
         Sources/Vorssaint/Core/PortManagerStrings.swift
         Sources/Vorssaint/Core/WhatsAppDownloadStrings.swift

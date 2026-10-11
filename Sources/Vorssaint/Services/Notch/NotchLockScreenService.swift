@@ -110,26 +110,29 @@ final class NotchLockScreenService {
             timeLeft: NotchCalendarSupport.showsTimeLeft())
         if model.gates != gates { model.gates = gates }
         var scene: [NotchLockScreenPanel] = []
+        // Mantel: Boring Notch keeps only its notch on the lock screen.
+        let boring = BoringNotchHooks.lockScreenIsBoring()
         // Without the Music section there is no player to show or to click.
-        if gates.music, let frame = frames.player {
+        if gates.music, !boring, let frame = frames.player {
             // The one part that takes clicks: the player's buttons and timeline.
             scene.append(Self.makePanel(frame: frame, interactive: true,
                                         content: NotchLockScreenPlayer(model: model, size: frame.size)))
         }
-        if let frame = frames.row {
+        if !boring, let frame = frames.row {
             scene.append(Self.makePanel(frame: frame, content: NotchLockScreenActivities(model: model, size: frame.size)))
         }
         let island = frames.island.flatMap { frame in
             frames.islandSurface.map { surface in
-                Self.makePanel(frame: frame, content: NotchLockScreenIsland(
+                Self.makePanel(frame: frame, content: BoringNotchLockScreenChoice(boring: boring, model: model, vorssaint: NotchLockScreenIsland(
                     model: model, size: surface.size, cameraWidth: NotchService.shared.geometry.bareCutout.width,
                     geometry: NotchService.shared.geometry.lockScreenMusicGeometry,
-                    window: frame.size, origin: CGPoint(x: surface.minX - frame.minX, y: frame.maxY - surface.maxY)))
+                    window: frame.size, origin: CGPoint(x: surface.minX - frame.minX, y: frame.maxY - surface.maxY))))  // Mantel
             }
         }
         let panels = scene + [island].compactMap { $0 }
         guard !panels.isEmpty else { space.close(); return }
         if !scene.isEmpty { startSources(gates) }
+        else if boring, gates.music { NotchMusicService.shared.start() }  // Mantel: the cover beside the camera
         // Joined before they are first shown, the windows belong to this
         // Space alone and are drawn over the lock screen with it.
         for panel in panels { space.add(panel) }
@@ -177,7 +180,7 @@ final class NotchLockScreenService {
     }
 
     private func hide(unlocking: Bool, stopsSources: Bool) {
-        if stopsSources, !scene.isEmpty {
+        if stopsSources, !scene.isEmpty || BoringNotchHooks.lockScreenIsBoring() {  // Mantel
             NotchMusicService.shared.stop()
             NotchDownloadService.shared.stop()
             NotchCalendarService.shared.stop()
