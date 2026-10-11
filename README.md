@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Resources/MantelBrand/AppIcon-Default.png" width="160" alt="Mantel icon: a mantel shelf over a fireplace with a fire">
+  <img src="Resources/MantelBrand/AppIcon-Default.png" width="160" alt="Mantel icon: a floating shelf over an arch with an orb, white on a graphite tile">
 </p>
 
 <h1 align="center">Mantel</h1>
