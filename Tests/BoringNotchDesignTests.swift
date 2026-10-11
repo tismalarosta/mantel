@@ -15,6 +15,56 @@ enum BoringNotchDesignTests {
         hooks(suite)
         music(suite)
         hud(suite)
+        calendarPanel(suite)
+    }
+
+    /// Slice 5d: the calendar panel's days, events, reminders and panel order.
+    private static func calendarPanel(_ suite: TestSuite) {
+        typealias C = BoringNotchCalendarSupport
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Paris")!
+        let noon = calendar.date(from: DateComponents(year: 2026, month: 10, day: 11, hour: 12))!
+        let day = C.dayInterval(noon, calendar: calendar)
+        suite.expect(day.duration == 86_400 && calendar.component(.hour, from: day.start) == 0,
+                     "a day runs from midnight to midnight")
+        let strip = C.stripDays(around: noon, calendar: calendar)
+        suite.expect(strip.count == 29 && calendar.isDate(strip[14], inSameDayAs: noon),
+                     "the day strip holds two weeks each side, today in the middle")
+        func event(_ id: String, _ startHour: Int, _ endHour: Int, allDay: Bool = false, dayOffset: Int = 0)
+            -> NotchCalendarEvent {
+            let base = calendar.date(byAdding: .day, value: dayOffset, to: day.start)!
+            return NotchCalendarEvent(id: id, title: id, calendar: "c",
+                                      start: base.addingTimeInterval(Double(startHour) * 3600),
+                                      end: base.addingTimeInterval(Double(endHour) * 3600),
+                                      allDay: allDay, location: "")
+        }
+        let events = [event("late", 15, 16), event("early", 9, 10), event("holiday", 0, 24, allDay: true),
+                      event("tomorrow", 9, 10, dayOffset: 1), event("overnight", -2, 1)]
+        suite.expect(C.events(events, on: noon, calendar: calendar).map(\.id) == ["holiday", "overnight", "early", "late"],
+                     "the panel shows the day's events, all-day first, then by start; other days left out")
+        func reminder(_ id: String, _ hour: Int?, done: Bool) -> BoringNotchReminder {
+            BoringNotchReminder(id: id, title: id, due: hour.map { day.start.addingTimeInterval(Double($0) * 3600) },
+                                hasTime: hour != nil, completed: done, color: .fallback)
+        }
+        let list = [reminder("done", 8, done: true), reminder("later", 17, done: false),
+                    reminder("soon", 9, done: false), reminder("someday", nil, done: false)]
+        suite.expect(C.ordered(list, hidingCompleted: false).map(\.id) == ["soon", "later", "someday", "done"]
+                        && C.ordered(list, hidingCompleted: true).map(\.id) == ["soon", "later", "someday"],
+                     "open reminders first by due time; completed ones last, or hidden (Boring Notch's default)")
+        suite.expect(Defaults.registeredDefaults[DefaultsKey.notchBoringReminders] as? Bool == true
+                        && Defaults.registeredDefaults[DefaultsKey.notchBoringHideCompleted] as? Bool == true,
+                     "reminders show by default, completed ones hidden")
+        let all: [BoringNotchSidePanel] = [.calendar, .upNext, .lyrics]
+        suite.expect(C.panel(chosen: nil, available: all, isPlaying: false) == .calendar
+                        && C.panel(chosen: nil, available: all, isPlaying: true) == .upNext,
+                     "the calendar first while nothing plays, Up Next while music plays (Matisse, 2026-10-11)")
+        suite.expect(C.panel(chosen: .lyrics, available: all, isPlaying: false) == .lyrics
+                        && C.panel(chosen: .lyrics, available: [.calendar], isPlaying: true) == .calendar
+                        && C.panel(chosen: nil, available: [], isPlaying: true) == nil,
+                     "a choice made with the toggle wins while still offered")
+        let plist = (try? String(contentsOfFile: "Resources/Info.plist", encoding: .utf8)) ?? ""
+        suite.expect(plist.contains("NSRemindersFullAccessUsageDescription"),
+                     "the app says why it asks for Reminders")
     }
 
     /// Slice 5c: HUD styles, battery, sneak peek and fullscreen.

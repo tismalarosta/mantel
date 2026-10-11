@@ -61,6 +61,19 @@ enum BoringNotchLyricsStyle: String, CaseIterable {
     case vorssaint
 }
 
+/// What Home's right column shows. Stored by raw value.
+enum BoringNotchSidePanel: String, CaseIterable {
+    case calendar, upNext, lyrics
+
+    var symbol: String {
+        switch self {
+        case .calendar: return "calendar"
+        case .upNext: return "list.bullet"
+        case .lyrics: return "quote.bubble"
+        }
+    }
+}
+
 enum BoringNotchMusicSupport {
     static func visualizer(_ raw: String?) -> BoringNotchVisualizer {
         raw.flatMap(BoringNotchVisualizer.init(rawValue:)) ?? .boringNotch

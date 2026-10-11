@@ -15,11 +15,14 @@ import SwiftUI
 struct BoringNotchHomeView: View {
     @ObservedObject private var music = NotchMusicService.shared
     @AppStorage(DefaultsKey.notchBoringLyricsStyle) private var lyricsStyle = BoringNotchLyricsStyle.boringNotch.rawValue
-    @AppStorage(DefaultsKey.notchBoringSidePanel) private var sidePanel = BoringNotchSidePanel.upNext.rawValue
+    /// The toggle's choice lasts while the notch is open; each opening starts
+    /// from the calendar, or Up Next while music plays (Matisse, 2026-10-11).
+    @State private var chosenPanel: BoringNotchSidePanel?
 
     private var panels: [BoringNotchSidePanel] {
-        guard music.playback != nil else { return [] }
         var list: [BoringNotchSidePanel] = []
+        if NotchCalendarSupport.isEnabled() || BoringNotchCalendarSupport.remindersEnabled() { list.append(.calendar) }
+        guard music.playback != nil else { return list }
         if NotchQueueSupport.isEnabled() { list.append(.upNext) }
         if NotchLyricsSupport.isEnabled(),
            BoringNotchMusicSupport.lyricsStyle(lyricsStyle) == .vorssaint { list.append(.lyrics) }
@@ -29,22 +32,21 @@ struct BoringNotchHomeView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             BoringNotchPlayer()
-            if let playback = music.playback, !panels.isEmpty {
-                sideColumn(playback: playback)
+            if let current = BoringNotchCalendarSupport.panel(chosen: chosenPanel, available: panels,
+                                                             isPlaying: music.playback?.isPlaying == true) {
+                sideColumn(current: current)
                     .frame(width: 215)
             }
         }
         .padding(.top, 4)
     }
 
-    private func sideColumn(playback: NotchPlayback) -> some View {
-        let current = panels.contains(BoringNotchSidePanel(rawValue: sidePanel) ?? .upNext)
-            ? BoringNotchSidePanel(rawValue: sidePanel) ?? .upNext : panels[0]
-        return VStack(alignment: .leading, spacing: 4) {
+    private func sideColumn(current: BoringNotchSidePanel) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
             if panels.count > 1 {
                 HStack(spacing: 6) {
                     ForEach(panels, id: \.self) { panel in
-                        Button { sidePanel = panel.rawValue } label: {
+                        Button { chosenPanel = panel } label: {
                             Image(systemName: panel.symbol)
                                 .font(.system(size: 10, weight: .semibold))
                                 .frame(width: 22, height: 16)
@@ -57,21 +59,15 @@ struct BoringNotchHomeView: View {
             }
             Group {
                 switch current {
-                case .upNext: NotchQueueView(playback: playback)
-                case .lyrics: NotchLyricsView(playback: playback)
+                case .calendar: BoringNotchCalendarView()
+                case .upNext: if let playback = music.playback { NotchQueueView(playback: playback) }
+                case .lyrics: if let playback = music.playback { NotchLyricsView(playback: playback) }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .clipped()
         }
     }
-}
-
-/// What the right column shows. Stored by raw value.
-enum BoringNotchSidePanel: String, CaseIterable {
-    case upNext, lyrics
-
-    var symbol: String { self == .upNext ? "list.bullet" : "quote.bubble" }
 }
 
 /// Boring Notch's music player: art with its glow, the song, the seek bar

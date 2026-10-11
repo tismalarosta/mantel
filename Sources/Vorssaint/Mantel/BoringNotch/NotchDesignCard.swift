@@ -83,6 +83,7 @@ struct NotchDesignCard: View {
             if NotchDesign.sanitized(design) == .boringNotch {
                 musicOptions
                 BoringNotchHUDOptions()
+                BoringNotchCalendarOptions()
             }
         }
         .onChange(of: design) { _, _ in

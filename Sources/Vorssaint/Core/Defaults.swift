@@ -613,7 +613,8 @@ enum DefaultsKey {
     static let notchBoringMusicSlotCount = "notchBoringMusicSlotCount"
     static let notchBoringVisualizer = "notchBoringVisualizer"
     static let notchBoringLyricsStyle = "notchBoringLyricsStyle"
-    static let notchBoringSidePanel = "notchBoringSidePanel"
+    static let notchBoringReminders = "notchBoringReminders"
+    static let notchBoringHideCompleted = "notchBoringHideCompleted"
     static let notchBoringHUDStyle = "notchBoringHUDStyle"
     static let notchBoringFullscreen = "notchBoringFullscreen"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
@@ -1832,7 +1833,8 @@ enum Defaults {
         DefaultsKey.notchBoringMusicSlotCount: 5,
         DefaultsKey.notchBoringVisualizer: "boringNotch",
         DefaultsKey.notchBoringLyricsStyle: "boringNotch",
-        DefaultsKey.notchBoringSidePanel: "upNext",
+        DefaultsKey.notchBoringReminders: true,
+        DefaultsKey.notchBoringHideCompleted: true,
         DefaultsKey.notchBoringHUDStyle: "inline",
         DefaultsKey.notchBoringFullscreen: "mediaApp",
         DefaultsKey.finderRenameEnabled: false,
