@@ -28,6 +28,11 @@ struct MenuBarHiderSettingsCard: View {
 
     var body: some View {
         SettingsCard(title: text.title) {
+            if !MenuBarHiderSupport.isSupported() {
+                Text(text.unsupported)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
             SettingsRow(symbol: "chevron.left", title: text.enable, caption: text.enableCaption) {
                 Toggle(text.enable, isOn: $enabled).labelsHidden()
             }
@@ -99,6 +104,7 @@ struct MenuBarHiderSettingsCard: View {
                             .padding(.leading, settingsRowTextInset)
                     }
                 }
+            }
             }
         }
         .onChange(of: syncKey) { _, _ in MenuBarHiderService.shared.syncWithPreferences() }
