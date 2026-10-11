@@ -255,6 +255,8 @@ final class FeatureRuntime: ObservableObject {
         .trackpadSwitcherSwipe: { TrackpadSwitcherSwipe.shared.syncWithPreferences() },
         .dockActiveIndicator: { DockActiveIndicator.shared.syncWithPreferences() },
         .dockAppCards: { if !DockExtrasSupport.appCardsOn { DockAppCard.shared.hide() } },
+        .dockFolderPop: { if !DockExtrasSupport.folderPopOn { DockFolderPop.shared.hide() } },
+        .dockLivePreviews: { if !DockExtrasSupport.livePreviewsOn { DockPreviewLive.shared.stop() } },
         .dockLock: {
             DockLock.shared.syncWithPreferences()
             DockClickService.shared.syncWithPreferences()

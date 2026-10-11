@@ -58,6 +58,15 @@ struct DockExtrasFeatureStrings {
     let appCardsCaption: String
     let nothingToday: String
     let allDay: String
+    let folderPopTitle: String
+    let folderPopHub: String
+    let folderPopCaption: String
+    let openInFinder: String
+    let folderEmpty: String
+    let livePreviewsTitle: String
+    let livePreviewsHub: String
+    let livePreviewsCaption: String
+    let livePreviewsRate: String
     let closeAll: String
     let minimizeAll: String
     let fullScreen: String
@@ -126,6 +135,15 @@ extension DockExtrasFeatureStrings {
         appCardsCaption: "Hovering a music app that is playing shows its song with play controls; hovering Calendar shows today’s events (needs the island’s calendar). Click the card to open the app.",
         nothingToday: "Nothing else today",
         allDay: "All day",
+        folderPopTitle: "Folder Pop",
+        folderPopHub: "Rest on a Dock folder to browse and drag its files",
+        folderPopCaption: "Rest the pointer on a folder in the Dock, like Downloads, to see its newest files. Click one to open it, drag it out to move or attach it.",
+        openInFinder: "Open in Finder",
+        folderEmpty: "This folder is empty.",
+        livePreviewsTitle: "Live previews",
+        livePreviewsHub: "Dock previews that keep moving, videos included",
+        livePreviewsCaption: "Captures the open Dock preview again several times a second. Uses more battery.",
+        livePreviewsRate: "Frames per second",
         closeAll: "Close All",
         minimizeAll: "Minimize All",
         fullScreen: "Full screen",
@@ -184,6 +202,15 @@ extension DockExtrasFeatureStrings {
         appCardsCaption: "Survoler une app de musique en lecture montre son morceau avec les commandes ; survoler Calendrier montre les événements du jour (nécessite le calendrier de l’île). Cliquez sur la carte pour ouvrir l’app.",
         nothingToday: "Rien d’autre aujourd’hui",
         allDay: "Toute la journée",
+        folderPopTitle: "Dossiers du Dock",
+        folderPopHub: "Arrêtez-vous sur un dossier du Dock pour parcourir et glisser ses fichiers",
+        folderPopCaption: "Arrêtez le pointeur sur un dossier du Dock, comme Téléchargements, pour voir ses fichiers les plus récents. Cliquez pour ouvrir, glissez pour déplacer ou joindre.",
+        openInFinder: "Ouvrir dans le Finder",
+        folderEmpty: "Ce dossier est vide.",
+        livePreviewsTitle: "Aperçus animés",
+        livePreviewsHub: "Des aperçus du Dock qui bougent, vidéos comprises",
+        livePreviewsCaption: "Recapture l’aperçu ouvert du Dock plusieurs fois par seconde. Consomme plus de batterie.",
+        livePreviewsRate: "Images par seconde",
         closeAll: "Tout fermer",
         minimizeAll: "Tout réduire",
         fullScreen: "Plein écran",

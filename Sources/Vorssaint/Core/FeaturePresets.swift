@@ -133,6 +133,8 @@ extension AppFeature {
         case .lidAnimation: return .periodic
         // Mantel: looks at the Dock once a second to follow its icons.
         case .dockActiveIndicator: return .periodic
+        // Mantel: captures the open Dock preview again several times a second.
+        case .dockLivePreviews: return .periodic
         // Log changes arrive as file events; a timer keeps countdowns and
         // limits current while the section is on.
         case .notch, .notchCalendar, .notchLyrics, .notchLiveEqualizer, .notchAgents: return .periodic
@@ -154,7 +156,7 @@ extension AppFeature {
                     defaults.string(forKey: DefaultsKey.brightnessKeyStep)) != .standard
                 ? .keyboard : .idle
         case .mouseAcceleration, .spacesOrder, .pastePlain, .typeClipboard, .soundOutputSwitcher,
-             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake, .dockAppCards,
+             .dockPreviewMassActions, .dockPreviewWindowButtons, .dockPreviewSwipe, .dockPreviewShake, .dockAppCards, .dockFolderPop,
              .audioPriority, .micMute,
              .bluetoothSleep, .keepAwake, .quickLauncher, .quickToggles, .colorPicker,
              .screenOCR, .cleaningMode, .mediaTools, .cleaner, .uninstaller, .homebrew, .screenshot,

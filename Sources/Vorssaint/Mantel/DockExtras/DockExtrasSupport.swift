@@ -47,6 +47,8 @@ enum DockExtrasSupport {
     static var activeIndicatorOn: Bool { isOn(.dockActiveIndicator, key: DefaultsKey.dockActiveIndicatorEnabled) }
     static var dockLockOn: Bool { isOn(.dockLock, key: DefaultsKey.dockLockEnabled) }
     static var appCardsOn: Bool { isOn(.dockAppCards, key: DefaultsKey.dockAppCardsEnabled) }
+    static var folderPopOn: Bool { isOn(.dockFolderPop, key: DefaultsKey.dockFolderPopEnabled) }
+    static var livePreviewsOn: Bool { isOn(.dockLivePreviews, key: DefaultsKey.dockLivePreviewsEnabled) }
 
     /// Whether the Dock tap should run for the extras alone.
     static var wantsDockTap: Bool { quitClickOn || scrollOn || titleBarScrollOn || dockLockOn }
@@ -446,4 +448,33 @@ enum DockExtrasSupport {
         }
         return best?.index
     }
+
+    // MARK: - C10: Dock folders
+
+    struct FolderItem: Equatable {
+        let url: URL
+        let added: Date
+    }
+
+    /// A folder's visible files, newest first (the Dock's own "Date Added"
+    /// order, modification date when the file system has none), at most
+    /// `limit` of them. Empty when the folder cannot be read.
+    static func folderItems(in folder: URL, limit: Int, fileManager: FileManager = .default) -> [FolderItem] {
+        let keys: [URLResourceKey] = [.addedToDirectoryDateKey, .contentModificationDateKey]
+        guard let urls = try? fileManager.contentsOfDirectory(at: folder, includingPropertiesForKeys: keys,
+                                                              options: [.skipsHiddenFiles]) else { return [] }
+        return urls.map { url -> FolderItem in
+            let values = try? url.resourceValues(forKeys: Set(keys))
+            return FolderItem(url: url, added: values?.addedToDirectoryDate ?? values?.contentModificationDate ?? .distantPast)
+        }
+        .sorted { ($0.added, $1.url.lastPathComponent) > ($1.added, $0.url.lastPathComponent) }
+        .prefix(max(0, limit))
+        .map { $0 }
+    }
+
+    // MARK: - C1: live previews
+
+    static let liveFPSChoices = [2, 5, 10]
+
+    static func sanitizedLiveFPS(_ raw: Int) -> Int { liveFPSChoices.contains(raw) ? raw : 5 }
 }

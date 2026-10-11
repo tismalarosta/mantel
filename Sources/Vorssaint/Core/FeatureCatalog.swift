@@ -31,6 +31,8 @@ enum AppFeature: String, CaseIterable {
     case trackpadSwitcherSwipe, dockActiveIndicator, dockLock
     // Mantel: DockDoor extras, batch B for friends (C13)
     case dockAppCards
+    // Mantel: DockDoor extras, batch C for friends (C10, C1)
+    case dockFolderPop, dockLivePreviews
     // Sound
     case mixer, soundOutputSwitcher, audioPriority, micMute, musicBlock
     // Energy and display
@@ -114,7 +116,8 @@ extension AppFeature {
         case .switcher, .dockPreview, .dockClick, .windowMaximizer, .windowLayout, .autoQuit, .spacesOrder,
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards:
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards,
+             .dockFolderPop, .dockLivePreviews:
             return .windowsDock
         case .scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts, .middleClick,
              .keyboardDebounce, .textSnippets, .superKey, .quitWindowProtection, .mouseClickDebounce:
@@ -183,6 +186,8 @@ extension AppFeature {
         case .dockActiveIndicator: return "smallcircle.filled.circle"
         case .dockLock: return "lock.display"
         case .dockAppCards: return "music.note.list"
+        case .dockFolderPop: return "folder.badge.gearshape"
+        case .dockLivePreviews: return "play.rectangle"
         case .finderCutPaste: return "scissors"
         case .finderRename: return "pencil"
         case .shelf: return "tray.full"
@@ -315,6 +320,8 @@ extension AppFeature {
         case .dockActiveIndicator: return [DefaultsKey.dockActiveIndicatorEnabled]
         case .dockLock: return [DefaultsKey.dockLockEnabled]
         case .dockAppCards: return [DefaultsKey.dockAppCardsEnabled]
+        case .dockFolderPop: return [DefaultsKey.dockFolderPopEnabled]
+        case .dockLivePreviews: return [DefaultsKey.dockLivePreviewsEnabled]
         case .finderCutPaste: return [DefaultsKey.finderCutPasteEnabled,
                                       DefaultsKey.finderPasteImageAsFile]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
@@ -402,6 +409,7 @@ extension AppFeature {
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
              .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards,
+             .dockFolderPop, .dockLivePreviews,
              // The bar reads other apps' menus and windows and types at the
              // caret, all of it through Accessibility.
              .commandBar:
@@ -540,7 +548,8 @@ extension AppFeature {
              .lidAnimation, .menuBarHider,
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards:
+             .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards,
+             .dockFolderPop, .dockLivePreviews:
             return false
         }
     }

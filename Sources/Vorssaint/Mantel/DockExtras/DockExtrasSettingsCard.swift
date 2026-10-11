@@ -27,11 +27,15 @@ struct DockExtrasSettingsCard: View {
     @AppStorage(DefaultsKey.dockLockEnabled) private var dockLock = true
     @AppStorage(DefaultsKey.dockLockScreen) private var dockLockScreen = ""
     @AppStorage(DefaultsKey.dockAppCardsEnabled) private var appCards = true
+    @AppStorage(DefaultsKey.dockFolderPopEnabled) private var folderPop = true
+    @AppStorage(DefaultsKey.dockLivePreviewsEnabled) private var livePreviews = true
+    @AppStorage(DefaultsKey.dockLivePreviewFPS) private var liveFPS = 5
 
     static var hasInstalledExtra: Bool {
         [AppFeature.dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
          .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
-         .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards]
+         .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards,
+         .dockFolderPop, .dockLivePreviews]
             .contains { $0.isAvailable }
     }
 
@@ -131,6 +135,24 @@ struct DockExtrasSettingsCard: View {
                     Toggle(text.appCardsTitle, isOn: $appCards).labelsHidden()
                 }
             }
+            if AppFeature.dockFolderPop.isAvailable {
+                SettingsRow(symbol: "folder.badge.gearshape", title: text.folderPopTitle, caption: text.folderPopCaption) {
+                    Toggle(text.folderPopTitle, isOn: $folderPop).labelsHidden()
+                }
+            }
+            if AppFeature.dockLivePreviews.isAvailable {
+                SettingsRow(symbol: "play.rectangle", title: text.livePreviewsTitle, caption: text.livePreviewsCaption) {
+                    Toggle(text.livePreviewsTitle, isOn: $livePreviews).labelsHidden()
+                }
+                if livePreviews {
+                    SettingsRow(symbol: "speedometer", title: text.livePreviewsRate) {
+                        Picker(text.livePreviewsRate, selection: $liveFPS) {
+                            ForEach(DockExtrasSupport.liveFPSChoices, id: \.self) { Text("\($0)").tag($0) }
+                        }
+                        .labelsHidden().pickerStyle(.segmented).fixedSize()
+                    }
+                }
+            }
             if AppFeature.dockLock.isAvailable {
                 SettingsRow(symbol: "lock.display", title: text.dockLockTitle, caption: text.dockLockCaption) {
                     Toggle(text.dockLockTitle, isOn: $dockLock).labelsHidden()
@@ -159,6 +181,8 @@ struct DockExtrasSettingsCard: View {
         .onChange(of: indicator) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
         .onChange(of: indicatorStyle) { _, _ in DockActiveIndicator.shared.syncWithPreferences() }
         .onChange(of: appCards) { _, on in if !on { DockAppCard.shared.hide() } }
+        .onChange(of: folderPop) { _, on in if !on { DockFolderPop.shared.hide() } }
+        .onChange(of: livePreviews) { _, on in if !on { DockPreviewLive.shared.stop() } }
         .onChange(of: dockLock) { _, _ in
             DockLock.shared.syncWithPreferences()
             DockClickService.shared.syncWithPreferences()

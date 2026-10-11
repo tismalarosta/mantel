@@ -18,6 +18,7 @@ enum DockExtrasTests {
         switcherSwipe(suite)
         indicator(suite)
         dockLock(suite)
+        folders(suite)
         registration(suite)
         offMeansOff(suite)
         sourceContracts(suite)
@@ -82,6 +83,8 @@ enum DockExtrasTests {
             (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
             (.dockLock, DefaultsKey.dockLockEnabled),
             (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
+            (.dockFolderPop, DefaultsKey.dockFolderPopEnabled),
+            (.dockLivePreviews, DefaultsKey.dockLivePreviewsEnabled),
         ]
         for (feature, key) in extras {
             suite.expect(!feature.installedByDefault && feature.group == .windowsDock
@@ -117,7 +120,10 @@ enum DockExtrasTests {
                            text.styleLine, text.styleDots, text.dockLockTitle, text.dockLockHub,
                            text.dockLockCaption, text.menuBarScreen, text.titleBarDesktop,
                            text.titleBarDesktopCaption, text.appCardsTitle, text.appCardsHub,
-                           text.appCardsCaption, text.nothingToday, text.allDay]
+                           text.appCardsCaption, text.nothingToday, text.allDay,
+                           text.folderPopTitle, text.folderPopHub, text.folderPopCaption, text.openInFinder,
+                           text.folderEmpty, text.livePreviewsTitle, text.livePreviewsHub,
+                           text.livePreviewsCaption, text.livePreviewsRate]
                             .contains(where: \.isEmpty),
                          "the Dock extras have complete strings in \(language.rawValue)")
         }
@@ -145,6 +151,8 @@ enum DockExtrasTests {
             (.dockActiveIndicator, DefaultsKey.dockActiveIndicatorEnabled),
             (.dockLock, DefaultsKey.dockLockEnabled),
             (.dockAppCards, DefaultsKey.dockAppCardsEnabled),
+            (.dockFolderPop, DefaultsKey.dockFolderPopEnabled),
+            (.dockLivePreviews, DefaultsKey.dockLivePreviewsEnabled),
         ]
         suite.expect(features.allSatisfy { !DockExtrasSupport.isOn($0.0, key: $0.1, in: defaults) },
                      "an update installs none of the extras")
@@ -178,6 +186,19 @@ enum DockExtrasTests {
         suite.expect(AppFeature.dockAppCards.energyProfile == .idle
                         && DockExtrasSupport.mediaBundleIDs.contains("com.github.th-ch.youtube-music"),
                      "the cards cost nothing at rest; YouTube Music counts as a music app")
+        let previewService = source("Sources/Vorssaint/Services/DockPreview/DockPreviewService.swift")
+        let live = source("Sources/Vorssaint/Mantel/DockExtras/DockPreviewLive.swift")
+        let folderPop = source("Sources/Vorssaint/Mantel/DockExtras/DockFolderPop.swift")
+        suite.expect(previewService.contains("DockFolderPop.shared.pointerMoved(at: axPoint)")
+                        && previewService.contains("DockPreviewLive.shared.begin()")
+                        && live.contains("service.refreshVisiblePreviews()")
+                        && !live.contains("SCStream") && !folderPop.contains("tapCreate"),
+                     "folders and live previews ride on Vorssaint's Dock preview and its one capture path")
+        suite.expect(AppFeature.dockLivePreviews.energyProfile == .periodic
+                        && AppFeature.dockFolderPop.energyProfile == .idle
+                        && DockExtrasSupport.sanitizedLiveFPS(10) == 10 && DockExtrasSupport.sanitizedLiveFPS(60) == 5
+                        && Defaults.registeredDefaults[DefaultsKey.dockLivePreviewFPS] as? Int == 5,
+                     "live previews are labelled as periodic, 2, 5 or 10 frames a second, 5 by default")
         suite.expect(![tap, buttons, titleBar, swipe, shake, switcherSwipe, indicator, lock].contains(where: \.isEmpty),
                      "the Dock extras sources are readable")
         let mantel = tap + buttons + titleBar + swipe + shake + indicator + lock
@@ -375,5 +396,27 @@ enum DockExtrasTests {
         let path = Support.callBackPath(locked: laptop, dock: .bottom, screens: [laptop, beside])
         suite.expect(path?.end == CGPoint(x: 60, y: 981) && path?.push == CGVector(dx: 0, dy: 8),
                      "the Dock is called back by pushing on the chosen screen's free edge")
+    }
+
+    private static func folders(_ suite: TestSuite) {
+        let fileManager = FileManager.default
+        let folder = fileManager.temporaryDirectory.appendingPathComponent("mantel-folder-pop-\(UUID().uuidString)")
+        defer { try? fileManager.removeItem(at: folder) }
+        guard (try? fileManager.createDirectory(at: folder, withIntermediateDirectories: true)) != nil else {
+            suite.expect(false, "a scratch folder is available")
+            return
+        }
+        for (index, name) in ["old.txt", "middle.txt", "new.txt", ".hidden"].enumerated() {
+            let url = folder.appendingPathComponent(name)
+            fileManager.createFile(atPath: url.path, contents: Data())
+            try? fileManager.setAttributes([.modificationDate: Date(timeIntervalSince1970: 1_000_000 + Double(index) * 100)],
+                                           ofItemAtPath: url.path)
+        }
+        let items = DockExtrasSupport.folderItems(in: folder, limit: 10)
+        suite.expect(!items.contains { $0.url.lastPathComponent == ".hidden" } && items.count == 3,
+                     "a Dock folder lists its visible files")
+        suite.expect(DockExtrasSupport.folderItems(in: folder, limit: 2).count == 2
+                        && DockExtrasSupport.folderItems(in: folder.appendingPathComponent("missing"), limit: 5).isEmpty,
+                     "the list is capped, and a missing folder lists nothing")
     }
 }

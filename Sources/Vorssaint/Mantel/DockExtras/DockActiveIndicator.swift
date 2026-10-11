@@ -192,6 +192,35 @@ enum DockIcons {
         return (listFrame, icons)
     }
 
+    struct Folder: Equatable {
+        let url: URL
+        let frame: CGRect
+    }
+
+    /// The Dock folder (stack) under a point, matched along the Dock's long
+    /// axis only, like Vorssaint's Dock hit test (the short axis of the
+    /// Dock's frames can be reported shifted); callers have already checked
+    /// the point is in the Dock's strip.
+    static func folder(at point: CGPoint) -> Folder? {
+        guard let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first
+        else { return nil }
+        let element = AXUIElementCreateApplication(dock.processIdentifier)
+        AXUIElementSetMessagingTimeout(element, 0.25)
+        guard let children = array(element, kAXChildrenAttribute as String) else { return nil }
+        for list in children where string(list, kAXRoleAttribute as String) == "AXList" {
+            guard let listFrame = frame(of: list), let items = array(list, kAXChildrenAttribute as String)
+            else { continue }
+            let horizontal = listFrame.width >= listFrame.height
+            for item in items where string(item, kAXSubroleAttribute as String) == "AXFolderDockItem" {
+                guard let itemFrame = frame(of: item), let url = url(item) else { continue }
+                let hit = horizontal ? (point.x >= itemFrame.minX && point.x <= itemFrame.maxX)
+                                     : (point.y >= itemFrame.minY && point.y <= itemFrame.maxY)
+                if hit { return Folder(url: url, frame: itemFrame) }
+            }
+        }
+        return nil
+    }
+
     static func listFrame() -> CGRect? {
         guard let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first
         else { return nil }
