@@ -571,6 +571,12 @@ enum DefaultsKey {
     // Quick tools: paste as plain text, color picker, screen OCR, mic mute.
     static let pastePlainEnabled = "pastePlainEnabled"
     static let pastePlainShortcut = "pastePlainShortcut"
+    // Mantel: Type Clipboard
+    static let typeClipboardEnabled = "typeClipboardEnabled"
+    static let typeClipboardShortcut = "typeClipboardShortcut"
+    static let typeClipboardSpeed = "typeClipboardSpeed"
+    static let typeClipboardCustomDelay = "typeClipboardCustomDelay"
+    static let typeClipboardEscapeStops = "typeClipboardEscapeStops"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1749,6 +1755,11 @@ enum Defaults {
         DefaultsKey.diskEjectExcludedVolumes: [String](),
         DefaultsKey.pastePlainEnabled: false,
         DefaultsKey.pastePlainShortcut: GlobalShortcut.pastePlainDefault.storageValue,
+        DefaultsKey.typeClipboardEnabled: true,
+        DefaultsKey.typeClipboardShortcut: GlobalShortcut.typeClipboardDefault.storageValue,
+        DefaultsKey.typeClipboardSpeed: "fast",
+        DefaultsKey.typeClipboardCustomDelay: 20,
+        DefaultsKey.typeClipboardEscapeStops: true,
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

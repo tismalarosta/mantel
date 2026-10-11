@@ -194,8 +194,12 @@ struct GlobalShortcut: Equatable, Hashable {
     // W for webcam, on the same free control-option-command layer.
     static let cameraPreviewDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_W),
                                                      modifiers: [.control, .option, .command])
-    // V for Vorssaint: the quick launcher's own combination.
-    static let quickLauncherDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_V),
+    // Mantel: ⌃⌘V belongs to Type Clipboard, so the quick launcher moves to
+    // the free ⌃⌥⌘B (SPEC decision, 2026-10-11).
+    static let quickLauncherDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_B),
+                                                     modifiers: [.control, .option, .command])
+    // Mantel: Type Clipboard, a paste that types (Keyboard Maestro style).
+    static let typeClipboardDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_V),
                                                      modifiers: [.control, .command])
     // Default screenshot shortcut on the available control-option-command layer.
     static let screenshotDefault = GlobalShortcut(keyCode: Int64(kVK_ANSI_4),
@@ -698,6 +702,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
     case clipboard
     case soundOutputSwitcher
     case pastePlain
+    case typeClipboard
     case finderRename
     case colorPicker
     case screenOCR
@@ -732,6 +737,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .clipboard: return DefaultsKey.clipboardHistoryShortcut
         case .soundOutputSwitcher: return DefaultsKey.soundOutputSwitcherShortcut
         case .pastePlain: return DefaultsKey.pastePlainShortcut
+        case .typeClipboard: return DefaultsKey.typeClipboardShortcut
         case .finderRename: return DefaultsKey.finderRenameShortcut
         case .colorPicker: return DefaultsKey.colorPickerShortcut
         case .screenOCR: return DefaultsKey.screenOCRShortcut
@@ -766,6 +772,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .clipboard: return .clipboardDefault
         case .soundOutputSwitcher: return .soundOutputSwitcherDefault
         case .pastePlain: return .pastePlainDefault
+        case .typeClipboard: return .typeClipboardDefault
         case .finderRename: return .finderRenameDefault
         case .colorPicker: return .colorPickerDefault
         case .screenOCR: return .screenOCRDefault
@@ -819,6 +826,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .clipboard: return FeatureStrings.clipboard(L10n.shared.language).title
         case .soundOutputSwitcher: return strings.soundOutputSwitcherTitle
         case .pastePlain: return strings.pastePlainName
+        case .typeClipboard: return FeatureStrings.typeClipboard(L10n.shared.language).title
         case .finderRename: return FeatureStrings.finderRename(L10n.shared.language).hubTitle
         case .colorPicker: return strings.colorPickerName
         case .screenOCR: return strings.ocrName
@@ -886,6 +894,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
                                  DefaultsKey.clipboardHistoryShortcutEnabled]
         case .soundOutputSwitcher: return [DefaultsKey.soundOutputSwitcherEnabled]
         case .pastePlain: return [DefaultsKey.pastePlainEnabled]
+        case .typeClipboard: return [DefaultsKey.typeClipboardEnabled]
         case .finderRename: return [DefaultsKey.finderRenameEnabled]
         case .colorPicker: return [DefaultsKey.colorPickerShortcutEnabled]
         case .screenOCR: return [DefaultsKey.screenOCRShortcutEnabled]
@@ -922,6 +931,7 @@ enum GlobalShortcutRole: CaseIterable, Identifiable {
         case .clipboard: return .clipboardHistory
         case .soundOutputSwitcher: return .soundOutputSwitcher
         case .pastePlain: return .pastePlain
+        case .typeClipboard: return .typeClipboard
         case .finderRename: return .finderRename
         case .colorPicker: return .colorPicker
         case .screenOCR: return .screenOCR

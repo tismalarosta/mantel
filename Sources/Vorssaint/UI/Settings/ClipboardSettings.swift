@@ -132,6 +132,11 @@ struct ClipboardSettings: View {
                 .settingsFormSectionAnchor(.pastePlain)
             }
 
+            // Mantel
+            if AppFeature.typeClipboard.isAvailable {
+                TypeClipboardSettingsSection()
+            }
+
             if AppFeature.clipboardHistory.isAvailable {
                 clipboardStatsSection
             }

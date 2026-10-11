@@ -390,6 +390,8 @@ if (( TEST )); then
         Sources/Vorssaint/Core/Localization.swift
         Sources/Vorssaint/Core/Localizations/Strings+*.swift
         Sources/Vorssaint/Core/FeatureStrings.swift
+        Sources/Vorssaint/Mantel/TypeClipboard/TypeClipboardSupport.swift
+        Sources/Vorssaint/Mantel/TypeClipboard/TypeClipboardStrings.swift
         Sources/Vorssaint/Core/KillProcessStrings.swift
         Sources/Vorssaint/Core/PortManagerStrings.swift
         Sources/Vorssaint/Core/WhatsAppDownloadStrings.swift
