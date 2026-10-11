@@ -153,6 +153,15 @@ struct NotchView: View {
                             NotchCapsuleNoticeView(notice: notice, geometry: service.geometry,
                                                    size: service.notice == nil ? service.capsuleNoticeSurface(notice)
                                                        : service.surfaceSize)
+                        } else if service.boringNoticeSize(for: notice) != nil {
+                            // Mantel: Boring Notch's HUD, battery banner or sneak peek.
+                            if BoringNotchHUDSupport.isHUD(notice.event) {
+                                BoringNotchHUDView(notice: notice, geometry: service.geometry)
+                            } else if notice.event == .battery {
+                                BoringNotchBatteryBanner(notice: notice, geometry: service.geometry, service: service)
+                            } else {
+                                BoringNotchSneakPeek(notice: notice, geometry: service.geometry)
+                            }
                         } else {
                             NotchNoticeView(notice: notice, geometry: service.geometry, hidesMascot: service.mascotBridging)
                         }

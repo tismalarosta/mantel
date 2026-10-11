@@ -881,6 +881,8 @@ final class NotchService: ObservableObject {
         if expanded { return showingCommandBar ? commandBarSurfaceSize : expandedSize }
         if dragPlaceholder { return CGSize(width: geometry.peek.width, height: geometry.safeContentTop + 66) }
         if let notice {
+            // Mantel: Boring Notch's HUD, battery banner and sneak peek.
+            if !noticeExpanded, let boring = BoringNotchHooks.noticeSize(event: notice.event, geometry: geometry) { return boring }
             guard noticeExpanded else { return geometry.noticeSize(wings: notice.wings(in: geometry)) }
             return geometry.notificationPreviewSize(
                 contentHeight: notice.previewContentHeight(width: geometry.notificationPreviewContentWidth))
@@ -909,7 +911,10 @@ final class NotchService: ObservableObject {
     /// further toward its wider side. A capsule runs its strips end to end.
     var surfaceShift: CGFloat {
         guard !geometry.floats, !fullscreenCompact, captureControls == nil, !expanded, !dragPlaceholder else { return 0 }
-        if let notice { return noticeExpanded ? 0 : geometry.noticeShift(notice.wings(in: geometry)) }
+        if let notice {
+            if !noticeExpanded, BoringNotchHooks.noticeSize(event: notice.event, geometry: geometry) != nil { return 0 }  // Mantel
+            return noticeExpanded ? 0 : geometry.noticeShift(notice.wings(in: geometry))
+        }
         return namedMusicWings.map { ($0.trailing - $0.leading) / 2 } ?? 0
     }
 
@@ -3322,8 +3327,11 @@ final class NotchService: ObservableObject {
     }
 
     private func updateFullscreenVisibility(displayID: CGDirectDisplayID) {
-        let hidden = UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen)
-            && SpaceWindowBridge.topology()?.isFullscreen(on: displayID, separateSpaces: NSScreen.screensHaveSeparateSpaces) == true
+        // Mantel: in the Boring Notch design its own fullscreen rule applies.
+        let hidden = BoringNotchHooks.hidesInFullscreen(
+            vorssaintSetting: UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen),
+            isFullscreen: SpaceWindowBridge.topology()?.isFullscreen(
+                on: displayID, separateSpaces: NSScreen.screensHaveSeparateSpaces) == true)
         guard hidden != hiddenInFullscreen else { return }
         hiddenInFullscreen = hidden
         if hidden {
@@ -3348,7 +3356,8 @@ final class NotchService: ObservableObject {
     private func fullscreenEnvironmentDidChange() {
         // Only the opt-in option depends on Spaces and the active app.
         guard running, !suspended,
-              hiddenInFullscreen || UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen)
+              hiddenInFullscreen || BoringNotchHooks.watchesFullscreen(
+                vorssaintSetting: UserDefaults.standard.bool(forKey: DefaultsKey.notchHideInFullscreen))
         else { return }
         let wasHidden = hiddenInFullscreen
         updateScreen()
@@ -4051,6 +4060,8 @@ final class NotchService: ObservableObject {
         let musicWanted = modules.contains(.music) && ((expanded && (selected == .music || (selected == .controls && NotchSupport.controls().contains(.music)))
             && !showingAppPanel && !showingSections && !showingCommandBar)
             || (!hiddenUntilHover && (NotchSupport.watchesMusicActivity() || NotchSupport.routes(.track))))
+            // Mantel: Boring Notch's Home tab always shows the player.
+            || (expanded && NotchDesign.isBoringNotch && !showingSections && !showingCommandBar)
         if musicWanted { NotchMusicService.shared.start() } else { NotchMusicService.shared.stop() }
         let needs = expanded && selected == .system && selectedMetric == nil && modules.contains(.system) && !showingAppPanel
             && !showingSections && !showingCommandBar

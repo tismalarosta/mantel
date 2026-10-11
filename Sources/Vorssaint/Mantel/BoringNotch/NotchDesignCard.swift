@@ -82,6 +82,7 @@ struct NotchDesignCard: View {
                 .fixedSize(horizontal: false, vertical: true)
             if NotchDesign.sanitized(design) == .boringNotch {
                 musicOptions
+                BoringNotchHUDOptions()
             }
         }
         .onChange(of: design) { _, _ in

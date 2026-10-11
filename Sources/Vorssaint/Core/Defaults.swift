@@ -614,6 +614,8 @@ enum DefaultsKey {
     static let notchBoringVisualizer = "notchBoringVisualizer"
     static let notchBoringLyricsStyle = "notchBoringLyricsStyle"
     static let notchBoringSidePanel = "notchBoringSidePanel"
+    static let notchBoringHUDStyle = "notchBoringHUDStyle"
+    static let notchBoringFullscreen = "notchBoringFullscreen"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1831,6 +1833,8 @@ enum Defaults {
         DefaultsKey.notchBoringVisualizer: "boringNotch",
         DefaultsKey.notchBoringLyricsStyle: "boringNotch",
         DefaultsKey.notchBoringSidePanel: "upNext",
+        DefaultsKey.notchBoringHUDStyle: "inline",
+        DefaultsKey.notchBoringFullscreen: "mediaApp",
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

@@ -346,7 +346,10 @@ final class FeatureRuntime: ObservableObject {
         .cameraPreview: { CameraPreviewService.shared.syncWithPreferences() },
         .wallpaper: { WallpaperService.shared.syncWithPreferences() },
         .radialMenu: { RadialMenuService.shared.syncWithPreferences() },
-        .notch: { NotchService.shared.syncWithPreferences() },
+        .notch: {
+            BoringNotchHooks.installAppProviders()  // Mantel
+            NotchService.shared.syncWithPreferences()
+        },
         .notchGestures: {
             if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
         },

@@ -68,7 +68,10 @@ struct BoringNotchOpenView: View {
             .clipShape(Capsule())
             .frame(maxWidth: .infinity, alignment: .leading)
             Color.clear.frame(width: service.geometry.cameraWidth)
-            Color.clear.frame(maxWidth: .infinity)
+            HStack(spacing: 4) {
+                BoringNotchHeaderBattery(service: service)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.system(.headline, design: .rounded))
     }

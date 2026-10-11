@@ -14,6 +14,63 @@ enum BoringNotchDesignTests {
         outline(suite)
         hooks(suite)
         music(suite)
+        hud(suite)
+    }
+
+    /// Slice 5c: HUD styles, battery, sneak peek and fullscreen.
+    private static func hud(_ suite: TestSuite) {
+        typealias H = BoringNotchHUDSupport
+        suite.expect(BoringNotchHUDStyle.sanitized(nil) == .inline
+                        && Defaults.registeredDefaults[DefaultsKey.notchBoringHUDStyle] as? String == "inline",
+                     "the HUD starts inside the notch (Matisse, 2026-10-11)")
+        suite.expect([NotchEvent.volume, .brightness, .keyboardLight, .microphone].allSatisfy(H.isHUD)
+                        && !H.isHUD(.battery) && !H.isHUD(.clipboard) && !H.isHUD(.track),
+                     "volume, brightness, keyboard light and mic are Boring Notch HUDs")
+        suite.expect(H.size(for: .volume, style: .inline, cameraWidth: 180, stripHeight: 32)
+                        == CGSize(width: 380, height: 32),
+                     "the inline HUD widens the notch by Boring Notch's 100 pt on each side")
+        suite.expect(H.size(for: .brightness, style: .below, cameraWidth: 180, stripHeight: 32)
+                        == CGSize(width: 260, height: 62),
+                     "the below style keeps the notch and drops a 30 pt band under it")
+        suite.expect(H.size(for: .battery, style: .inline, cameraWidth: 180, stripHeight: 32)?.width == 440
+                        && H.size(for: .track, style: .inline, cameraWidth: 180, stripHeight: 32)?.height == 54,
+                     "battery shows as a wide banner, a song change as a line below the notch")
+        suite.expect(H.size(for: .clipboard, style: .inline, cameraWidth: 180, stripHeight: 32) == nil
+                        && H.size(for: .systemNotification, style: .below, cameraWidth: 180, stripHeight: 32) == nil,
+                     "other notices keep Vorssaint's layout")
+        suite.expect(H.symbol(for: .volume, level: 0) == "speaker.slash.fill"
+                        && H.symbol(for: .volume, level: 0.2) == "speaker.wave.1.fill"
+                        && H.symbol(for: .volume, level: 0.5) == "speaker.wave.2.fill"
+                        && H.symbol(for: .volume, level: 0.9) == "speaker.wave.3.fill"
+                        && H.symbol(for: .brightness, level: 0.4) == "sun.min.fill"
+                        && H.symbol(for: .brightness, level: 0.8) == "sun.max.fill",
+                     "HUD marks follow the level like Boring Notch's")
+        suite.expect(H.batteryTint(percent: 15, charging: false, plugged: false) == .low
+                        && H.batteryTint(percent: 15, charging: true, plugged: true) == .charging
+                        && H.batteryTint(percent: 60, charging: false, plugged: false) == .normal
+                        && H.batteryFill(percent: 140) == 1 && H.batteryFill(percent: nil) == 0,
+                     "the battery is red at 20 % or below, green while charging, its fill clamped")
+        suite.expect(BoringNotchFullscreenPolicy.sanitized(nil) == .mediaApp,
+                     "Boring Notch hides over the media app by default")
+        suite.expect(H.hidesInFullscreen(policy: .allApps, isFullscreen: true, frontmostBundleID: "a", playerBundleID: "b")
+                        && !H.hidesInFullscreen(policy: .allApps, isFullscreen: false, frontmostBundleID: "a", playerBundleID: "a")
+                        && !H.hidesInFullscreen(policy: .never, isFullscreen: true, frontmostBundleID: "a", playerBundleID: "a")
+                        && H.hidesInFullscreen(policy: .mediaApp, isFullscreen: true,
+                                               frontmostBundleID: "com.spotify.client", playerBundleID: "com.spotify.client")
+                        && !H.hidesInFullscreen(policy: .mediaApp, isFullscreen: true,
+                                                frontmostBundleID: "com.apple.Safari", playerBundleID: "com.spotify.client")
+                        && !H.hidesInFullscreen(policy: .mediaApp, isFullscreen: true,
+                                                frontmostBundleID: "com.apple.Safari", playerBundleID: nil),
+                     "fullscreen hiding: all apps, only over the music player, or never")
+        func source(_ path: String) -> String { (try? String(contentsOfFile: path, encoding: .utf8)) ?? "" }
+        let hudView = source("Sources/Vorssaint/Mantel/BoringNotch/BoringNotchHUDView.swift")
+        suite.expect(hudView.contains("AppVolumeMixer.setSystemOutputVolume")
+                        && hudView.contains("BrightnessService.shared.setBrightness")
+                        && !hudView.contains("tapCreate") && !hudView.contains("CGEvent"),
+                     "dragging the HUD goes through Vorssaint's mixer and brightness service; no key tap of its own")
+        let service = source("Sources/Vorssaint/Services/Notch/NotchService.swift")
+        suite.expect(service.contains("(expanded && NotchDesign.isBoringNotch && !showingSections && !showingCommandBar)"),
+                     "music runs while Boring Notch's Home tab is open")
     }
 
     /// Slice 5b: the player's slots, labels and pick-one choices.
