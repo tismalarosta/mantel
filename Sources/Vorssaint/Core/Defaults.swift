@@ -609,6 +609,11 @@ enum DefaultsKey {
     // Mantel: Boring Notch design
     static let notchDesign = "notchDesign"
     static let notchBoringTab = "notchBoringTab"
+    static let notchBoringMusicSlots = "notchBoringMusicSlots"
+    static let notchBoringMusicSlotCount = "notchBoringMusicSlotCount"
+    static let notchBoringVisualizer = "notchBoringVisualizer"
+    static let notchBoringLyricsStyle = "notchBoringLyricsStyle"
+    static let notchBoringSidePanel = "notchBoringSidePanel"
     static let colorPickerShortcutEnabled = "colorPickerShortcutEnabled"
     static let colorPickerShortcut = "colorPickerShortcut"
     static let colorPickerFormat = "colorPickerFormat"       // hex | rgb | hsl | swiftui
@@ -1821,6 +1826,11 @@ enum Defaults {
         DefaultsKey.dockPreviewWindowButtonsEnabled: true,
         DefaultsKey.notchDesign: "boringNotch",
         DefaultsKey.notchBoringTab: "home",
+        DefaultsKey.notchBoringMusicSlots: "none,previous,playPause,next,none",
+        DefaultsKey.notchBoringMusicSlotCount: 5,
+        DefaultsKey.notchBoringVisualizer: "boringNotch",
+        DefaultsKey.notchBoringLyricsStyle: "boringNotch",
+        DefaultsKey.notchBoringSidePanel: "upNext",
         DefaultsKey.finderRenameEnabled: false,
         DefaultsKey.finderRenameShortcut: GlobalShortcut.finderRenameDefault.storageValue,
         DefaultsKey.diskImageInstallerUseUserApplications: false,

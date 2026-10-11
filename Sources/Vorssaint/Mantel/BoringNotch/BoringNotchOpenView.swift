@@ -3,7 +3,7 @@
 // Part of Mantel, a fork of Vorssaint (github.com/vorssaint/vorssaint-utils).
 // Layout from Boring Notch (github.com/TheBoredTeam/boring.notch, GPL-3.0):
 // boringNotch/components/Notch/BoringHeader.swift, components/Tabs/TabSelectionView.swift,
-// TabButton.swift, components/Notch/NotchHomeView.swift (music player, simplified for slice 5a).
+// TabButton.swift; the player is in BoringNotchPlayerView.swift.
 
 import SwiftUI
 
@@ -82,71 +82,22 @@ struct BoringNotchOpenView: View {
     }
 }
 
-/// Boring Notch's home player, first pass: the 90 pt cover, title and
-/// artist, and the three core buttons. Slice 5b adds the arrangeable button
-/// slots, the seek bar, Up Next and the visualizer and lyrics choices.
-struct BoringNotchHomeView: View {
-    @ObservedObject private var music = NotchMusicService.shared
-
-    var body: some View {
-        HStack(spacing: 14) {
-            cover
-            VStack(alignment: .leading, spacing: 4) {
-                Text(music.playback?.track.title ?? " ")
-                    .font(.headline)
-                    .lineLimit(1)
-                    .foregroundStyle(.white)
-                Text(music.playback?.track.artist ?? " ")
-                    .font(.subheadline)
-                    .lineLimit(1)
-                    .foregroundStyle(.gray)
-                Spacer(minLength: 0)
-                HStack(spacing: 22) {
-                    control("backward.fill") { _ = music.send(.previous) }
-                    control(music.playback?.isPlaying == true ? "pause.fill" : "play.fill", size: 22) {
-                        _ = music.send(.toggle)
-                    }
-                    control("forward.fill") { _ = music.send(.next) }
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .frame(height: BoringNotchMetrics.openArtSize)
-        }
-        .padding(.top, 8)
-    }
-
-    private var cover: some View {
-        Group {
-            if let artwork = music.artwork {
-                Image(nsImage: artwork).resizable().aspectRatio(contentMode: .fill)
-            } else {
-                ZStack {
-                    Color.white.opacity(0.08)
-                    Image(systemName: "music.note").font(.system(size: 28)).foregroundStyle(.gray)
-                }
-            }
-        }
-        .frame(width: BoringNotchMetrics.openArtSize, height: BoringNotchMetrics.openArtSize)
-        .clipShape(RoundedRectangle(cornerRadius: BoringNotchMetrics.openArtRadius, style: .continuous))
-    }
-
-    private func control(_ symbol: String, size: CGFloat = 16, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: size, weight: .semibold))
-                .frame(width: 32, height: 32)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(.white)
-    }
-}
-
 /// Boring Notch's closed music activity: the cover left of the camera, the
 /// four bars right of it (`MusicLiveActivity` in ContentView.swift).
 struct BoringNotchMusicActivity: View {
     @ObservedObject var service: NotchService
     @ObservedObject private var music = NotchMusicService.shared
+    @AppStorage(DefaultsKey.notchBoringVisualizer) private var visualizer = BoringNotchVisualizer.boringNotch.rawValue
+
+    /// SPEC §3D: Boring Notch's bars, or Vorssaint's live equalizer.
+    @ViewBuilder private var bars: some View {
+        let playing = music.playback?.isPlaying == true
+        if BoringNotchMusicSupport.visualizer(visualizer) == .vorssaint, AppFeature.notchLiveEqualizer.isAvailable {
+            NotchLiveEqualizerBars(isPlaying: playing, bars: 4, barWidth: 2.5, height: 12, tint: .gray)
+        } else {
+            BoringNotchBars(isPlaying: playing)
+        }
+    }
 
     var body: some View {
         let side = max(0, service.geometry.stripHeight - 12)
@@ -162,7 +113,7 @@ struct BoringNotchMusicActivity: View {
             .clipShape(RoundedRectangle(cornerRadius: BoringNotchMetrics.closedArtRadius, style: .continuous))
             .frame(maxWidth: .infinity)
             Color.clear.frame(width: service.geometry.cameraWidth)
-            BoringNotchBars(isPlaying: music.playback?.isPlaying == true)
+            bars
                 .frame(width: 16, height: 12)
                 .frame(maxWidth: .infinity)
         }

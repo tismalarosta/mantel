@@ -268,7 +268,11 @@ struct NotchView: View {
         }
     }
 
-    private var compact: some View { NotchRestingStrip(service: service) }
+    // Mantel: Boring Notch's resting notch shows nothing beside the camera.
+    @ViewBuilder private var compact: some View {
+        if NotchDesign.isBoringNotch { Color.clear.accessibilityHidden(true) }
+        else { NotchRestingStrip(service: service) }
+    }
 
     /// Open beside a camera, the companion stays where it rested closed, and
     /// plays there what happens while the island is open.

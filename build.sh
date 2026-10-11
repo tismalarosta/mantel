@@ -399,6 +399,7 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasSupport.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasStrings.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchDesign.swift
+        Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMusicSupport.swift
         Sources/Vorssaint/Core/KillProcessStrings.swift
         Sources/Vorssaint/Core/PortManagerStrings.swift
         Sources/Vorssaint/Core/WhatsAppDownloadStrings.swift

@@ -898,7 +898,9 @@ final class NotchService: ObservableObject {
                                           reach: named.map { ($0.leading - $0.trailing) / 2 } ?? 0)
                 : resting
         }
-        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry))
+        // Mantel: Boring Notch rests as a bare notch, without Vorssaint's extras.
+        let resting = geometry.restingSize(showsContent: !NotchDesign.isBoringNotch
+            && (idleContent != .none || mascotShows(on: geometry)))
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 

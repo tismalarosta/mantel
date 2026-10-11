@@ -13,6 +13,49 @@ enum BoringNotchDesignTests {
         metrics(suite)
         outline(suite)
         hooks(suite)
+        music(suite)
+    }
+
+    /// Slice 5b: the player's slots, labels and pick-one choices.
+    private static func music(_ suite: TestSuite) {
+        typealias Slot = BoringNotchMusicSlot
+        suite.expect(Slot.defaultLayout == [.none, .previous, .playPause, .next, .none]
+                        && Defaults.registeredDefaults[DefaultsKey.notchBoringMusicSlots] as? String
+                            == Slot.stored(Slot.defaultLayout)
+                        && Defaults.registeredDefaults[DefaultsKey.notchBoringMusicSlotCount] as? Int == 5,
+                     "the player starts with Boring Notch's five slots: empty, previous, play, next, empty")
+        suite.expect(Slot.layout(from: "shuffle,next", count: 4) == [.shuffle, .next, .none, .none],
+                     "a short layout is padded with empty slots")
+        suite.expect(Slot.layout(from: "previous,playPause,next,volume,shuffle", count: 3)
+                        == [.previous, .playPause, .next],
+                     "a long layout is cut to the slot count")
+        suite.expect(Slot.layout(from: "bogus,favorite,next", count: 3) == [.next, .none, .none]
+                        && Slot.layout(from: nil, count: 9).count == 5 && Slot.layout(from: "", count: 1).count == 3,
+                     "unknown slots are dropped and the count stays between 3 and 5")
+        suite.expect(Slot.layout(from: Slot.stored([.goBackward, .playPause, .goForward]), count: 3)
+                        == [.goBackward, .playPause, .goForward],
+                     "a layout survives the trip to disk")
+        suite.expect(!Slot.pickerOptions.isEmpty && Slot.allCases.allSatisfy { !$0.symbol.isEmpty },
+                     "every slot has a picker entry and a symbol")
+        typealias S = BoringNotchMusicSupport
+        suite.expect(S.timeString(0) == "0:00" && S.timeString(65) == "1:05" && S.timeString(3725) == "1:02:05"
+                        && S.timeString(.nan) == "0:00",
+                     "slider times read m:ss, and h:mm:ss past an hour")
+        suite.expect(S.skipTarget(position: 10, by: -15, duration: 200) == 0
+                        && S.skipTarget(position: 195, by: 15, duration: 200) == 200
+                        && S.skipTarget(position: 50, by: 15, duration: 200) == 65,
+                     "15 s skips stay inside the track")
+        suite.expect(S.visualizer(nil) == .boringNotch && S.visualizer("vorssaint") == .vorssaint
+                        && S.lyricsStyle(nil) == .boringNotch && S.lyricsStyle("vorssaint") == .vorssaint,
+                     "the pick-one choices default to Boring Notch (SPEC §3D)")
+        func source(_ path: String) -> String { (try? String(contentsOfFile: path, encoding: .utf8)) ?? "" }
+        let player = source("Sources/Vorssaint/Mantel/BoringNotch/BoringNotchPlayerView.swift")
+        suite.expect(player.contains("NotchQueueView(playback: playback)")
+                        && player.contains("NotchMusicService.shared") && !player.contains("MRMediaRemote"),
+                     "the player shows Vorssaint's Up Next and reads Vorssaint's Now Playing bridge only")
+        let service = source("Sources/Vorssaint/Services/Notch/NotchService.swift")
+        suite.expect(service.contains("showsContent: !NotchDesign.isBoringNotch"),
+                     "Boring Notch rests as a bare notch, without Vorssaint's resting extras")
     }
 
     private static func setting(_ suite: TestSuite) {
