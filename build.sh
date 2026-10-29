@@ -415,6 +415,7 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/MenuBarHider/MenuBarHiderStrings.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasSupport.swift
         Sources/Vorssaint/Mantel/MantelBuild.swift
+        Sources/Vorssaint/Mantel/Updates/MantelUpdates.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasStrings.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchDesign.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMusicSupport.swift
@@ -747,6 +748,9 @@ if (( DEV )); then
     perl -pi -e 's/(?<![A-Za-z])Vorssaint(?![A-Za-z])/Mantel/g' "$STAGE/Contents/Info.plist" \
         "$STAGE"/Contents/Resources/*.lproj/InfoPlist.strings(N)
     /usr/libexec/PlistBuddy -c "Set :NSHumanReadableCopyright Mantel, built on Vorssaint (GPL-3.0)" "$STAGE/Contents/Info.plist"
+    # Mantel: its own version, which the updater compares with release tags
+    # (mantel-v<version>). Bump MANTEL_VERSION before building a release.
+    /usr/libexec/PlistBuddy -c "Add :MantelVersion string $(<MANTEL_VERSION)" "$STAGE/Contents/Info.plist"
     FAN_PLIST="$STAGE/Contents/Library/LaunchDaemons/$FAN_HELPER_ID.plist"
     /usr/libexec/PlistBuddy -c "Set :Label $FAN_HELPER_ID" "$FAN_PLIST"
     /usr/libexec/PlistBuddy -c "Set :BundleProgram Contents/Library/LaunchServices/$FAN_HELPER_ID" "$FAN_PLIST"
@@ -992,5 +996,5 @@ if (( ${FRIENDS:-0} )); then
     # Only the zip stays: a second unzipped Mantel.app with the same id would
     # make macOS mix up the copies (icon, permissions).
     rm -rf "$SHARE_DIR" build/friends.noindex
-    echo "✓ Zip for friends: build/Mantel.zip"
+    echo "✓ Zip for friends: build/Mantel.zip (MantelVersion $(<MANTEL_VERSION): tag the release mantel-v$(<MANTEL_VERSION))"
 fi

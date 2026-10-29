@@ -27,7 +27,9 @@ final class UpdateService: ObservableObject {
     /// preview. Set alongside `.available`; cleared otherwise.
     @Published private(set) var availableNotes: String?
 
-    private let repository = "vorssaint/vorssaint-utils"
+    private let repository = MantelBuild.isMantel ? MantelUpdates.repository : "vorssaint/vorssaint-utils"  // Mantel
+    /// Mantel: Mantel builds carry a dev bundle id but update from Mantel's releases.
+    private static var isLocalBuild: Bool { AppInfo.isDeveloperBuild && !MantelBuild.isMantel }
     private var downloadURL: URL?
     /// Size the release advertises for the asset, used to bound the download.
     private var downloadExpectedBytes: Int64?
@@ -67,7 +69,7 @@ final class UpdateService: ObservableObject {
         }
         // The local dev build never auto-updates, but can simulate the
         // "update available" UI via the `simulateUpdate` default, for testing.
-        if AppInfo.isDeveloperBuild {
+        if Self.isLocalBuild {
             if UserDefaults.standard.bool(forKey: DefaultsKey.simulateUpdate) {
                 let simulatedVersion = AppInfo.isBeta ? "9.9.9-beta.1" : "9.9.9"
                 state = .available(version: simulatedVersion)
@@ -100,7 +102,7 @@ final class UpdateService: ObservableObject {
     // MARK: - Check
 
     func check(manual: Bool) {
-        if AppInfo.isDeveloperBuild {
+        if Self.isLocalBuild {
             // No real update target; reflect the simulation default so the
             // notification UI can be exercised locally.
             if UserDefaults.standard.bool(forKey: DefaultsKey.simulateUpdate) {
@@ -152,10 +154,13 @@ final class UpdateService: ObservableObject {
                     return
                 }
 
-                let candidates = releases.map { rel -> UpdateServiceSupport.ReleaseCandidate in
-                    let asset = rel.assets.first { $0.name.hasSuffix(".dmg") }
+                let candidates = releases.compactMap { rel -> UpdateServiceSupport.ReleaseCandidate? in
+                    // Mantel: its tags are mantel-v<version>, its asset Mantel.zip.
+                    let tag = MantelBuild.isMantel ? MantelUpdates.version(fromTag: rel.tagName) : rel.tagName
+                    guard let tag else { return nil }
+                    let asset = rel.assets.first { MantelBuild.isMantel ? $0.name == MantelUpdates.assetName : $0.name.hasSuffix(".dmg") }
                     return UpdateServiceSupport.ReleaseCandidate(
-                        tagName: rel.tagName,
+                        tagName: tag,
                         isPrerelease: rel.prerelease ?? false,
                         isDraft: rel.draft ?? false,
                         dmgURL: asset?.browserDownloadURL,
@@ -166,7 +171,7 @@ final class UpdateService: ObservableObject {
 
                 if let chosen = UpdateServiceSupport.selectUpdate(
                     from: candidates,
-                    currentVersion: AppInfo.version,
+                    currentVersion: MantelBuild.isMantel ? MantelUpdates.version : AppInfo.version,
                     includeBetas: self.includeBetaUpdates
                 ) {
                     let versionClean = chosen.tagName.trimmingCharacters(in: CharacterSet(charactersIn: "vV "))
@@ -193,7 +198,7 @@ final class UpdateService: ObservableObject {
     /// or the panel opens, so a new release surfaces promptly without hammering the
     /// API. The hourly timer is the floor; this makes it feel immediate.
     func checkIfStale(maxAge: TimeInterval = 15 * 60) {
-        if AppInfo.isDeveloperBuild { return }
+        if Self.isLocalBuild { return }
         guard autoCheckEnabled else { return }
         switch state {
         case .checking, .downloading, .installing: return
@@ -206,8 +211,14 @@ final class UpdateService: ObservableObject {
     // MARK: - Download & install
 
     func downloadAndInstall() {
-        if AppInfo.isDeveloperBuild { return }  // never replace the local dev build over itself
+        if Self.isLocalBuild { return }  // never replace the local dev build over itself
         guard let downloadURL else { return }
+        // Mantel: the release page unless "Install updates for me" is on.
+        if MantelBuild.isMantel, !MantelUpdates.installsForMe || MantelUpdates.signerRequirement() == nil
+            || !FileManager.default.isWritableFile(atPath: (Bundle.main.bundlePath as NSString).deletingLastPathComponent) {
+            if case let .available(version) = state { MantelUpdates.openReleasePage(version: version) }
+            return
+        }
         // Pre-flight BEFORE spending the download: a translocated app or one
         // running from a read-only volume (the mounted DMG) can never be
         // replaced in place, so say so now instead of after the download.
@@ -277,7 +288,7 @@ final class UpdateService: ObservableObject {
                     }
                     // Move out of the session's scratch space before handing off.
                     let dmgURL = FileManager.default.temporaryDirectory
-                        .appendingPathComponent("Vorssaint-update.dmg")
+                        .appendingPathComponent(MantelBuild.isMantel ? "Mantel-update.zip" : "Vorssaint-update.dmg")
                     try? FileManager.default.removeItem(at: dmgURL)
                     do {
                         try FileManager.default.moveItem(at: tempURL, to: dmgURL)
@@ -328,8 +339,9 @@ final class UpdateService: ObservableObject {
 
         let appDirectory = (appPath as NSString).deletingLastPathComponent
         let lastFailure = UserDefaults.standard.string(forKey: DefaultsKey.updateLastInstallFailure)
-        if fm.isWritableFile(atPath: appDirectory),
-           !UpdateInstallerSupport.shouldForceAdminInstall(afterFailureCode: lastFailure) {
+        // Mantel: no admin route; an unwritable folder fails at the copy and is reported.
+        if MantelBuild.isMantel || (fm.isWritableFile(atPath: appDirectory)
+           && !UpdateInstallerSupport.shouldForceAdminInstall(afterFailureCode: lastFailure)) {
             launchUserInstaller(appPath: appPath, dmgPath: dmgPath, pid: pid,
                                 resultPath: resultURL.path, expectedVersion: expectedVersion)
         } else {
@@ -346,7 +358,12 @@ final class UpdateService: ObservableObject {
         let scriptURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("vorssaint-update-\(pid)-\(UUID().uuidString).sh")
         do {
-            try UpdateInstallerSupport.installerScript()
+            // Mantel: its own zip installer, pinned to this copy's signing certificate.
+            let script = MantelBuild.isMantel
+                ? MantelUpdates.signerRequirement().map(MantelUpdates.installerScript(requirement:))
+                : UpdateInstallerSupport.installerScript()
+            guard let script else { throw CocoaError(.fileReadNoPermission) }
+            try script
                 .write(to: scriptURL, atomically: true, encoding: .utf8)
         } catch {
             failInstall(dmgPath: dmgPath, message: error.localizedDescription)
@@ -467,7 +484,7 @@ final class UpdateService: ObservableObject {
         let s = L10n.shared.s
         Notifier.post(title: s.updateNotifyTitle,
                       body: "\(s.updateInstallFailedBody) (\(code))")
-        if !AppInfo.isDeveloperBuild {
+        if !Self.isLocalBuild {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
                 self?.check(manual: false)
             }

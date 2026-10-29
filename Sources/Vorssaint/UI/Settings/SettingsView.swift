@@ -634,6 +634,8 @@ struct UpdatesView: View {
                 SettingsCaptionText(l10n.s.includeBetaUpdatesCaption)
             }
 
+            if MantelBuild.isMantel { MantelUpdatesToggle() }  // Mantel
+
             statusRow
 
             HStack {
