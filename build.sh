@@ -82,8 +82,19 @@ if (( DEV )); then
     SIGNING_SLUG="mantel"
 fi
 export SIGNING_IDENTITY="$LEGACY_IDENTITY" SIGNING_SLUG SIGNING_ORG="${${LEGACY_IDENTITY%% *}}"
+# Mantel: the signing keychain's password lives in the login keychain (item
+# "mantel-signing-keychain"), not in this public script. Until it is moved
+# there (SPEC §6), the old password still works.
+SIGNING_KEYCHAIN_PASSWORD="$SIGNING_SLUG-signing"
+if (( DEV )); then
+    SIGNING_KEYCHAIN_PASSWORD="$(security find-generic-password -s mantel-signing-keychain -a "$USER" -w 2>/dev/null \
+        || echo "$SIGNING_KEYCHAIN_PASSWORD")"
+fi
+export SIGNING_KEYCHAIN_PASSWORD
 
 developer_id_identity() {
+    # Mantel: always Mantel's own identity; updates are pinned to its certificate.
+    (( DEV )) && return 0
     security find-identity -v -p codesigning 2>/dev/null \
         | grep 'Developer ID Application' \
         | head -1 \
@@ -97,7 +108,7 @@ legacy_identity_installed() {
     local probe signed=1
     # A locked keychain still lists its identities but cannot sign with them,
     # and this one is locked after every reboot; unlock it before asking.
-    security unlock-keychain -p "$SIGNING_SLUG-signing" \
+    security unlock-keychain -p "$SIGNING_KEYCHAIN_PASSWORD" \
         "$HOME/Library/Keychains/$SIGNING_SLUG-signing.keychain-db" 2>/dev/null || true
     probe="$(mktemp)"
     cp /bin/echo "$probe"
@@ -125,6 +136,8 @@ if (( DEV || INSTALL )) && [[ -z "$(developer_id_identity)" ]] \
         echo "    System Settings will show them as granted while the app is not trusted." >&2
         echo "    After fixing the identity, clear the stale grant once with:" >&2
         echo "      tccutil reset Accessibility $APP_BUNDLE_ID" >&2
+        # Mantel: an ad-hoc build loses permissions and cannot update; stop.
+        (( DEV )) && exit 1
     fi
 fi
 
@@ -805,6 +818,11 @@ xattr -c -r "$STAGE" 2>/dev/null || true
 #      designated requirement across their local builds.
 #   3. Ad-hoc — fresh clone with no identity at all.
 DEVID="$(developer_id_identity)"
+# Mantel: a friends build signed ad-hoc could never update itself; stop instead.
+if (( ${FRIENDS:-0} )) && ! legacy_identity_installed; then
+    echo "✗ Mantel Signing cannot sign (keychain locked or missing): no friends zip built." >&2
+    exit 1
+fi
 codesign_app() {
     local target="$1"
     if [[ -n "$DEVID" ]]; then

@@ -27,7 +27,8 @@ IDENTITY="${SIGNING_IDENTITY:-Vorssaint Utils Signing}"
 SIGNING_SLUG="${SIGNING_SLUG:-vorssaint}"
 SIGNING_ORG="${SIGNING_ORG:-Vorssaint}"
 KC="$HOME/Library/Keychains/$SIGNING_SLUG-signing.keychain-db"
-KCPASS="$SIGNING_SLUG-signing"
+# Mantel: build.sh passes the password from the login keychain.
+KCPASS="${SIGNING_KEYCHAIN_PASSWORD:-$SIGNING_SLUG-signing}"
 
 # A find-identity listing also names certificates codesign then rejects, and -v
 # excludes every self-signed one; ask codesign itself with a throwaway copy.
@@ -46,6 +47,13 @@ identity_can_sign() {
 if identity_can_sign; then
     echo "✓ Signing identity already installed."
     exit 0
+fi
+
+# Mantel: friends' updates and macOS permissions are pinned to this
+# certificate; never replace an existing one without a person deciding to.
+if [[ "$SIGNING_SLUG" == mantel && -f "$KC" ]]; then
+    echo "✗ $KC exists but cannot sign (wrong password?). Not replacing it: a new certificate breaks friends' updates." >&2
+    exit 1
 fi
 
 WORK="$(mktemp -d)"
