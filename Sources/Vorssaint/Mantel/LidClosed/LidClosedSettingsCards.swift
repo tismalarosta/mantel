@@ -46,6 +46,10 @@ struct NetworkFallbackSettingsCard: View {
                 }
                 Text(text.loginNote).font(.caption).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if !service.missingLogins.isEmpty {
+                    Text(text.loginMissingHelp).font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .padding(.leading, settingsRowTextInset)
             .disabled(!service.hasLocation)
@@ -97,6 +101,10 @@ struct NetworkFallbackSettingsCard: View {
             if service.allowedLogins.contains(ssid) {
                 Label(text.loginAllowed, systemImage: "key.fill")
                     .font(.caption).foregroundStyle(.green)
+            } else if service.missingLogins.contains(ssid) {
+                Label(text.loginMissing, systemImage: "info.circle")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .help(text.loginMissingHelp)
             } else {
                 Button(text.loginAllow) { service.allowLogin(for: ssid) }
                     .controlSize(.small)

@@ -29,6 +29,7 @@ struct LidClosedFeatureStrings {
     let loginAllowed = "Login allowed"
     let loginAllow = "Allow login"
     let loginMissing = "No saved login"
+    let loginMissingHelp = "This Mac has no password saved for this network. An open network is joined without one. A network that signs you in on a web page (like ESSEC STUDENT) cannot be signed into with the lid shut: if it asks again, Mantel falls back to the hotspot."
     let loginNote = "\"Allow login\": macOS asks once for your Mac password so Mantel can read the saved Wi-Fi password, or the username and password of a school network like ESSEC. Click Always Allow. Needed because the lid will be shut when the switch happens."
     let remove = "Remove"
     let hotspot = "iPhone hotspot fallback"

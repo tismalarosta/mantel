@@ -35,6 +35,8 @@ final class NetworkFallbackService: NSObject, ObservableObject, CLLocationManage
     @Published private(set) var locationStatus = CLAuthorizationStatus.notDetermined
     /// The networks this Mac knows, for the Add menu; empty without Location.
     @Published private(set) var knownNetworks: [String] = []
+    /// Networks "Allow login" found no saved password for (open or web sign-in).
+    @Published private(set) var missingLogins: Set<String> = []
 
     private var installed = false
     private let location = CLLocationManager()
@@ -233,7 +235,9 @@ final class NetworkFallbackService: NSObject, ObservableObject, CLLocationManage
         queue.async { [weak self] in
             let login = WiFiCredentials.saved(for: ssid)
             DispatchQueue.main.async {
-                guard let self, let login else { NSSound.beep(); return }
+                guard let self else { return }
+                guard let login else { self.missingLogins.insert(ssid); return }
+                self.missingLogins.remove(ssid)
                 self.logins[ssid] = login
                 self.objectWillChange.send()
                 var allowed = self.allowedLogins
