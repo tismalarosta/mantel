@@ -70,6 +70,14 @@ struct EnergySettings: View {
                     LidAnimationSettingsCard()
                         .settingsSectionAnchor(.lidAnimation, cornerRadius: 16)
                 }
+                if (focus == nil || focus == .networkFallback), AppFeature.networkFallback.isAvailable {
+                    NetworkFallbackSettingsCard()
+                        .settingsSectionAnchor(.networkFallback, cornerRadius: 16)
+                }
+                if (focus == nil || focus == .lidPause), AppFeature.lidPause.isAvailable {
+                    LidPauseSettingsCard()
+                        .settingsSectionAnchor(.lidPause, cornerRadius: 16)
+                }
             }
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)

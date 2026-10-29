@@ -386,7 +386,7 @@ enum FeatureCatalogTests {
 
         // MARK: Features hub catalog
 
-        suite.expect(AppFeature.allCases.count == 93, "feature catalog has 93 features")
+        suite.expect(AppFeature.allCases.count == 95, "feature catalog has 95 features")
         suite.expect(Set(AppFeature.allCases.map(\.rawValue)).count == AppFeature.allCases.count,
                "feature ids are unique")
         suite.expect(AppFeature.allCases.map(\.rawValue) == [
@@ -395,6 +395,7 @@ enum FeatureCatalogTests {
             "mouseClickDebounce", "keyboardDebounce", "textSnippets", "superKey", "quitWindowProtection",
             "clipboardHistory", "pastePlain", "finderCutPaste", "finderRename", "shelf", "urlCleaner",
             "diskImageInstaller", "typeClipboard", "lidAnimation", "menuBarHider",
+            "networkFallback", "lidPause",
             "dockQuitClick", "dockScroll", "dockPreviewMassActions", "dockPreviewWindowButtons",
             "dockPreviewSwipe", "dockPreviewShake", "titleBarScroll",
             "trackpadSwitcherSwipe", "dockActiveIndicator", "dockLock", "dockAppCards",
@@ -1955,8 +1956,9 @@ enum FeatureCatalogTests {
         suite.expect(!pageVisible(.energy, available: allFeatures.subtracting([.keepAwake, .brightness,
                                                                          .extraBrightness,
                                                                          .bluetoothSleep,
-                                                                         .lidAnimation])),
-               "energy hides when all five of its features are off")
+                                                                         .lidAnimation,
+                                                                         .networkFallback, .lidPause])),
+               "energy hides when all seven of its features are off")
         suite.expect(pageVisible(.energy, available: [.lidAnimation]),
                "Mantel's lid animation alone keeps the energy page")
         suite.expect(pageVisible(.energy, available: [.extraBrightness]), "XDR alone keeps the energy page")

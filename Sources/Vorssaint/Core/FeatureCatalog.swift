@@ -23,6 +23,7 @@ enum AppFeature: String, CaseIterable {
          diskImageInstaller
     // Mantel additions, appended so every Vorssaint id keeps its place
     case typeClipboard, lidAnimation, menuBarHider
+    case networkFallback, lidPause
     // Mantel: DockDoor extras (SPEC §3C)
     case dockQuitClick, dockScroll, dockPreviewMassActions, dockPreviewWindowButtons
     // Mantel: DockDoor extras, batch 2 (SPEC §3C: C3, C4, C8)
@@ -127,7 +128,8 @@ extension AppFeature {
             return .clipboardFiles
         case .mixer, .soundOutputSwitcher, .audioPriority, .micMute, .musicBlock:
             return .sound
-        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation:
+        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation,
+             .networkFallback, .lidPause:
             return .energyDisplay
         case .quickLauncher, .quickToggles, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
@@ -174,6 +176,8 @@ extension AppFeature {
         case .pastePlain: return "doc.plaintext"
         case .typeClipboard: return "keyboard.badge.ellipsis"
         case .lidAnimation: return "macbook"
+        case .networkFallback: return "wifi"
+        case .lidPause: return "pause.circle"
         case .menuBarHider: return "menubar.rectangle"
         case .dockQuitClick: return "power"
         case .dockScroll: return "scroll"
@@ -339,7 +343,7 @@ extension AppFeature {
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .scratchpad,
              .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager,
              .monitorCPU, .monitorGPU, .monitorMemory, .monitorNetwork, .monitorDisk, .monitorPower,
-             .connectedDevices, .fanControl:
+             .connectedDevices, .fanControl, .networkFallback, .lidPause:
             return []
         }
     }
@@ -444,7 +448,9 @@ extension AppFeature {
              .soundOutputSwitcher, .audioPriority,
              .extraBrightness, .bluetoothSleep, .quickLauncher, .colorPicker, .micMute, .mediaTools,
              .scratchpad, .wallpaper, .monitorGPU, .monitorNetwork, .connectedDevices, .fanControl, .killProcess,
-             .portManager:
+             .portManager,
+             // Mantel: Location is asked from Stay Online's own card.
+             .networkFallback, .lidPause:
             return []
         }
     }
@@ -545,7 +551,7 @@ extension AppFeature {
             return true
         case .focusFollowsMouse, .scrollHorizontal, .linearScroll, .diskImageInstaller, .audioPriority,
              .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .spacesOrder,
-             .lidAnimation, .menuBarHider,
+             .lidAnimation, .menuBarHider, .networkFallback, .lidPause,
              .dockQuitClick, .dockScroll, .dockPreviewMassActions, .dockPreviewWindowButtons,
              .dockPreviewSwipe, .dockPreviewShake, .titleBarScroll,
              .trackpadSwitcherSwipe, .dockActiveIndicator, .dockLock, .dockAppCards,

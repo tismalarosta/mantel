@@ -66,6 +66,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             UNUserNotificationCenter.current().delegate = self
         }
         beginStartupWatch()
+        // Mantel: apps Lid Pause froze before a crash run again.
+        LidPauseService.resumeLeftovers()
         Self.boundAccessibilityWaits()
         // Pay the first AppKit process lookup before an input callback needs
         // it. Each click still resolves the current process independently.
@@ -323,6 +325,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         PreciseVolumeRollerService.shared.stop()
         AppVolumeMixer.shared.stopAll()
         FanControlService.restoreBeforeTerminationIfNeeded()
+        // Mantel: nothing stays frozen after Mantel quits.
+        LidPauseService.resumeLeftovers()
         // Restore a singular preferred-microphone override. An active
         // microphone priority selection remains the system input on quit.
         AudioInputDeviceManager.shared.stop()

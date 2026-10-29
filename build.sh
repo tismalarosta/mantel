@@ -429,6 +429,8 @@ if (( TEST )); then
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasSupport.swift
         Sources/Vorssaint/Mantel/MantelBuild.swift
         Sources/Vorssaint/Mantel/Updates/MantelUpdates.swift
+        Sources/Vorssaint/Mantel/NetworkFallback/NetworkFallbackSupport.swift
+        Sources/Vorssaint/Mantel/LidPause/LidPauseSupport.swift
         Sources/Vorssaint/Mantel/DockExtras/DockExtrasStrings.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchDesign.swift
         Sources/Vorssaint/Mantel/BoringNotch/BoringNotchMusicSupport.swift

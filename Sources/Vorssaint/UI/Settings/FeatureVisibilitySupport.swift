@@ -60,6 +60,8 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
     case typeClipboard
     case lidAnimation
     case menuBarHider
+    case networkFallback
+    case lidPause
     case dockExtras
 
     var page: SettingsPage {
@@ -67,7 +69,8 @@ enum SettingsSectionAnchor: String, CaseIterable, Hashable {
         case .panelConfiguration, .mixer, .audioPriority, .musicBlocking,
              .soundOutputSwitcher, .menuBarHider:
             return .general
-        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation: return .energy
+        case .keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation,
+             .networkFallback, .lidPause: return .energy
         case .scrollDirection, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts,
              .middleClick, .mouseClickDebounce:
             return .mouse
@@ -360,6 +363,10 @@ extension AppFeature {
             return FeatureSettingsDestination(.energy, sectionAnchor: .bluetoothSleep)
         case .lidAnimation:
             return FeatureSettingsDestination(.energy, sectionAnchor: .lidAnimation)
+        case .networkFallback:
+            return FeatureSettingsDestination(.energy, sectionAnchor: .networkFallback)
+        case .lidPause:
+            return FeatureSettingsDestination(.energy, sectionAnchor: .lidPause)
 
         case .quickLauncher:
             return FeatureSettingsDestination(.quickTools, sectionAnchor: .quickLauncher)
@@ -413,7 +420,8 @@ enum FeatureVisibilitySupport {
     /// always shows (General, Shortcuts, About and friends).
     static func features(for page: SettingsPage) -> [AppFeature] {
         switch page {
-        case .energy: return [.keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation]
+        case .energy: return [.keepAwake, .brightness, .extraBrightness, .bluetoothSleep, .lidAnimation,
+                              .networkFallback, .lidPause]
         case .monitor: return monitorFeatures
         case .mouse: return [.scrollInverter, .scrollHorizontal, .focusFollowsMouse, .smoothScroll, .linearScroll, .mouseAcceleration, .mouseNavigation, .mouseButtonShortcuts,
                              .middleClick, .mouseClickDebounce]

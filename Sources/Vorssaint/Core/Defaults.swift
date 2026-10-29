@@ -587,6 +587,12 @@ enum DefaultsKey {
     static let lidAnimationSoftness = "lidAnimationSoftness"
     static let lidAnimationShadow = "lidAnimationShadow"
     static let lidAnimationPauseShortcut = "lidAnimationPauseShortcut"
+    // Mantel: Stay Online and Lid Pause (lid closed)
+    static let networkFallbackPriority = "networkFallbackPriority"
+    static let networkFallbackAllowedPasswords = "networkFallbackAllowedPasswords"
+    static let networkFallbackRestartWiFi = "networkFallbackRestartWiFi"
+    static let lidPauseKeepList = "lidPauseKeepList"
+    static let lidPausePausedPIDs = "lidPausePausedPIDs"
     // Mantel: menu bar hider (from Ice)
     static let menuBarHiderEnabled = "menuBarHiderEnabled"
     static let menuBarHiderShowOnClick = "menuBarHiderShowOnClick"
@@ -1830,6 +1836,7 @@ enum Defaults {
         DefaultsKey.lidAnimationSoftness: 0.65,
         DefaultsKey.lidAnimationShadow: 0.65,
         DefaultsKey.lidAnimationPauseShortcut: GlobalShortcut.lidAnimationPauseDefault.storageValue,
+        DefaultsKey.networkFallbackRestartWiFi: true,
         DefaultsKey.menuBarHiderEnabled: false,
         DefaultsKey.menuBarHiderShowOnClick: true,
         DefaultsKey.menuBarHiderShowOnHover: false,

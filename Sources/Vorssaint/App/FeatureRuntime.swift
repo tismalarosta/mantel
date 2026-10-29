@@ -337,6 +337,9 @@ final class FeatureRuntime: ObservableObject {
         .bluetoothSleep: { BluetoothSleepService.shared.syncWithPreferences() },
         .lidAnimation: { MainActor.assumeIsolated { LidAnimationService.shared.syncWithPreferences() } },
         .menuBarHider: { MenuBarHiderService.shared.syncWithPreferences() },
+        // Mantel
+        .networkFallback: { NetworkFallbackService.shared.syncWithPreferences() },
+        .lidPause: { LidPauseService.shared.syncWithPreferences() },
         .quickLauncher: { QuickLauncherService.shared.syncWithPreferences() },
         .colorPicker: {
             ScreenCaptureService.shared.syncWithPreferences()

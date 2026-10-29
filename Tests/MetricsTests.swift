@@ -195,6 +195,8 @@ struct MetricsTests {
             ("mantel-branding", { MantelBrandingTests.run(suite) }),
             ("mantel-updates", { MantelUpdatesTests.run(suite) }),
             ("boring-notch", { BoringNotchDesignTests.run(suite) }),
+            ("network-fallback", { NetworkFallbackTests.run(suite) }),
+            ("lid-pause", { LidPauseTests.run(suite) }),
         ]
         var selected = Set<String>()
         var listOnly = false

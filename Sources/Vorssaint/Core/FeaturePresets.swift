@@ -131,6 +131,9 @@ extension AppFeature {
         case .notchAccessories: return .periodic
         // Mantel: reads the lid angle sensor many times a second.
         case .lidAnimation: return .periodic
+        // Mantel: a lid read every 2 s and a Wi-Fi check a minute, only while
+        // Keep Awake is in closed-lid mode.
+        case .networkFallback, .lidPause: return .periodic
         // Mantel: looks at the Dock once a second to follow its icons.
         case .dockActiveIndicator: return .periodic
         // Mantel: captures the open Dock preview again several times a second.
