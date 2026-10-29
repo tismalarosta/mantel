@@ -1062,6 +1062,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             guard let self, self.popover.isShown else { return }
             guard !PanelInteractionState.shared.preventsPopoverDismissal else { return }
             guard self.statusController.containsStatusItem(at: NSEvent.mouseLocation) == false else { return }
+            // Mantel: macOS 27 sometimes reports a click on the panel itself here
+            // (traced 2026-10-29: a section tab closed the panel).
+            guard self.popover.contentViewController?.view.window?.frame.contains(NSEvent.mouseLocation) != true else { return }
             self.closePopover(reason: .outsideClick)
         }
 
