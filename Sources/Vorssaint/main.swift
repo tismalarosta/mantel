@@ -16,6 +16,7 @@ if CommandLine.arguments.contains("--notch-presentation-test") {
 }
 #endif
 
+MainActor.assumeIsolated { RenderCheck.runIfRequestedAndExit() }  // Mantel: offscreen PNGs
 if CommandLine.arguments.contains("--selftest") {
     SelfTest.runAndExit()
 }
